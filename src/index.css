@@ -1,1 +1,131 @@
 @import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens — implements docs/05-ui-ux-spec.md §4 (typography) and §5 (colour).
+   Values traced to docs/01-brand-guidelines.md §3–4.
+   --------------------------------------------------------------------------- */
+@theme {
+  /* Ground and surfaces (S5.1) */
+  --color-ground: var(--color-zinc-950);
+  --color-surface: var(--color-zinc-900);
+  --color-surface-raised: var(--color-zinc-800);
+  --color-hairline: var(--color-zinc-800);
+  --color-hairline-strong: var(--color-zinc-700);
+
+  /* Text — zinc-500/600 are deliberately absent; they fail AA (S5.2) */
+  --color-ink: var(--color-zinc-100); /* 18.07:1 on ground */
+  --color-ink-muted: var(--color-zinc-300); /* 13.45:1 */
+  --color-ink-subtle: var(--color-zinc-400); /* 7.56:1 — floor for muted text */
+
+  /* Brand accent (S5.4) */
+  --color-brand: var(--color-lime-400); /* 12.95:1 on ground */
+  --color-brand-hover: var(--color-lime-300);
+  --color-brand-dim: var(--color-lime-500);
+
+  /* Semantic accents — one meaning each (S5.3) */
+  --color-verified: var(--color-emerald-400);
+  --color-attention: var(--color-amber-300);
+  --color-info: var(--color-blue-400);
+
+  /* Fluid type scale (S4.4) */
+  --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
+  --text-h2: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+  --text-h3: clamp(1.125rem, 1.05rem + 0.3vw, 1.375rem);
+  --text-lead: clamp(1.0625rem, 1rem + 0.28vw, 1.25rem);
+
+  /* Fluid section rhythm */
+  --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
+
+  /* Accordion open/close — height-based, but confined to the panel so it
+     cannot shift the rest of the page (S6.1 "no layout-shifting animation"). */
+  --animate-accordion-down: accordion-down 200ms ease-out;
+  --animate-accordion-up: accordion-up 200ms ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky header never covers a heading */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-ground);
+    color: var(--color-ink-muted);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible focus on every interactive element (S7.5) */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Body copy defaults (S4.5) */
+  p {
+    line-height: 1.65;
+  }
+
+  /* Reduced motion (S6.3) — decorative motion off, functional transitions clamped */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 150ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Measure cap for prose (S4.5) */
+  .measure {
+    max-width: 65ch;
+  }
+
+  /* Static ground treatment replacing the animated matrix wash (S6.2).
+     A fixed gradient + grid: cinematic depth at zero runtime cost. */
+  .ground-field {
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        color-mix(in oklab, var(--color-brand) 10%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(to right, var(--color-zinc-900) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-zinc-900) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      4rem 4rem,
+      4rem 4rem;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+  }
+}

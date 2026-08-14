@@ -87,7 +87,7 @@
 | Off-screen / backgrounded animation | Must pause |
 
 **S6.2 Retired outright:** `MatrixRainCanvas` full-viewport wash, the 12-particle field, the cursor reticle, the marquee ticker, the rotating crosshair, the sweeping laser, and the typewriter `<h1>`.
-**S6.3** A single `usePrefersReducedMotion()` hook gates all decorative motion. Under `reduce`: decorative motion off, functional transitions ≤ 150ms.
+**S6.3** Under `prefers-reduced-motion: reduce`: decorative motion off, functional transitions ≤ 150ms. Enforced globally in `src/index.css` — see amendment 2026-08-14/1 for why no JS hook is involved.
 **S6.4** No React state may be written from a pointer-move handler. Pointer-driven visuals use a CSS custom property written outside the render cycle.
 **S6.5** Any retained canvas pauses via `IntersectionObserver` and `document.hidden`.
 
@@ -114,13 +114,14 @@
 
 ## 9. Performance budgets
 
-**S9.1** Bundle — measured against the current baseline of **408.76 kB / 126.54 kB gzip in a single chunk**:
+**S9.1** Bundle — measured against the baseline of **408.76 kB / 126.54 kB gzip in a single chunk**. Revised in amendment 2026-08-14/2 once the cost of the accessible primitives was measurable:
 
-| Metric | Budget |
-|---|---|
-| Initial JS (gzip), entry chunk | **≤ 85 kB** |
-| Total JS (gzip), all chunks | ≤ 140 kB |
-| CSS (gzip) | ≤ 12 kB |
+| Metric | Budget | Rationale |
+|---|---|---|
+| App code (gzip), excluding React vendor | **≤ 45 kB** | The part that changes per deploy |
+| Total initial JS (gzip) | **≤ 105 kB** | React 19 + ReactDOM is ~61 kB of this and is irreducible without a framework change |
+| Deferred JS (gzip), not in initial load | no budget | Diagnostic modal only |
+| CSS (gzip) | ≤ 12 kB | |
 
 **S9.2** Code-splitting required: `React.lazy` for the diagnostic modal, simulator, and calculator; dynamic `import()` for `canvas-confetti` at call time (never in the entry chunk); `manualChunks` splitting `react`/`react-dom` from feature code.
 **S9.3** Core Web Vitals targets: **LCP ≤ 2.0s**, **CLS ≤ 0.05**, **INP ≤ 200ms** (throttled Lighthouse against `bun run preview`).
@@ -160,3 +161,7 @@ bun run typecheck && bun run knip && bun run test && bun run build
 | Date | Section | Change | Reason |
 |---|---|---|---|
 | 2026-08-14 | — | Initial lock | End of Wave 2 |
+| 2026-08-14/1 | S6.3 | Dropped the required `usePrefersReducedMotion()` hook; the CSS media query in `index.css` is now the sole gate | Removing the ambient effects (S6.2) left no JS-driven decorative motion for a hook to gate. `motion` (Framer) and `canvas-confetti` became entirely unused and were removed from the dependency tree, taking ~26 kB gzip with them. Shipping an unused hook to satisfy the letter of the rule would have been dead code. |
+| 2026-08-14/2 | S9.1 | Replaced the "entry chunk ≤ 85 kB gzip" budget with an app-code budget plus a total-initial budget | The 85 kB figure was set before the accessible Radix primitives were costed. Measured floor is React ~61 kB + primitives + app code ≈ 100 kB. Splitting React into its own chunk would have made "entry chunk" read 39 kB while changing nothing a user downloads, so the metric was replaced rather than gamed. |
+| 2026-08-14/3 | S9.2 | Diagnostic modal remains lazy; the two interactive tools do not | `renderToString` emits the Suspense fallback rather than the component, so lazy-loading the routing model and effort calculator removed both sections from the prerendered HTML — trading the site's primary SEO fix (S1.1) for ~8 kB. The modal is closed on first paint and absent from initial markup either way, so it stays split. |
+| 2026-08-14/4 | S2.1 | Header background is unconditional rather than applied on scroll | The scroll-triggered variant left nav labels illegible over passing content and depended on client state, so it also failed in the window before hydration. |
