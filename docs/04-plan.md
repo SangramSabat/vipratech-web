@@ -1,5 +1,10 @@
 # VipraTech Marketing Site — Impeccable Wave Plan
 
+> **Status: executed and superseded in places.** This is the plan **as approved at the Wave 1 gate**, kept as the record of what was decided and why. Where implementation contradicted it, the authority is
+> [`05-ui-ux-spec.md` §12 Amendments](./05-ui-ux-spec.md#12-amendments) — not this file.
+>
+> Known divergences: the `usePrefersReducedMotion` hook (amendment 1), the 85 kB entry-chunk budget (amendment 2), lazy-loading the two interactive tools (amendment 3), and the single-`<nav>` rule (Wave 5 verification). Read the amendments before treating anything below as current.
+
 ## Context
 
 `vipratech-web` is the public marketing site for VipraTech Labs (applied-AI engineering: document reconciliation, AI agent red-teaming, voice AI, revenue automation, AI product research). It is a single-page React 19 + Vite 6 + Tailwind v4 client-rendered SPA, statically deployed to GitHub Pages, with no backend, no analytics, and no lead database. The conversion terminus is an in-browser "Fit Diagnostic" that ends in a prefilled `mailto:`.

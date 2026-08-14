@@ -14,7 +14,10 @@ export const Tabs = TabsPrimitive.Root;
 export function TabsList({ className, ...props }: ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
-      className={cn("flex gap-2 overflow-x-auto pb-4", className)}
+      // Wraps rather than scrolling once there is room for a second row: the
+      // five offers overflowed a single row at desktop widths, hiding the last
+      // one behind a scroll with no affordance while the heading counted five.
+      className={cn("flex gap-2 overflow-x-auto pb-4 sm:flex-wrap sm:overflow-visible", className)}
       {...props}
     />
   );

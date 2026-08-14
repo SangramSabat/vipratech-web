@@ -153,14 +153,14 @@ function LabelledSlider({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="text-sm font-medium text-ink">
+        <span id={`${id}-label`} className="text-sm font-medium text-ink">
           {label}
-        </label>
+        </span>
         <span className="font-mono text-sm font-bold text-brand tabular-nums">{display}</span>
       </div>
       <Slider
         id={id}
-        aria-label={label}
+        label={label}
         value={[value]}
         min={min}
         max={max}
