@@ -70,6 +70,15 @@ test.describe('diagnostic integrity (spec S10.1–S10.4)', () => {
 
     await expect(dialog.getByText('Probably not yet')).toBeVisible();
     await expect(dialog.getByText(/rule engine will be cheaper/i)).toBeVisible();
+
+    // A weak verdict must not headline the sprint it just advised against.
+    // Assert the headline itself, not a substring match: Playwright's `name`
+    // matching is substring by default and would find the sprint inside the
+    // conditional "If you did run the ... " subheading.
+    await expect(dialog.getByRole('heading', {level: 3})).toHaveText(
+      'No sprint recommended yet',
+    );
+    await expect(dialog.getByText(/if you did run the/i)).toBeVisible();
   });
 
   test('the workflow selector drives the recommended sprint', async ({page}) => {

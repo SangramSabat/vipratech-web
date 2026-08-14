@@ -99,14 +99,22 @@ const sitemap = [
 await writeFile(path.join(distDir, "sitemap.xml"), sitemap, "utf8");
 
 // GitHub Pages serves this for unknown paths.
+//
+// The app bundle is stripped deliberately. It is a static page with one link,
+// so it needs no JavaScript — and leaving the script in meant the bundle booted,
+// found no route matching "/404.html", fell back to the home route and rendered
+// the home page straight over the 404 (React hydration error #418). The
+// stylesheet stays so the page keeps the site's background and type.
 const notFound = withMetadata(template, {
   path: "/404.html",
   title: "Page not found — VipraTech Labs",
   description: "That page does not exist. Return to the VipraTech Labs home page.",
-}).replace(
-  ROOT_DIV,
+})
+  .replace(/\s*<script type="module"[^>]*><\/script>/g, "")
+  .replace(
+    ROOT_DIV,
   `<div id="root"><main style="min-height:100vh;display:grid;place-items:center;padding:2rem;text-align:center;font-family:ui-sans-serif,system-ui,sans-serif"><div><p style="font-family:ui-monospace,monospace;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9ae600">404</p><h1 style="margin:.75rem 0 0;font-size:2rem;font-weight:800;color:#f4f4f5">That page does not exist.</h1><p style="margin:1rem 0 2rem;color:#d4d4d8">The link may be out of date.</p><a href="/" style="display:inline-block;background:#9ae600;color:#000;font-weight:700;padding:.85rem 1.75rem;border-radius:.75rem;text-decoration:none">Back to the home page</a></div></main></div>`,
-);
+  );
 await writeFile(path.join(distDir, "404.html"), notFound, "utf8");
 
 // The SSR bundle is a build artifact, not something to publish.

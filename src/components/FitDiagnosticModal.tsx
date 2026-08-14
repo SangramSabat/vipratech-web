@@ -47,6 +47,9 @@ export function FitDiagnosticModal({
   const [analysis, setAnalysis] = useState<DiagnosticAnalysis | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Drives the honest framing of a weak result (see the result header below).
+  const isWeakFit = analysis?.fitStatus === "Probably not yet";
+
   const diagnosticInput: FitDiagnosticInput = {
     workflowType,
     challenges,
@@ -252,15 +255,26 @@ export function FitDiagnosticModal({
                 </span>
               </p>
 
+              {/*
+                A weak result must not headline the sprint it has just advised
+                against. Presenting "Probably not yet" above a recommended
+                sprint contradicts the answer the visitor was given.
+              */}
               <div className="flex flex-col gap-4 rounded-2xl border border-hairline bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="grid size-16 shrink-0 place-items-center rounded-2xl border border-brand/40 bg-brand/10 font-mono text-xl font-bold text-brand tabular-nums">
+                  <div
+                    className={`grid size-16 shrink-0 place-items-center rounded-2xl border font-mono text-xl font-bold tabular-nums ${
+                      isWeakFit
+                        ? "border-hairline-strong bg-surface-raised text-ink-subtle"
+                        : "border-brand/40 bg-brand/10 text-brand"
+                    }`}
+                  >
                     {analysis.fitScore}
                   </div>
                   <div>
                     <p className="font-mono text-sm font-bold text-ink">{analysis.fitStatus}</p>
                     <h3 className="mt-1 text-h3 font-bold text-ink">
-                      {analysis.recommendedSprint}
+                      {isWeakFit ? "No sprint recommended yet" : analysis.recommendedSprint}
                     </h3>
                     <p className="mt-1 text-sm text-ink-subtle">
                       {analysis.estimatedDurationDays}
@@ -307,7 +321,9 @@ export function FitDiagnosticModal({
 
               <div className="rounded-xl border border-hairline bg-surface/80 p-4">
                 <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
-                  A sprint would produce
+                  {isWeakFit
+                    ? `If you did run the ${analysis.recommendedSprint}, it would produce`
+                    : "A sprint would produce"}
                 </h4>
                 <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {analysis.sprintDeliverables.map((item) => (

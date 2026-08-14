@@ -150,4 +150,21 @@ test.describe('service routes', () => {
     expect(body).toContain('That page does not exist.');
     expect(body).toContain('href="/"');
   });
+
+  test('the 404 stays a 404 and does not boot the app', async ({page}) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+
+    await page.goto('/404.html', {waitUntil: 'networkidle'});
+    await page.waitForTimeout(500);
+
+    // The bundle used to load here, find no route for "/404.html", fall back to
+    // the home route and render the home page over the 404.
+    await expect(page.locator('h1')).toHaveText('That page does not exist.');
+    await expect(page.locator('script[type="module"]')).toHaveCount(0);
+    expect(errors).toEqual([]);
+
+    await page.getByRole('link', {name: /back to the home page/i}).click();
+    await expect(page.locator('h1')).toHaveText('AI for decisions you have to defend.');
+  });
 });

@@ -111,7 +111,7 @@ export function ServiceDetail({
         intro={{
           eyebrow: "Scope",
           heading: "What the work covers.",
-          subhead: `Everything below is in scope for ${service.primaryOfferName}. Anything outside it gets said out loud before the sprint starts, not after.`,
+          subhead: `Everything below is in scope for the ${service.primaryOfferName}. Anything outside it gets said out loud before the sprint starts, not after.`,
         }}
       >
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
