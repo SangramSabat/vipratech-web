@@ -40,6 +40,16 @@
 | 10 | Final CTA | `#contact` | |
 | 11 | `<footer>` | — | |
 
+**S2.1a** Routes. Each is prerendered to its own document sharing one JS bundle; there is no router library and no client-side navigation.
+
+| Path | Page | Title / description |
+|---|---|---|
+| `/` | Home | Site-level |
+| `/services/<id>/` (×5) | Service detail | Per offer, from `SERVICE_OFFERS` |
+| `/404.html` | Not found | GitHub Pages fallback |
+
+Every route emits its own `<title>`, `<meta name="description">`, canonical, and OG/Twitter tags, and appears in a generated `sitemap.xml`. Service routes emit `Service` + `BreadcrumbList` JSON-LD; the `FAQPage` node is claimed by the home route only.
+
 **S2.2** Landmarks: exactly one `<header>`, one `<main id="main">`, one `<footer>`. `<nav>` may appear more than once (primary and footer) provided each carries a distinct `aria-label`. Each numbered section is a `<section>` with `aria-labelledby` pointing at its heading id.
 **S2.3** Heading order: one `<h1>` (hero only). Each section opens with `<h2>`. No level skipped. Card titles are `<h3>`.
 **S2.4** Each of the five service panels is an `<article>`.
@@ -190,3 +200,4 @@ a screen reader actually consumes.
 | 2026-08-14/4 | S2.1 | Header background is unconditional rather than applied on scroll | The scroll-triggered variant left nav labels illegible over passing content and depended on client state, so it also failed in the window before hydration. |
 | 2026-08-14/5 | S3.3 | "Never twice in one viewport" replaced with "at most one primary CTA per section" | Measured: the six primary CTAs sit 909/1966/2067/875/2469px apart, so the routing-model and effort-calculator CTAs fall inside one 900px viewport at a section boundary. Two identical buttons invoking the same action across a boundary is the pattern the reference class uses, not a competing focal point. The original defect — six identical lime pills competing *within* one section — is what the per-section rule actually pins down. |
 | 2026-08-14/6 | S7.1 | Focus restoration on dialog close is now explicit (`returnFocusTo` + `onCloseAutoFocus`); the dialog also stays mounted while closed | Closing left keyboard users on `<body>` — a WCAG 2.4.3 failure. Radix does not restore on its own in this configuration: the dialog is controlled and portalled with no `DialogTrigger` to return to. Keeping the subtree mounted was tried first and did **not** fix it; the explicit restore did. Caught by the Playwright suite. An earlier ad-hoc check had given a false pass because it asserted `document.activeElement.textContent.includes(...)`, and `<body>`'s textContent contains the entire page. |
+| 2026-08-14/7 | S2.1, S9.6 | Five service offers split onto their own prerendered routes | One URL behind client-side tabs gave nothing to rank per offer (plan finding 5, previously parked). `scripts/prerender.mjs` now emits six documents plus a generated sitemap and a branded 404. Radix `TabsContent` also gained `forceMount`: it mounts only the active panel, so four of the five links through to the new pages were absent from the prerendered HTML and invisible to crawlers. |

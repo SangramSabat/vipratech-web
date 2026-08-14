@@ -41,9 +41,21 @@ export function TabsTrigger({
   );
 }
 
+/**
+ * `forceMount` keeps every panel in the DOM, with Radix marking the inactive
+ * ones `hidden`. Without it only the active panel is rendered, so four of the
+ * five service panels — and the links through to their pages — were absent
+ * from the prerendered HTML and invisible to crawlers.
+ */
 export function TabsContent({
   className,
   ...props
 }: ComponentProps<typeof TabsPrimitive.Content>) {
-  return <TabsPrimitive.Content className={cn("mt-8", className)} {...props} />;
+  return (
+    <TabsPrimitive.Content
+      forceMount
+      className={cn("mt-8 data-[state=inactive]:hidden", className)}
+      {...props}
+    />
+  );
 }

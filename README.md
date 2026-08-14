@@ -54,8 +54,21 @@ bun run test:e2e       # playwright, against the built artifact
 ```
 
 `bun run build` runs three steps: the client build, an SSR build into `.ssr/`, and
-`scripts/prerender.mjs`, which injects the rendered markup into `dist/index.html`
-and deletes `.ssr/`. To inspect the result locally:
+`scripts/prerender.mjs`, which renders **one HTML document per route**, generates
+`sitemap.xml` and a branded `404.html`, and deletes `.ssr/`.
+
+Routes (see `src/routes.ts`):
+
+| Path | Page |
+|---|---|
+| `/` | Home |
+| `/services/<id>/` | One per service offer, five in total |
+
+There is no router library. Each route is its own prerendered document sharing a
+single JS bundle, so links navigate normally and every offer has its own title,
+description, canonical URL and structured data.
+
+To inspect the result locally:
 
 ```bash
 bun run preview

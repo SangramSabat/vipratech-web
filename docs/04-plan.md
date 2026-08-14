@@ -158,7 +158,9 @@ Create `/docs`, in strict dependency order. Each doc states what it inherits fro
 - **Performance (finding 10)** — `React.lazy` for the modal, simulator, and calculator; dynamic `import()` for `canvas-confetti` at call time; `manualChunks` for vendor splitting; per-icon `lucide-react` imports verified tree-shaken; explicit bundle budget recorded in the Spec.
 - **Polish** — final alignment/spacing pass against the Spec; confirm `bun run knip` stays clean after the lazy-loading refactor.
 
-**Parking lot (logged, not built this cycle):** per-service routes; pricing transparency (finding 28); persona-adaptive content.
+**Parking lot (logged, not built this cycle):** pricing transparency (finding 28); persona-adaptive content.
+
+**Since built:** per-service routes (finding 5) — see `05-ui-ux-spec.md` S2.1a and amendment 2026-08-14/7.
 
 **Blocked on your input (slots built, content pending):** client logos, named testimonials, case-study metrics, and formal compliance certifications (findings 25; patterns D, E, G). See the content-dependency note in the Reference Class section.
 

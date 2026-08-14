@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   CheckCircle2,
   Cpu,
   FileSpreadsheet,
@@ -9,6 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { CTA, SECTIONS, SERVICE_OFFERS } from "../../data/companyData";
+import { servicePath } from "../../routes";
 import type { DiagnosticTriggerProps } from "../../types";
 import { Button } from "../ui/Button";
 import { Section } from "../ui/Section";
@@ -80,14 +82,26 @@ export function Services({ onOpenDiagnostic }: DiagnosticTriggerProps) {
                   <p className="mt-1.5 text-sm text-ink-muted">{service.targetAudience}</p>
                 </div>
 
-                <Button
-                  size="lg"
-                  className="mt-8 w-full"
-                  onClick={() => onOpenDiagnostic(service.title)}
-                >
-                  <Sparkles className="size-4" aria-hidden="true" />
-                  {CTA.primary}
-                </Button>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Button
+                    size="lg"
+                    className="flex-1"
+                    onClick={() => onOpenDiagnostic(service.title)}
+                  >
+                    <Sparkles className="size-4" aria-hidden="true" />
+                    {CTA.primary}
+                  </Button>
+                  <Button
+                    as="a"
+                    size="lg"
+                    variant="secondary"
+                    href={servicePath(service.id)}
+                    className="flex-1"
+                  >
+                    Read the full scope
+                    <ArrowRight className="size-4 text-brand" aria-hidden="true" />
+                  </Button>
+                </div>
               </div>
 
               <div className="rounded-2xl border border-hairline bg-surface/70 p-6 lg:col-span-5">

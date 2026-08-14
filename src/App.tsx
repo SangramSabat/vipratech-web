@@ -1,5 +1,8 @@
 import { lazy, Suspense, useRef, useState } from "react";
 import { HomePage } from "./components/HomePage";
+import { ServiceDetail } from "./pages/ServiceDetail";
+import { SERVICE_OFFERS } from "./data/companyData";
+import { HOME_ROUTE, type Route } from "./routes";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { StructuredData } from "./components/StructuredData";
@@ -10,7 +13,11 @@ const FitDiagnosticModal = lazy(() =>
   import("./components/FitDiagnosticModal").then((m) => ({ default: m.FitDiagnosticModal })),
 );
 
-export default function App() {
+export default function App({ route = HOME_ROUTE }: { route?: Route }) {
+  const service = route.serviceId
+    ? SERVICE_OFFERS.find((offer) => offer.id === route.serviceId)
+    : undefined;
+
   const [workflow, setWorkflow] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   // Mounted lazily on first use, then kept mounted (see below).
@@ -30,7 +37,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-ground font-sans text-ink selection:bg-brand selection:text-black">
-      <StructuredData />
+      <StructuredData route={route} />
 
       {/* First focusable element on the page (spec S7.6) */}
       <a
@@ -43,7 +50,11 @@ export default function App() {
       <SiteHeader />
 
       <main id="main" className="flex-1">
-        <HomePage onOpenDiagnostic={handleOpenDiagnostic} />
+        {service ? (
+          <ServiceDetail service={service} onOpenDiagnostic={handleOpenDiagnostic} />
+        ) : (
+          <HomePage onOpenDiagnostic={handleOpenDiagnostic} />
+        )}
       </main>
 
       <SiteFooter />

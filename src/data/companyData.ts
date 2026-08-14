@@ -37,12 +37,13 @@ export const CTA = {
   secondary: "Book a 30-min fit call",
 } as const;
 
+/** Root-relative so they resolve from a service page as well as the home page. */
 export const NAV_LINKS: NavLink[] = [
-  { href: "#how", label: "How it works" },
-  { href: "#why", label: "Why pilots stall" },
-  { href: "#services", label: "What we build" },
-  { href: "#products", label: "Evidence" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#how", label: "How it works" },
+  { href: "/#why", label: "Why pilots stall" },
+  { href: "/#services", label: "What we build" },
+  { href: "/#products", label: "Evidence" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 /* -------------------------------------------------------------------------- */

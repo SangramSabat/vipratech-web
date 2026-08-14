@@ -124,9 +124,13 @@ test.describe('CTA hierarchy (spec S3.2, S3.3)', () => {
     await page.goto('/');
     const perSection = await page.evaluate(() => {
       // The primary variant paints an opaque lime fill. Exclude the sr-only
-      // skip link and the active tab, which share the fill but are not CTAs.
+      // skip link and the active tab, which share the fill but are not CTAs,
+      // and anything not currently rendered — inactive tab panels stay mounted
+      // so their links are crawlable, but they compete for nothing.
       const isPrimaryCta = (el: Element) => {
         if (el.closest('.sr-only') || el.getAttribute('role') === 'tab') return false;
+        const rect = el.getBoundingClientRect();
+        if (!rect.width || !rect.height) return false;
         const bg = getComputedStyle(el).backgroundColor;
         return bg === 'oklch(0.841 0.238 128.85)' || bg === 'rgb(154, 230, 0)';
       };
