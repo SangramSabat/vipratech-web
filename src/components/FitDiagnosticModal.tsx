@@ -27,12 +27,15 @@ interface FitDiagnosticModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialWorkflow?: string;
+  /** The control that opened the dialog, so focus can be handed back to it. */
+  returnFocusTo?: HTMLElement | null;
 }
 
 export function FitDiagnosticModal({
   isOpen,
   onClose,
   initialWorkflow,
+  returnFocusTo,
 }: FitDiagnosticModalProps) {
   const [workflowType, setWorkflowType] = useState(initialWorkflow ?? SERVICE_OFFERS[0].title);
   // Nothing is pre-filled: pre-selected answers produced lead data the visitor
@@ -73,7 +76,18 @@ export function FitDiagnosticModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="fit-diagnostic-description">
+      <DialogContent
+        aria-describedby="fit-diagnostic-description"
+        // Radix does not hand focus back on its own here: the dialog is
+        // controlled and portalled with no DialogTrigger to return to, so
+        // closing left keyboard users on <body> (WCAG 2.4.3, spec S7.1).
+        // Restore explicitly to whatever opened it.
+        onCloseAutoFocus={(event) => {
+          if (!returnFocusTo?.isConnected) return;
+          event.preventDefault();
+          returnFocusTo.focus();
+        }}
+      >
         <div className="border-b border-hairline bg-surface/50 p-6 pr-16">
           <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
             Fit diagnostic

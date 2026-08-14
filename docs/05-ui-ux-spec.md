@@ -2,7 +2,7 @@
 
 > **Inherits from:** `01-brand-guidelines.md` → `02-personas.md` → `03-copywriting-matrix.md` → `04-plan.md`.
 >
-> **Status: LOCKED.** This is the single source of truth for implementation. Every change in Waves 3–5 must cite a section of this file. A decision this Spec does not cover is a flag-and-ask, not an invention. Amendments go in §10 with a dated entry — never a silent edit.
+> **Status: LOCKED.** This is the single source of truth for implementation. Every change in Waves 3–5 must cite a section of this file. A decision this Spec does not cover is a flag-and-ask, not an invention. Amendments go in §12 with a dated entry — never a silent edit.
 
 ---
 
@@ -46,7 +46,7 @@
 
 ## 3. CTA hierarchy
 
-**S3.1** Exactly **three tiers**, and **at most one primary visible per viewport**:
+**S3.1** Exactly **three tiers**, with primary use bounded by S3.3:
 
 | Tier | Style | Label | Action |
 |---|---|---|---|
@@ -55,7 +55,7 @@
 | Tertiary | Text link, `lime-400`, underline on hover | contextual | in-page anchor |
 
 **S3.2** **Every CTA label must name the action it performs.** A label saying "schedule" must open scheduling.
-**S3.3** Primary CTA appears in: hero, engagement lifecycle, simulator, calculator, final CTA. Never twice in one viewport.
+**S3.3** **At most one primary CTA per section.** It appears in: hero, engagement lifecycle, services, routing model, effort calculator, final CTA. Repeating the *same* primary action down the page is intended; two competing primaries inside one section is the defect this guards against. See amendment 2026-08-14/5.
 **S3.4** Secondary CTA is standing — present in the header and repeated at final CTA and footer.
 
 ## 4. Typography
@@ -142,19 +142,42 @@ These are correctness requirements, not polish. They exist because the site's th
 
 ## 11. Verification
 
-Run after every wave — the same gates `.github/workflows/pages.yml` enforces:
+Everything below runs from one command, and the same gates run in CI:
 
 ```bash
-bun run typecheck && bun run knip && bun run test && bun run build
+bun run verify   # typecheck -> knip -> unit tests -> build -> bundle budgets -> e2e
 ```
 
-**S11.1** Prerender: `grep -c "AI for decisions you have to defend" dist/index.html` ≥ 1.
-**S11.2** Diagnostic integrity: `fitDiagnostic.test.ts` asserts two materially different inputs yield different `fitScore` **and** different `keyRisksIdentified`.
-**S11.3** Banned tokens absent: `grep -rn "text-zinc-500\|text-zinc-600\|text-\[9px\]\|text-\[10px\]\|text-\[11px\]" src/` returns nothing.
-**S11.4** Stop-list absent: `grep -rni "kinetic\|signal matrix\|target_lock\|reticle\|cybernetic" src/` returns nothing.
-**S11.5** Bundle within S9.1 — checked against `vite build` output.
-**S11.6** Manual a11y: keyboard-only modal cycle (open → trap → Escape → focus restored), tab arrow-key navigation, and a full pass with OS reduced-motion enabled.
-**S11.7** Responsive pass at 360 / 768 / 1280 / 1920 with no horizontal scroll.
+Unit tests (`vitest`) cover the scoring function. Everything that depends on a
+real browser — prerendered HTML, hydration, the accessibility tree, contrast,
+motion, and vitals — is covered by Playwright in `e2e/`, running against the
+**built** artifact rather than the dev server.
+
+| Criterion | Where it is enforced |
+|---|---|
+| **S11.1** Prerendered content reaches a JS-disabled client | `e2e/prerender.spec.ts` — asserts the `<h1>` and all eight section headings with `javaScriptEnabled: false` |
+| **S11.2** Diagnostic responds to its input | `fitDiagnostic.test.ts` (unit) + `e2e/diagnostic.spec.ts` (through the shipped UI) |
+| **S11.3 / S11.4** Banned tokens and stop-list absent | `grep` — see below |
+| **S11.5** Bundle within S9.1 | `bun run check:bundle` (`scripts/check-bundle.mjs`) |
+| **S11.6** Accessibility | `e2e/accessibility.spec.ts` — **accessible names read from the CDP accessibility tree, never the DOM**, plus focus trap/Escape/restore, tab arrow keys, contrast, tap targets, heading order |
+| **S11.7** Responsive and motion | `e2e/responsive.spec.ts` — 360/768/1280/1920, reduced-motion, LCP and CLS |
+| Hydration correctness | `e2e/prerender.spec.ts` — fails on any console error or warning |
+| Structured data and social card | `e2e/prerender.spec.ts` — JSON-LD parsed and cross-checked, OG tags and assets fetched |
+
+Two checks remain greps, since they are about source rather than behaviour:
+
+```bash
+grep -rn "text-zinc-500\|text-zinc-600\|text-\[9px\]\|text-\[10px\]\|text-\[11px\]" src/   # S11.3
+grep -rni "kinetic\|signal matrix\|target_lock\|reticle\|cybernetic" src/                        # S11.4
+```
+
+**Why the accessibility tests query CDP rather than the DOM:** a DOM-based check
+reported every control as named because it searched ancestors for `aria-label`.
+Assistive technology does not do that. It hid five sliders whose accessible name
+was empty, and separately gave a false pass on focus restoration by asserting
+`document.activeElement.textContent.includes(...)` — `<body>`'s textContent
+contains the whole page, so that assertion could never fail. Assert against what
+a screen reader actually consumes.
 
 ## 12. Amendments
 
@@ -165,3 +188,5 @@ bun run typecheck && bun run knip && bun run test && bun run build
 | 2026-08-14/2 | S9.1 | Replaced the "entry chunk ≤ 85 kB gzip" budget with an app-code budget plus a total-initial budget | The 85 kB figure was set before the accessible Radix primitives were costed. Measured floor is React ~61 kB + primitives + app code ≈ 100 kB. Splitting React into its own chunk would have made "entry chunk" read 39 kB while changing nothing a user downloads, so the metric was replaced rather than gamed. |
 | 2026-08-14/3 | S9.2 | Diagnostic modal remains lazy; the two interactive tools do not | `renderToString` emits the Suspense fallback rather than the component, so lazy-loading the routing model and effort calculator removed both sections from the prerendered HTML — trading the site's primary SEO fix (S1.1) for ~8 kB. The modal is closed on first paint and absent from initial markup either way, so it stays split. |
 | 2026-08-14/4 | S2.1 | Header background is unconditional rather than applied on scroll | The scroll-triggered variant left nav labels illegible over passing content and depended on client state, so it also failed in the window before hydration. |
+| 2026-08-14/5 | S3.3 | "Never twice in one viewport" replaced with "at most one primary CTA per section" | Measured: the six primary CTAs sit 909/1966/2067/875/2469px apart, so the routing-model and effort-calculator CTAs fall inside one 900px viewport at a section boundary. Two identical buttons invoking the same action across a boundary is the pattern the reference class uses, not a competing focal point. The original defect — six identical lime pills competing *within* one section — is what the per-section rule actually pins down. |
+| 2026-08-14/6 | S7.1 | Focus restoration on dialog close is now explicit (`returnFocusTo` + `onCloseAutoFocus`); the dialog also stays mounted while closed | Closing left keyboard users on `<body>` — a WCAG 2.4.3 failure. Radix does not restore on its own in this configuration: the dialog is controlled and portalled with no `DialogTrigger` to return to. Keeping the subtree mounted was tried first and did **not** fix it; the explicit restore did. Caught by the Playwright suite. An earlier ad-hoc check had given a false pass because it asserted `document.activeElement.textContent.includes(...)`, and `<body>`'s textContent contains the entire page. |

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { HomePage } from "./components/HomePage";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
@@ -11,8 +11,22 @@ const FitDiagnosticModal = lazy(() =>
 );
 
 export default function App() {
-  const [diagnosticWorkflow, setDiagnosticWorkflow] = useState<string | null>(null);
-  const isOpen = diagnosticWorkflow !== null;
+  const [workflow, setWorkflow] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  // Mounted lazily on first use, then kept mounted (see below).
+  const [hasOpened, setHasOpened] = useState(false);
+  // Bumped per opening so each visit to the diagnostic starts from a blank form.
+  const [openCount, setOpenCount] = useState(0);
+  // Whatever the visitor activated to open the dialog, so focus can go back.
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  const handleOpenDiagnostic = (nextWorkflow = "") => {
+    triggerRef.current = document.activeElement as HTMLElement | null;
+    setWorkflow(nextWorkflow);
+    setHasOpened(true);
+    setOpenCount((count) => count + 1);
+    setIsOpen(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-ground font-sans text-ink selection:bg-brand selection:text-black">
@@ -29,18 +43,29 @@ export default function App() {
       <SiteHeader />
 
       <main id="main" className="flex-1">
-        <HomePage onOpenDiagnostic={(workflow = "") => setDiagnosticWorkflow(workflow)} />
+        <HomePage onOpenDiagnostic={handleOpenDiagnostic} />
       </main>
 
       <SiteFooter />
 
-      {isOpen && (
+      {/*
+        Mounted from the first open onward and left mounted while closed, so the
+        dialog can run its own close lifecycle (dismissable-layer teardown,
+        scroll-lock release) instead of having the subtree removed mid-commit.
+        The `key` changes per opening rather than on close, so the form starts
+        blank each visit without disturbing the closing transition.
+
+        Focus restoration is handled explicitly via `returnFocusTo` — keeping the
+        subtree mounted alone did not fix it (spec S7.1, amendment 2026-08-14/6).
+      */}
+      {hasOpened && (
         <Suspense fallback={null}>
           <FitDiagnosticModal
-            key={diagnosticWorkflow}
+            key={`${workflow}-${openCount}`}
             isOpen={isOpen}
-            onClose={() => setDiagnosticWorkflow(null)}
-            initialWorkflow={diagnosticWorkflow || undefined}
+            onClose={() => setIsOpen(false)}
+            initialWorkflow={workflow || undefined}
+            returnFocusTo={triggerRef.current}
           />
         </Suspense>
       )}

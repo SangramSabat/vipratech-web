@@ -34,26 +34,48 @@ Vite prints the local preview URL.
 
 ## Verification
 
+One command runs everything CI runs:
+
 ```bash
-bun run typecheck
-bun run knip
-bun run test
-bun run build
+bun run verify
 ```
 
-The production artifact is written to `dist/`. To inspect it locally:
+That chains: `typecheck` → `knip` → unit tests → `build` → bundle budgets → end-to-end tests.
+
+Individually:
+
+```bash
+bun run typecheck      # tsc
+bun run knip           # unused code and dependencies
+bun run test           # vitest, unit only (src/)
+bun run build          # client build + SSR build + prerender injection
+bun run check:bundle   # bundle budgets from docs/05-ui-ux-spec.md S9.1
+bun run test:e2e       # playwright, against the built artifact
+```
+
+`bun run build` runs three steps: the client build, an SSR build into `.ssr/`, and
+`scripts/prerender.mjs`, which injects the rendered markup into `dist/index.html`
+and deletes `.ssr/`. To inspect the result locally:
 
 ```bash
 bun run preview
 ```
 
-`bun run build` runs three steps: the client build, an SSR build into `.ssr/`, and `scripts/prerender.mjs`, which injects the rendered markup into `dist/index.html` and deletes `.ssr/`. To confirm prerendering worked:
+### End-to-end tests
 
-```bash
-grep -c "AI for decisions you have to defend" dist/index.html   # expect >= 1
-```
+`e2e/` verifies the things that only exist in a real browser against a real build:
+prerendered HTML (fetched with JavaScript disabled), hydration without console
+errors, the accessibility tree, contrast, motion budget, responsive behaviour at
+four widths, Core Web Vitals, and the diagnostic's integrity requirements.
 
-The OpenGraph card at `public/og.png` is generated from `scripts/og-template.html` by rendering it headlessly at 1200×630.
+**Accessibility assertions read the CDP accessibility tree, not the DOM.** This is
+deliberate. A DOM-based check reported every control as named because it searched
+ancestors for `aria-label` — assistive technology does not do that — and it hid
+five sliders whose accessible name was empty. Assert against what a screen reader
+actually consumes.
+
+The Playwright config prefers a preinstalled Chromium at `/opt/pw-browsers/chromium`
+when present, and otherwise uses the browser from `playwright install`.
 
 ## GitHub Pages
 

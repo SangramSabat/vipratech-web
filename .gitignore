@@ -7,3 +7,6 @@ coverage/
 .env*
 .playwright-cli/
 output/
+test-results/
+playwright-report/
+.playwright/

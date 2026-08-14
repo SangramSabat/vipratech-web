@@ -1,6 +1,7 @@
+/// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
 
 export default defineConfig(({isSsrBuild}) => ({
   base: '/',
@@ -19,5 +20,10 @@ export default defineConfig(({isSsrBuild}) => ({
               /node_modules\/(react|react-dom|scheduler)\//.test(id) ? 'react' : undefined,
       },
     },
+  },
+  test: {
+    // Unit tests only. The Playwright specs in e2e/ are driven by
+    // `bun run test:e2e` and cannot run under vitest.
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 }));

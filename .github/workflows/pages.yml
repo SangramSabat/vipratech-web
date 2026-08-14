@@ -35,6 +35,23 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Check bundle budgets
+        run: bun run check:bundle
+
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
+
+      - name: End-to-end verification
+        run: bun run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
       - name: Configure Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
