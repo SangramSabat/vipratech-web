@@ -6,7 +6,7 @@ export function SiteFooter() {
     <footer className="border-t border-hairline bg-ground py-16">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 md:grid-cols-12 lg:px-8">
         <div className="md:col-span-5">
-          <div className="flex items-center gap-2.5">
+          <div className="flex min-h-11 items-center gap-2.5">
             <svg viewBox="0 0 64 64" className="size-7" aria-hidden="true">
               <rect width="64" height="64" rx="12" className="fill-surface" />
               <path d="M14 16h10l8 28 8-28h10L38 52H26L14 16Z" className="fill-brand" />

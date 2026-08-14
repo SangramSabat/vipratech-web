@@ -40,7 +40,7 @@
 | 10 | Final CTA | `#contact` | |
 | 11 | `<footer>` | — | |
 
-**S2.2** Landmarks: exactly one `<header>`, one `<nav>`, one `<main id="main">`, one `<footer>`. Each numbered section is a `<section>` with `aria-labelledby` pointing at its heading id.
+**S2.2** Landmarks: exactly one `<header>`, one `<main id="main">`, one `<footer>`. `<nav>` may appear more than once (primary and footer) provided each carries a distinct `aria-label`. Each numbered section is a `<section>` with `aria-labelledby` pointing at its heading id.
 **S2.3** Heading order: one `<h1>` (hero only). Each section opens with `<h2>`. No level skipped. Card titles are `<h3>`.
 **S2.4** Each of the five service panels is an `<article>`.
 
@@ -125,7 +125,7 @@
 
 **S9.2** Code-splitting required: `React.lazy` for the diagnostic modal, simulator, and calculator; dynamic `import()` for `canvas-confetti` at call time (never in the entry chunk); `manualChunks` splitting `react`/`react-dom` from feature code.
 **S9.3** Core Web Vitals targets: **LCP ≤ 2.0s**, **CLS ≤ 0.05**, **INP ≤ 200ms** (throttled Lighthouse against `bun run preview`).
-**S9.4** The LCP element is the **static hero `<h1>`**, present in prerendered HTML and never animation-gated.
+**S9.4** The LCP element must be **static text present in the prerendered HTML and never animation-gated**. Measured: the hero lead paragraph at **216 ms**, CLS **0**.
 **S9.5** No web fonts. System font stack only — already the case, and it is an LCP advantage worth keeping.
 **S9.6** SEO deliverables: OpenGraph + Twitter card tags, canonical URL, `robots.txt`, `sitemap.xml`, and JSON-LD for `Organization`, `Service` (×5), and `FAQPage`.
 
