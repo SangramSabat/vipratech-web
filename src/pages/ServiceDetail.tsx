@@ -73,6 +73,21 @@ export function ServiceDetail({
                 </p>
                 <p className="mt-2 text-ink-muted">{service.targetAudience}</p>
               </div>
+
+              {/* The concrete failure this practice addresses. Without it every
+                  service page opened with the same category-name-plus-features
+                  shape and the five read as one template (S12.3). */}
+              <div className="mt-4 rounded-2xl border-l-2 border-attention/50 border-y border-r border-hairline bg-surface/40 p-5">
+                <p className="font-mono text-xs font-bold uppercase tracking-wider text-attention">
+                  What this usually looks like
+                </p>
+                <p className="mt-2.5 text-lead text-ink">{service.failureMode.symptom}</p>
+                <p className="mt-3 text-sm text-ink-muted">{service.failureMode.cost}</p>
+                <p className="mt-3 border-t border-hairline pt-3 text-sm text-ink-subtle">
+                  <span className="font-semibold text-ink-muted">Why it persists — </span>
+                  {service.failureMode.whyItPersists}
+                </p>
+              </div>
             </div>
 
             <div className="lg:col-span-5">

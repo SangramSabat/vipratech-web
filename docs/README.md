@@ -13,7 +13,7 @@ These documents form a **traceable lifecycle**. Each inherits from the one above
 ## Working rules
 
 1. **Cite the Spec.** Any change in Waves 3–5 references the `05-ui-ux-spec.md` section it satisfies. If the Spec doesn't cover it, flag it — don't invent.
-2. **Amend, don't drift.** Spec changes get a dated entry in §12. Never a silent edit.
+2. **Amend, don't drift.** Spec changes get a dated entry in §13. Never a silent edit.
 3. **Copy lives in `src/data/companyData.ts`**, and must match `03-copywriting-matrix.md`.
 4. **Evidence before claims.** No fabricated logos, testimonials, metrics, or certifications — see `01-brand-guidelines.md` §6.
 

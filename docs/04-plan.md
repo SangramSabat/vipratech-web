@@ -1,7 +1,7 @@
 # VipraTech Marketing Site — Impeccable Wave Plan
 
 > **Status: executed and superseded in places.** This is the plan **as approved at the Wave 1 gate**, kept as the record of what was decided and why. Where implementation contradicted it, the authority is
-> [`05-ui-ux-spec.md` §12 Amendments](./05-ui-ux-spec.md#12-amendments) — not this file.
+> [`05-ui-ux-spec.md` §13 Amendments](./05-ui-ux-spec.md#13-amendments) — not this file.
 >
 > Known divergences: the `usePrefersReducedMotion` hook (amendment 1), the 85 kB entry-chunk budget (amendment 2), lazy-loading the two interactive tools (amendment 3), and the single-`<nav>` rule (Wave 5 verification). Read the amendments before treating anything below as current.
 

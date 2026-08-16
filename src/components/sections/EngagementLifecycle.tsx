@@ -1,6 +1,7 @@
 import { Sparkles } from "lucide-react";
 import { CTA, ENGAGEMENT_STEPS, SECTIONS } from "../../data/companyData";
 import type { DiagnosticTriggerProps } from "../../types";
+import { cn } from "../../lib/utils";
 import { Button } from "../ui/Button";
 import { Section } from "../ui/Section";
 
@@ -20,8 +21,21 @@ export function EngagementLifecycle({ onOpenDiagnostic }: DiagnosticTriggerProps
         {ENGAGEMENT_STEPS.map((step) => (
           <li
             key={step.step}
-            className="lift flex flex-col rounded-2xl border border-hairline bg-surface/70 p-6"
+            className={cn(
+              "lift relative flex flex-col rounded-2xl border p-6",
+              // The paid sprint is what the page is actually asking for, so it
+              // carries visual weight the free call and the open-ended build do
+              // not (S12.4). Three identical cards made the ask invisible.
+              step.featured
+                ? "sheen border-brand/35 bg-brand/[0.06]"
+                : "border-hairline bg-surface/70",
+            )}
           >
+            {step.featured && (
+              <span className="absolute -top-2.5 left-6 rounded-md border border-brand/40 bg-ground px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-brand">
+                Where most engagements start
+              </span>
+            )}
             <div className="flex items-center justify-between gap-3">
               <span className="font-mono text-3xl font-extrabold text-brand">{step.step}</span>
               <span className="rounded-md bg-surface-raised px-2.5 py-1 font-mono text-xs text-ink-muted">

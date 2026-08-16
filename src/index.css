@@ -177,6 +177,26 @@
     }
   }
 
+  /* A lit top edge (S12.4). One hairline of brand light where a raised surface
+     would catch it — the cheapest way to make a card read as an object rather
+     than a rectangle, and reserved for the one featured card per section so it
+     stays a hierarchy signal instead of a texture. */
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset-inline: 1.25rem;
+    top: -1px;
+    height: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklch, var(--color-brand) 65%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+
   /* Hover lift for cards. The overshoot is what reads as considered rather
      than corporate; it costs one easing token. */
   .lift {

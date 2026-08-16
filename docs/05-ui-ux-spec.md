@@ -2,7 +2,7 @@
 
 > **Inherits from:** `01-brand-guidelines.md` → `02-personas.md` → `03-copywriting-matrix.md` → `04-plan.md`.
 >
-> **Status: LOCKED.** This is the single source of truth for implementation. Every change in Waves 3–5 must cite a section of this file. A decision this Spec does not cover is a flag-and-ask, not an invention. Amendments go in §12 with a dated entry — never a silent edit.
+> **Status: LOCKED.** This is the single source of truth for implementation. Every change in Waves 3–5 must cite a section of this file. A decision this Spec does not cover is a flag-and-ask, not an invention. Amendments go in §13 with a dated entry — never a silent edit.
 
 ---
 
@@ -214,7 +214,33 @@ was empty, and separately gave a false pass on focus restoration by asserting
 contains the whole page, so that assertion could never fail. Assert against what
 a screen reader actually consumes.
 
-## 12. Amendments
+## 12. Commercial disclosure, copy depth and card hierarchy
+
+**S12.1 Commercial terms are a section, not a footnote.** Every stage of the
+engagement publishes three things: what it costs, what the buyer commits to, and
+what they keep if they stop there. "Paid — quoted per scope" on its own reads as
+evasive; the same fact beside its basis and its exit reads as normal.
+
+**S12.2 The basis is published even when the number is not.** The reference
+class does not publish services pricing either, so a figure was never the gap —
+the gap was giving a buyer no way to reason about it. `FEE_DRIVERS` lists what
+moves the quote. `SPRINT_FEE_BAND` is `null` until a real band is supplied and
+the section reads correctly either way. **A fee figure must never be invented to
+fill the slot** — that is precisely the unevidenced claim this site exists to
+argue against (S10.2).
+
+**S12.3 Each service page must open on its own failure mode.** Every offer
+carries a `failureMode` of symptom, cost, and why it persists, written in the
+buyer's language. Without it the five pages shared one shape — category name
+plus feature list — and read as a template rather than five practices.
+
+**S12.4 One featured card per section, at most.** Where a section presents
+parallel options, the one the page is actually asking for may carry brand
+border, tint, a label and the `.sheen` lit edge; the others stay neutral. Three
+identical cards make the ask invisible. This is the CTA hierarchy rule (S3.1)
+applied to surfaces.
+
+## 13. Amendments
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
@@ -228,4 +254,5 @@ a screen reader actually consumes.
 | 2026-08-14/7 | S2.1, S9.6 | Five service offers split onto their own prerendered routes | One URL behind client-side tabs gave nothing to rank per offer (plan finding 5, previously parked). `scripts/prerender.mjs` now emits six documents plus a generated sitemap and a branded 404. Radix `TabsContent` also gained `forceMount`: it mounts only the active panel, so four of the five links through to the new pages were absent from the prerendered HTML and invisible to crawlers. |
 | 2026-08-14/8 | S10.2 | A weak diagnostic result no longer headlines the sprint it advised against | Screen-by-screen review found "Probably not yet" sitting directly above "Reconciliation Opportunity Sprint" and a list of what "a sprint would produce" — telling the visitor they likely do not need this, then presenting it as the recommendation. Weak results now read "No sprint recommended yet", carry a neutral rather than brand-coloured score, and frame deliverables conditionally. |
 | 2026-08-16/10 | S6.6, S6.7, S11.8 | Motion added back deliberately: scroll-linked reveals, a sequential lifecycle entrance, spring hover, a designed focus halo, one conic CTA trace, and cross-document view transitions | Waves 3–5 stripped motion to nothing because every effect on the old site was ambient decoration bought with a JS animation library. The budget left ~5 kB of JS and ~4.6 kB of CSS headroom, which rules a library out permanently — but CSS scroll-driven animations, `@property`, `linear()` easing and view transitions now cover all of it declaratively, on the compositor, for **+0.57 kB CSS and +0.03 kB JS**. Each effect is tied to something true: entrances follow reading order, the stagger is used only on a genuinely ordered lifecycle, and the one flourish rides the primary CTA tier that S3.1 already caps at one per section. Two hiding failure modes are guarded and tested (S6.6, S11.8). |
+| 2026-08-16/11 | §12 (new), §13 | Commercial terms section, per-service failure modes, featured-card hierarchy; the amendment log moved from §12 to §13 to make room | Three parked items landed together. **Pricing:** re-checking the reference class showed none of them publish services pricing either, so the earlier "every reference site names a price" note was wrong and the gap was never the number — it was that "Paid — quoted per scope" appeared with no basis, no commitment and no exit beside it. All three now publish, plus what moves the quote. `SPRINT_FEE_BAND` stays `null` rather than carrying an invented figure. **Copy:** every offer gained a `failureMode`, because the five service pages previously shared one category-plus-features shape and read as a template. **Visual:** the paid sprint — the thing the page actually asks for — now carries brand weight against two neutral siblings. Caught by the existing type-scale test: the first draft of both new surfaces used 10px and 11px labels, which S4.2 bans. |
 | 2026-08-14/9 | S1.1 | `404.html` ships without the app bundle | The bundle booted on the 404, found no route for "/404.html", fell back to the home route and rendered the home page over the 404 (React hydration error #418). It is a static page with one link and needs no JavaScript; the stylesheet is retained. |

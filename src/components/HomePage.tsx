@@ -7,6 +7,7 @@ import { Products } from "./sections/Products";
 import { RoutingModel } from "./sections/RoutingModel";
 import { EffortCalculator } from "./sections/EffortCalculator";
 import { Assurance } from "./sections/Assurance";
+import { CommercialTerms } from "./sections/CommercialTerms";
 import { Faq } from "./sections/Faq";
 import { FinalCta } from "./sections/FinalCta";
 
@@ -32,6 +33,7 @@ export function HomePage({ onOpenDiagnostic }: DiagnosticTriggerProps) {
       <RoutingModel onOpenDiagnostic={onOpenDiagnostic} />
       <EffortCalculator onOpenDiagnostic={onOpenDiagnostic} />
       <Assurance />
+      <CommercialTerms onOpenDiagnostic={onOpenDiagnostic} />
       <Faq />
       <FinalCta onOpenDiagnostic={onOpenDiagnostic} />
     </>
