@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1200px; height:630px; }
+  body {
+    background:#09090b;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color:#f4f4f5;
+    position:relative;
+    overflow:hidden;
+  }
+  .field {
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(ellipse 70% 60% at 15% -10%, rgba(154,230,0,0.18), transparent 70%),
+      linear-gradient(to right, #18181b 1px, transparent 1px),
+      linear-gradient(to bottom, #18181b 1px, transparent 1px);
+    background-size: 100% 100%, 64px 64px, 64px 64px;
+  }
+  .wrap { position:relative; padding:64px 80px; height:100%; display:flex; flex-direction:column; justify-content:center; gap:56px; }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .mark { width:44px; height:44px; border-radius:10px; background:#09090b; border:1px solid #27272a; display:flex; align-items:center; justify-content:center; }
+  .mark svg { width:26px; height:26px; }
+  .name { font-size:20px; font-weight:700; letter-spacing:-0.01em; }
+  .eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:15px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase;
+    color:#9ae600; margin-bottom:18px;
+  }
+  h1 { font-size:70px; line-height:1.04; font-weight:800; letter-spacing:-0.035em; max-width:20ch; }
+  .accent { color:#9ae600; }
+  .sub { margin-top:22px; font-size:22px; line-height:1.5; color:#d4d4d8; max-width:44ch; }
+  .foot { display:flex; align-items:center; gap:18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:16px; color:#9f9fa9; }
+  .chip { border:1px solid #27272a; border-radius:999px; padding:8px 16px; background:#18181b; }
+  .rule { position:absolute; left:0; right:0; bottom:0; height:6px; background:linear-gradient(to right, #9ae600, rgba(154,230,0,0.15) 55%, transparent); }
+</style>
+</head>
+<body>
+  <div class="field"></div>
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 64 64"><path d="M14 16h10l8 28 8-28h10L38 52H26L14 16Z" fill="#9ae600"/></svg>
+      </div>
+      <div class="name">VipraTech Labs</div>
+    </div>
+
+    <div>
+      <div class="eyebrow">Applied AI for regulated operations</div>
+      <h1>AI for decisions you have to <span class="accent">defend</span>.</h1>
+      <div class="sub">Rules handle the known cases. AI handles the ambiguous ones. A human approves anything consequential.</div>
+    </div>
+  </div>
+  <div class="rule"></div>
+</body>
+</html>

@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { motion } from "motion/react";
-import { X, Sparkles, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, FileCheck } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, CheckCircle2, Copy, FileCheck, Info } from "lucide-react";
 import type { DiagnosticAnalysis, FitDiagnosticInput } from "../types";
-import confetti from "canvas-confetti";
-import { SERVICE_OFFERS } from "../data/companyData";
-import { analyzeFitDiagnostic, buildFitCallMailto } from "../diagnostic/fitDiagnostic";
+import { COMPANY_INFO, SERVICE_OFFERS } from "../data/companyData";
+import {
+  analyzeFitDiagnostic,
+  buildFitCallMailto,
+  buildFitCallSummary,
+} from "../diagnostic/fitDiagnostic";
+import { Button } from "./ui/Button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/Dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 
 const CHALLENGE_OPTIONS = [
   "Unstructured PDFs and spreadsheet mismatches",
@@ -15,24 +20,35 @@ const CHALLENGE_OPTIONS = [
   "Difficulty scaling repeated decisions",
 ];
 
+const TIMELINES = ["Urgent (1-2 Weeks)", "1-2 Months", "Q3/Q4 Roadmap"];
+const TEAM_SIZES = ["1-10 People", "10-50 People", "50+ Enterprise"];
+
 interface FitDiagnosticModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialWorkflow?: string;
+  /** The control that opened the dialog, so focus can be handed back to it. */
+  returnFocusTo?: HTMLElement | null;
 }
 
 export function FitDiagnosticModal({
   isOpen,
   onClose,
   initialWorkflow,
+  returnFocusTo,
 }: FitDiagnosticModalProps) {
   const [workflowType, setWorkflowType] = useState(initialWorkflow ?? SERVICE_OFFERS[0].title);
-  const [challenges, setChallenges] = useState(CHALLENGE_OPTIONS.slice(0, 2));
-  const [currentWorkaround, setCurrentWorkaround] = useState("Manual spreadsheet mapping and team email chains");
-  const [timeline, setTimeline] = useState("1-2 Months");
-  const [teamSize, setTeamSize] = useState("10-50 People");
-
+  // Nothing is pre-filled: pre-selected answers produced lead data the visitor
+  // never actually chose (docs/05-ui-ux-spec.md S10.3).
+  const [challenges, setChallenges] = useState<string[]>([]);
+  const [currentWorkaround, setCurrentWorkaround] = useState("");
+  const [timeline, setTimeline] = useState(TIMELINES[1]);
+  const [teamSize, setTeamSize] = useState(TEAM_SIZES[1]);
   const [analysis, setAnalysis] = useState<DiagnosticAnalysis | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  // Drives the honest framing of a weak result (see the result header below).
+  const isWeakFit = analysis?.fitStatus === "Probably not yet";
 
   const diagnosticInput: FitDiagnosticInput = {
     workflowType,
@@ -42,291 +58,325 @@ export function FitDiagnosticModal({
     teamSize,
   };
 
-  const toggleChallenge = (item: string) => {
+  const toggleChallenge = (item: string) =>
     setChallenges((current) =>
       current.includes(item)
         ? current.filter((challenge) => challenge !== item)
         : [...current, item],
     );
-  };
 
-  const handleRunDiagnostic = () => {
-    setAnalysis(analyzeFitDiagnostic(diagnosticInput));
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-    });
+  const handleCopy = async () => {
+    if (!analysis) return;
+    try {
+      await navigator.clipboard.writeText(buildFitCallSummary(diagnosticInput, analysis));
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard can be blocked by permissions; the mailto link and the
+      // visible address below both still work.
+    }
   };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <motion.div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="fit-diagnostic-title"
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden text-zinc-100 my-8"
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        aria-describedby="fit-diagnostic-description"
+        // Radix does not hand focus back on its own here: the dialog is
+        // controlled and portalled with no DialogTrigger to return to, so
+        // closing left keyboard users on <body> (WCAG 2.4.3, spec S7.1).
+        // Restore explicitly to whatever opened it.
+        onCloseAutoFocus={(event) => {
+          if (!returnFocusTo?.isConnected) return;
+          event.preventDefault();
+          returnFocusTo.focus();
+        }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-lime-500/10 border border-lime-500/30 rounded-xl text-lime-400">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono tracking-widest text-lime-400 uppercase">
-                  AI Fit Assessment Engine
-                </span>
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-zinc-800 text-zinc-400 rounded-md">
-                  VipraTech Diagnostic
-                </span>
-              </div>
-              <h2 id="fit-diagnostic-title" className="text-xl font-bold tracking-tight text-white mt-0.5">
-                Evaluate Workflow Automation Feasibility
-              </h2>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close fit diagnostic"
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+        <div className="border-b border-hairline bg-surface/50 p-6 pr-16">
+          <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+            Fit diagnostic
+          </p>
+          <DialogTitle className="mt-1.5">
+            A two-minute structured self-assessment
+          </DialogTitle>
+          <DialogDescription id="fit-diagnostic-description" className="mt-1.5">
+            Answer four questions and we will show you what a sprint would cover — including if we
+            think you don&apos;t need one.
+          </DialogDescription>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+        <div className="p-6">
           {!analysis ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Form Left */}
-              <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-5">
                 <div>
-                  <label htmlFor="workflow-type" className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
-                    1. Target Workflow Area
-                  </label>
-                  <select
-                    id="workflow-type"
-                    value={workflowType}
-                    onChange={(e) => setWorkflowType(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 focus:outline-none focus:border-lime-500 transition-colors"
+                  <label
+                    htmlFor="workflow-type"
+                    className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle"
                   >
-                    {SERVICE_OFFERS.map((service) => (
-                      <option key={service.id} value={service.title}>
-                        {service.diagnosticLabel}
-                      </option>
-                    ))}
-                  </select>
+                    1. Target workflow area
+                  </label>
+                  <Select value={workflowType} onValueChange={setWorkflowType}>
+                    <SelectTrigger id="workflow-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SERVICE_OFFERS.map((service) => (
+                        <SelectItem key={service.id} value={service.title}>
+                          {service.diagnosticLabel}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
-                    2. Primary Pain Points / Challenges
-                  </label>
+                <fieldset>
+                  <legend className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
+                    2. Which of these apply?
+                  </legend>
                   <div className="space-y-2">
-                    {CHALLENGE_OPTIONS.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        aria-pressed={challenges.includes(item)}
-                        onClick={() => toggleChallenge(item)}
-                        className={`w-full text-left p-2.5 rounded-xl text-xs font-medium border transition-all flex items-center justify-between ${
-                          challenges.includes(item)
-                            ? "bg-lime-500/10 border-lime-500/50 text-lime-300"
-                            : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                        }`}
-                      >
-                        <span>{item}</span>
-                        {challenges.includes(item) && (
-                          <CheckCircle2 className="w-4 h-4 text-lime-400" />
-                        )}
-                      </button>
-                    ))}
+                    {CHALLENGE_OPTIONS.map((item) => {
+                      const selected = challenges.includes(item);
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => toggleChallenge(item)}
+                          className={`flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${
+                            selected
+                              ? "border-brand/50 bg-brand/10 text-ink"
+                              : "border-hairline bg-surface/60 text-ink-subtle hover:border-hairline-strong hover:text-ink"
+                          }`}
+                        >
+                          <span>{item}</span>
+                          {selected && (
+                            <CheckCircle2
+                              className="size-4 shrink-0 text-brand"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
+                </fieldset>
               </div>
 
-              {/* Form Right */}
-              <div className="space-y-4 flex flex-col justify-between">
+              <div className="flex flex-col space-y-5">
                 <div>
-                  <label htmlFor="current-workaround" className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
-                    3. Current Workaround
+                  <label
+                    htmlFor="current-workaround"
+                    className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle"
+                  >
+                    3. How is this handled today?
                   </label>
                   <textarea
                     id="current-workaround"
-                    rows={3}
+                    rows={4}
                     value={currentWorkaround}
-                    onChange={(e) => setCurrentWorkaround(e.target.value)}
-                    placeholder="E.g. Spreadsheets, manual email validation, basic LLM wrapper without guardrails..."
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-lime-500 transition-colors"
+                    onChange={(event) => setCurrentWorkaround(event.target.value)}
+                    placeholder="e.g. Two people reconcile spreadsheets by hand each morning and email the mismatches."
+                    className="w-full rounded-xl border border-hairline bg-surface p-3 text-sm text-ink placeholder:text-ink-subtle focus:border-brand focus:outline-none"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="timeline" className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
-                      Expected Timeline
-                    </label>
-                    <select
-                      id="timeline"
-                      value={timeline}
-                      onChange={(e) => setTimeline(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 focus:outline-none focus:border-lime-500"
+                    <label
+                      htmlFor="timeline"
+                      className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle"
                     >
-                      <option value="Urgent (1-2 Weeks)">Urgent (1-2 Weeks)</option>
-                      <option value="1-2 Months">1-2 Months</option>
-                      <option value="Q3/Q4 Roadmap">Q3/Q4 Roadmap</option>
-                    </select>
+                      Timeline
+                    </label>
+                    <Select value={timeline} onValueChange={setTimeline}>
+                      <SelectTrigger id="timeline">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIMELINES.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <label htmlFor="team-size" className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1.5">
-                      Team Size
-                    </label>
-                    <select
-                      id="team-size"
-                      value={teamSize}
-                      onChange={(e) => setTeamSize(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 focus:outline-none focus:border-lime-500"
+                    <label
+                      htmlFor="team-size"
+                      className="mb-2 block font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle"
                     >
-                      <option value="1-10 People">1-10 People</option>
-                      <option value="10-50 People">10-50 People</option>
-                      <option value="50+ Enterprise">50+ Enterprise</option>
-                    </select>
+                      Team size
+                    </label>
+                    <Select value={teamSize} onValueChange={setTeamSize}>
+                      <SelectTrigger id="team-size">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TEAM_SIZES.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div className="p-4 bg-zinc-900/80 border border-zinc-800 rounded-xl text-xs text-zinc-400 space-y-1">
-                  <div className="font-semibold text-zinc-200 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-lime-400" />
-                    VipraTech Guarantee
-                  </div>
-                  <p>
-                    We evaluate your technical boundary first. If your problem is better solved deterministically or without AI, we will state so upfront.
+                <div className="mt-auto space-y-4">
+                  <p className="rounded-xl border border-hairline bg-surface/80 p-4 text-sm text-ink-muted">
+                    If your problem is better solved deterministically, or without AI at all, the
+                    result will say so.
                   </p>
-                </div>
 
-                <button
-                  onClick={handleRunDiagnostic}
-                  className="w-full py-3.5 px-4 bg-lime-400 hover:bg-lime-300 text-black font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-lime-500/10 cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Generate Evidence-Based Diagnostic
-                </button>
+                  <Button
+                    size="lg"
+                    className="w-full"
+                    disabled={challenges.length === 0}
+                    onClick={() => setAnalysis(analyzeFitDiagnostic(diagnosticInput))}
+                  >
+                    See my result
+                  </Button>
+                  {challenges.length === 0 && (
+                    <p className="text-center text-sm text-ink-subtle">
+                      Select at least one item above to continue.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
-            /* Analysis Result View */
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              {/* Fit Summary Banner */}
-              <div className="p-5 bg-zinc-900 border border-lime-500/30 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-6">
+              <p className="flex gap-3 rounded-xl border border-info/30 bg-info/10 p-4 text-sm text-ink-muted">
+                <Info className="mt-0.5 size-4 shrink-0 text-info" aria-hidden="true" />
+                <span>
+                  This is a structured self-assessment based on what you entered — not a verified
+                  finding. Everything below is a starting point for the fit call, not a commitment.
+                </span>
+              </p>
+
+              {/*
+                A weak result must not headline the sprint it has just advised
+                against. Presenting "Probably not yet" above a recommended
+                sprint contradicts the answer the visitor was given.
+              */}
+              <div className="flex flex-col gap-4 rounded-2xl border border-hairline bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-2xl bg-lime-500/10 border border-lime-500/40 flex items-center justify-center text-lime-400 font-mono text-2xl font-bold">
-                    {analysis.fitScore}%
+                  <div
+                    className={`grid size-16 shrink-0 place-items-center rounded-2xl border font-mono text-xl font-bold tabular-nums ${
+                      isWeakFit
+                        ? "border-hairline-strong bg-surface-raised text-ink-subtle"
+                        : "border-brand/40 bg-brand/10 text-brand"
+                    }`}
+                  >
+                    {analysis.fitScore}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 text-xs font-mono bg-lime-500/20 text-lime-300 border border-lime-500/40 rounded">
-                        {analysis.fitStatus}
-                      </span>
-                      <span className="text-xs text-zinc-400 font-mono">
-                        Duration: {analysis.estimatedDurationDays}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mt-1">
-                      Recommended: {analysis.recommendedSprint}
+                    <p className="font-mono text-sm font-bold text-ink">{analysis.fitStatus}</p>
+                    <h3 className="mt-1 text-h3 font-bold text-ink">
+                      {isWeakFit ? "No sprint recommended yet" : analysis.recommendedSprint}
                     </h3>
+                    <p className="mt-1 text-sm text-ink-subtle">
+                      {analysis.estimatedDurationDays}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-hairline bg-surface/60 p-4">
+                  <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-brand">
+                    <FileCheck className="size-4" aria-hidden="true" />
+                    Where we would start
+                  </h4>
+                  <p className="mt-3 text-sm text-ink-muted">{analysis.recommendedArchitecture}</p>
+                  <p className="mt-3 border-t border-hairline pt-3 text-sm text-ink-subtle">
+                    {analysis.reasoning}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-hairline bg-surface/60 p-4">
+                  <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-attention">
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                    What we would want to check
+                  </h4>
+                  {analysis.keyRisksIdentified.length > 0 ? (
+                    <ul className="mt-3 space-y-2">
+                      {analysis.keyRisksIdentified.map((risk) => (
+                        <li key={risk} className="flex gap-2 text-sm text-ink-muted">
+                          <span className="text-attention" aria-hidden="true">
+                            •
+                          </span>
+                          <span>{risk}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-ink-muted">
+                      Nothing stands out from your answers yet — the fit call would go looking.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-hairline bg-surface/80 p-4">
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
+                  {isWeakFit
+                    ? `If you did run the ${analysis.recommendedSprint}, it would produce`
+                    : "A sprint would produce"}
+                </h4>
+                <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {analysis.sprintDeliverables.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 rounded-lg border border-hairline bg-ground/60 p-2.5 text-sm text-ink-muted"
+                    >
+                      <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="space-y-4 border-t border-hairline pt-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <Button variant="tertiary" onClick={() => setAnalysis(null)}>
+                    ← Change my answers
+                  </Button>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Button variant="secondary" onClick={handleCopy}>
+                      {copied ? (
+                        <Check className="size-4 text-brand" aria-hidden="true" />
+                      ) : (
+                        <Copy className="size-4" aria-hidden="true" />
+                      )}
+                      {copied ? "Copied" : "Copy summary"}
+                    </Button>
+                    <Button as="a" size="lg" href={buildFitCallMailto(diagnosticInput, analysis)}>
+                      Send this to VipraTech
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Button>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-xs font-mono text-zinc-400 block">
-                    Evidence Level
-                  </span>
-                  <span className="text-sm font-semibold text-lime-400">
-                    {analysis.evidenceLevelToDeliver}
-                  </span>
-                </div>
+                {/* mailto: fails silently on many mobile and webmail setups, so
+                    the address is always visible as a fallback (S10.4). */}
+                <p className="text-sm text-ink-subtle">
+                  If your mail client doesn&apos;t open, copy the summary and email it to{" "}
+                  <a
+                    href={`mailto:${COMPANY_INFO.email}`}
+                    className="font-medium text-brand underline-offset-4 hover:underline"
+                  >
+                    {COMPANY_INFO.email}
+                  </a>
+                  .
+                </p>
               </div>
-
-              {/* Grid Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Architecture & Reason */}
-                <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl space-y-3">
-                  <h4 className="text-xs font-mono text-lime-400 uppercase tracking-wider flex items-center gap-2">
-                    <FileCheck className="w-4 h-4" />
-                    Target System Architecture
-                  </h4>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
-                    {analysis.recommendedArchitecture}
-                  </p>
-                  <p className="text-xs text-zinc-400 italic">
-                    "{analysis.reasoning}"
-                  </p>
-                </div>
-
-                {/* Key Risks */}
-                <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl space-y-3">
-                  <h4 className="text-xs font-mono text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4" />
-                    Risks to De-Risk in Sprint
-                  </h4>
-                  <ul className="space-y-1.5 text-xs text-zinc-300">
-                    {analysis.keyRisksIdentified.map((risk, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-amber-400 font-mono">•</span>
-                        <span>{risk}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Deliverables */}
-              <div className="p-4 bg-zinc-900/80 border border-zinc-800 rounded-xl space-y-2">
-                <h4 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                  Sprint Outputs Provided at Completion:
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-200">
-                  {analysis.sprintDeliverables.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 p-2 bg-zinc-950/60 border border-zinc-800/80 rounded-lg">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-lime-400 flex-shrink-0" />
-                      <span className="truncate">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-zinc-800">
-                <button
-                  onClick={() => setAnalysis(null)}
-                  className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  ← Modify Diagnostic Inputs
-                </button>
-
-                <a
-                  href={buildFitCallMailto(diagnosticInput, analysis)}
-                  className="w-full sm:w-auto py-3 px-6 bg-lime-400 hover:bg-lime-300 text-black font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-lime-500/10 cursor-pointer"
-                >
-                  <span>Request Free 30-Min Fit Call</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            </motion.div>
+            </div>
           )}
         </div>
-      </motion.div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/entry-server.tsx!"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.mjs",
+    "e2e/**/*.ts"
+  ],
+  "ignore": [
+    "src/data/personas.ts"
+  ],
+  "ignoreDependencies": [
+    "tailwindcss"
+  ]
+}

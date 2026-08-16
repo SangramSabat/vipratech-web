@@ -1,8 +1,13 @@
 node_modules/
 dist/
+.ssr/
 coverage/
 .DS_Store
 *.log
 .env*
 .playwright-cli/
 output/
+test-results/
+playwright-report/
+.playwright/
+.vercel

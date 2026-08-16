@@ -1,1 +1,285 @@
 @import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens — implements docs/05-ui-ux-spec.md §4 (typography) and §5 (colour).
+   Values traced to docs/01-brand-guidelines.md §3–4.
+   --------------------------------------------------------------------------- */
+@theme {
+  /* Ground and surfaces (S5.1) */
+  --color-ground: var(--color-zinc-950);
+  --color-surface: var(--color-zinc-900);
+  --color-surface-raised: var(--color-zinc-800);
+  --color-hairline: var(--color-zinc-800);
+  --color-hairline-strong: var(--color-zinc-700);
+
+  /* Text — zinc-500/600 are deliberately absent; they fail AA (S5.2) */
+  --color-ink: var(--color-zinc-100); /* 18.07:1 on ground */
+  --color-ink-muted: var(--color-zinc-300); /* 13.45:1 */
+  --color-ink-subtle: var(--color-zinc-400); /* 7.56:1 — floor for muted text */
+
+  /* Brand accent (S5.4) */
+  --color-brand: var(--color-lime-400); /* 12.95:1 on ground */
+  --color-brand-hover: var(--color-lime-300);
+  --color-brand-dim: var(--color-lime-500);
+
+  /* Semantic accents — one meaning each (S5.3) */
+  --color-verified: var(--color-emerald-400);
+  --color-attention: var(--color-amber-300);
+  --color-info: var(--color-blue-400);
+
+  /* Fluid type scale (S4.4) */
+  --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
+  --text-h2: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+  --text-h3: clamp(1.125rem, 1.05rem + 0.3vw, 1.375rem);
+  --text-lead: clamp(1.0625rem, 1rem + 0.28vw, 1.25rem);
+
+  /* Fluid section rhythm */
+  --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
+
+  /* Spring easing with a slight overshoot (S6.6). ~60 bytes of curve replaces
+     a physics library; used for hover lift, never for anything load-bearing. */
+  --ease-spring: linear(0, 0.5 7.5%, 0.92 15%, 1.05 23%, 1.01 34%, 1);
+
+  /* Accordion open/close — height-based, but confined to the panel so it
+     cannot shift the rest of the page (S6.1 "no layout-shifting animation"). */
+  --animate-accordion-down: accordion-down 200ms ease-out;
+  --animate-accordion-up: accordion-up 200ms ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky header never covers a heading */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-ground);
+    color: var(--color-ink-muted);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible focus on every interactive element (S7.5).
+     :focus-visible only, so the ring appears for keyboard users and not on
+     mouse click. The halo is a designed state, not the UA default. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-brand) 22%, transparent);
+  }
+
+  /* Body copy defaults (S4.5) */
+  p {
+    line-height: 1.65;
+  }
+
+  /* Reduced motion (S6.3) — decorative motion off, functional transitions clamped */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 150ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Measure cap for prose (S4.5) */
+  .measure {
+    max-width: 65ch;
+  }
+
+  /* Static ground treatment replacing the animated matrix wash (S6.2).
+     A fixed gradient + grid: cinematic depth at zero runtime cost. */
+  .ground-field {
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        color-mix(in oklab, var(--color-brand) 10%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(to right, var(--color-zinc-900) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-zinc-900) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      4rem 4rem,
+      4rem 4rem;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+  }
+
+  /* --- Motion (S6.6) -----------------------------------------------------
+     All of the below is CSS-only and compositor-driven: no animation library,
+     no IntersectionObserver, no React state. Transform/opacity only, so none
+     of it can shift layout (S6.1).
+     ---------------------------------------------------------------------- */
+
+  /* Scroll-linked entrance. Guarded by @supports so that a browser without
+     scroll-driven animations (Firefox today) never applies the opacity:0
+     start state and silently hides the content. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 22%;
+      }
+
+      /* Sequential children resolve in order. Used only where the order is
+         real information — a numbered lifecycle, not an arbitrary grid. */
+      .reveal-stagger > * {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+      }
+      .reveal-stagger > :nth-child(1) { animation-range: entry 5% entry 55%; }
+      .reveal-stagger > :nth-child(2) { animation-range: entry 12% entry 62%; }
+      .reveal-stagger > :nth-child(3) { animation-range: entry 19% entry 69%; }
+      .reveal-stagger > :nth-child(4) { animation-range: entry 26% entry 76%; }
+    }
+  }
+
+  @keyframes reveal-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* A lit top edge (S12.4). One hairline of brand light where a raised surface
+     would catch it — the cheapest way to make a card read as an object rather
+     than a rectangle, and reserved for the one featured card per section so it
+     stays a hierarchy signal instead of a texture. */
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset-inline: 1.25rem;
+    top: -1px;
+    height: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklch, var(--color-brand) 65%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  /* Hover lift for cards. The overshoot is what reads as considered rather
+     than corporate; it costs one easing token. */
+  .lift {
+    transition:
+      transform 500ms var(--ease-spring),
+      border-color 200ms ease-out,
+      box-shadow 500ms var(--ease-spring);
+  }
+  .lift:hover,
+  .lift:focus-within {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklch, var(--color-brand) 45%, transparent);
+    box-shadow: 0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
+  }
+
+  /* The single flourish on the page, reserved for the one primary CTA per
+     section (S3.1). Applied anywhere else it becomes the noise the old site
+     shipped, so it is deliberately not a general-purpose utility. */
+  .cta-trace {
+    position: relative;
+    z-index: 0;
+  }
+  .cta-trace::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--trace-angle),
+      transparent 55%,
+      var(--color-brand) 76%,
+      var(--color-lime-200) 86%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-trace:hover::before,
+    .cta-trace:focus-visible::before {
+      opacity: 1;
+      animation: cta-spin 2.4s linear infinite;
+    }
+  }
+}
+
+/* Animatable angle for the CTA trace. Must sit at the top level. */
+@property --trace-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cta-spin {
+  to {
+    --trace-angle: 360deg;
+  }
+}
+
+/* Cross-document view transitions (S6.7).
+   The site is six separately prerendered documents with no router, so this is
+   two lines that make navigation feel continuous with zero routing JavaScript.
+   Unsupported browsers simply navigate as before. */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The global rule in @layer base clamps animation-duration, but a
+     scroll-driven animation takes its progress from the timeline rather than
+     the duration — so these must be switched off by name or the start state
+     would strand content at opacity 0. */
+  .reveal,
+  .reveal-stagger > * {
+    animation-name: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
