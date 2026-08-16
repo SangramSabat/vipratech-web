@@ -36,6 +36,10 @@
   /* Fluid section rhythm */
   --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
 
+  /* Spring easing with a slight overshoot (S6.6). ~60 bytes of curve replaces
+     a physics library; used for hover lift, never for anything load-bearing. */
+  --ease-spring: linear(0, 0.5 7.5%, 0.92 15%, 1.05 23%, 1.01 34%, 1);
+
   /* Accordion open/close — height-based, but confined to the panel so it
      cannot shift the rest of the page (S6.1 "no layout-shifting animation"). */
   --animate-accordion-down: accordion-down 200ms ease-out;
@@ -78,11 +82,14 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Visible focus on every interactive element (S7.5) */
+  /* Visible focus on every interactive element (S7.5).
+     :focus-visible only, so the ring appears for keyboard users and not on
+     mouse click. The halo is a designed state, not the UA default. */
   :focus-visible {
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
     border-radius: 0.25rem;
+    box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-brand) 22%, transparent);
   }
 
   /* Body copy defaults (S4.5) */
@@ -127,5 +134,132 @@
       4rem 4rem,
       4rem 4rem;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+  }
+
+  /* --- Motion (S6.6) -----------------------------------------------------
+     All of the below is CSS-only and compositor-driven: no animation library,
+     no IntersectionObserver, no React state. Transform/opacity only, so none
+     of it can shift layout (S6.1).
+     ---------------------------------------------------------------------- */
+
+  /* Scroll-linked entrance. Guarded by @supports so that a browser without
+     scroll-driven animations (Firefox today) never applies the opacity:0
+     start state and silently hides the content. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 22%;
+      }
+
+      /* Sequential children resolve in order. Used only where the order is
+         real information — a numbered lifecycle, not an arbitrary grid. */
+      .reveal-stagger > * {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+      }
+      .reveal-stagger > :nth-child(1) { animation-range: entry 5% entry 55%; }
+      .reveal-stagger > :nth-child(2) { animation-range: entry 12% entry 62%; }
+      .reveal-stagger > :nth-child(3) { animation-range: entry 19% entry 69%; }
+      .reveal-stagger > :nth-child(4) { animation-range: entry 26% entry 76%; }
+    }
+  }
+
+  @keyframes reveal-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Hover lift for cards. The overshoot is what reads as considered rather
+     than corporate; it costs one easing token. */
+  .lift {
+    transition:
+      transform 500ms var(--ease-spring),
+      border-color 200ms ease-out,
+      box-shadow 500ms var(--ease-spring);
+  }
+  .lift:hover,
+  .lift:focus-within {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklch, var(--color-brand) 45%, transparent);
+    box-shadow: 0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
+  }
+
+  /* The single flourish on the page, reserved for the one primary CTA per
+     section (S3.1). Applied anywhere else it becomes the noise the old site
+     shipped, so it is deliberately not a general-purpose utility. */
+  .cta-trace {
+    position: relative;
+    z-index: 0;
+  }
+  .cta-trace::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--trace-angle),
+      transparent 55%,
+      var(--color-brand) 76%,
+      var(--color-lime-200) 86%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-trace:hover::before,
+    .cta-trace:focus-visible::before {
+      opacity: 1;
+      animation: cta-spin 2.4s linear infinite;
+    }
+  }
+}
+
+/* Animatable angle for the CTA trace. Must sit at the top level. */
+@property --trace-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cta-spin {
+  to {
+    --trace-angle: 360deg;
+  }
+}
+
+/* Cross-document view transitions (S6.7).
+   The site is six separately prerendered documents with no router, so this is
+   two lines that make navigation feel continuous with zero routing JavaScript.
+   Unsupported browsers simply navigate as before. */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The global rule in @layer base clamps animation-duration, but a
+     scroll-driven animation takes its progress from the timeline rather than
+     the duration — so these must be switched off by name or the start state
+     would strand content at opacity 0. */
+  .reveal,
+  .reveal-stagger > * {
+    animation-name: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

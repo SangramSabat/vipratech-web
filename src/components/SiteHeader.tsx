@@ -15,7 +15,13 @@ import { Button } from "./ui/Button";
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-ground/85 backdrop-blur-md">
+    <header
+      className="sticky top-0 z-40 border-b border-hairline bg-ground/85 backdrop-blur-md"
+      // Pins the header across a cross-document navigation (S6.7) so it stays
+      // put while the page beneath it resolves. The name must be unique per
+      // document, and this header renders exactly once.
+      style={{ viewTransitionName: "site-header" }}
+    >
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3 sm:px-6 lg:px-8">
         <a href="#top" className="flex min-h-11 shrink-0 items-center gap-2.5 pr-2">
           <svg viewBox="0 0 64 64" className="size-7" aria-hidden="true">

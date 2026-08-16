@@ -143,7 +143,7 @@ export function ServiceDetail({
             <li key={other.id}>
               <a
                 href={servicePath(other.id)}
-                className="flex h-full flex-col rounded-2xl border border-hairline bg-surface/70 p-6 transition-colors hover:border-brand/40"
+                className="lift flex h-full flex-col rounded-2xl border border-hairline bg-surface/70 p-6"
               >
                 <h3 className="text-h3 font-bold text-ink">{other.title}</h3>
                 <p className="mt-2 flex-1 text-sm text-ink-muted">{other.description}</p>

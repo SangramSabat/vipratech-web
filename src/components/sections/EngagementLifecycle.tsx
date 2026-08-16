@@ -14,11 +14,13 @@ import { Section } from "../ui/Section";
 export function EngagementLifecycle({ onOpenDiagnostic }: DiagnosticTriggerProps) {
   return (
     <Section id="how" intro={SECTIONS.how}>
-      <ol className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {/* The one place a stagger is honest: these are three ordered stages, so
+          resolving them in sequence restates information the content carries. */}
+      <ol className="reveal-stagger grid grid-cols-1 gap-6 md:grid-cols-3">
         {ENGAGEMENT_STEPS.map((step) => (
           <li
             key={step.step}
-            className="flex flex-col rounded-2xl border border-hairline bg-surface/70 p-6"
+            className="lift flex flex-col rounded-2xl border border-hairline bg-surface/70 p-6"
           >
             <div className="flex items-center justify-between gap-3">
               <span className="font-mono text-3xl font-extrabold text-brand">{step.step}</span>

@@ -29,7 +29,10 @@ export function Section({
       aria-labelledby={headingId}
       className={cn("border-t border-hairline py-section", className)}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Scroll-linked entrance (S6.6). Applied here rather than per section so
+          the rule holds everywhere, and never to the hero — animating the LCP
+          element is banned (S6.1) and the hero is not a <Section>. */}
+      <div className="reveal mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader intro={intro} headingId={headingId} align={align} />
         {children}
       </div>

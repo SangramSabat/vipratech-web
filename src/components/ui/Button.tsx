@@ -9,8 +9,10 @@ import { cn } from "../../lib/utils";
  * nothing read as primary.
  */
 const VARIANTS = {
+  // cta-trace is the page's one flourish and rides the primary tier precisely
+  // because the spec already caps that at one per section (S3.1, S6.6).
   primary:
-    "bg-brand text-black font-bold shadow-lg shadow-brand/20 hover:bg-brand-hover active:translate-y-px",
+    "cta-trace bg-brand text-black font-bold shadow-lg shadow-brand/20 hover:bg-brand-hover active:translate-y-px",
   secondary:
     "border border-hairline-strong bg-transparent text-ink font-semibold hover:border-brand/60 hover:bg-surface",
   tertiary:

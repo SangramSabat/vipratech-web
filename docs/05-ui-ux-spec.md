@@ -101,6 +101,30 @@ Every route emits its own `<title>`, `<meta name="description">`, canonical, and
 **S6.4** No React state may be written from a pointer-move handler. Pointer-driven visuals use a CSS custom property written outside the render cycle.
 **S6.5** Any retained canvas pauses via `IntersectionObserver` and `document.hidden`.
 
+**S6.6 Permitted motion.** Motion is CSS-only and compositor-driven: no animation
+library, no `IntersectionObserver`, no React state. Transform and opacity only.
+
+| Effect | Where | Rule |
+|---|---|---|
+| Scroll-linked entrance (`.reveal`) | `Section` shell | Never the hero — animating the LCP element stays banned (S6.1) |
+| Sequential entrance (`.reveal-stagger`) | Engagement lifecycle only | Permitted only where order is real information |
+| Spring hover lift (`.lift`) | Cards | `--ease-spring`; hover and `:focus-within` |
+| Conic CTA trace (`.cta-trace`) | Primary buttons | One per section by S3.1; not a general utility |
+| Designed focus halo | `:focus-visible` globally | Ring plus halo, keyboard only |
+
+Two guards are mandatory, because both failure modes hide content rather than
+degrade it: the scroll-linked rules sit inside `@supports (animation-timeline:
+view())` so a browser without scroll-driven animations never applies the
+`opacity: 0` start state; and they are switched off **by name** under
+`prefers-reduced-motion: reduce`, because a scroll-driven animation takes its
+progress from the timeline rather than the duration the global clamp sets.
+Covered by test (S11.8).
+
+**S6.7 Cross-document view transitions.** `@view-transition { navigation: auto; }`
+plus a `view-transition-name` on the site header. The six prerendered documents
+share no router, so this is the whole navigation treatment; unsupported browsers
+navigate exactly as before.
+
 ## 7. Accessibility — acceptance criteria
 
 **S7.1** Modal (shadcn `Dialog`): focus trapped on open, focus restored to trigger on close, `Escape` closes, body scroll locked, `aria-modal` + labelled title.
@@ -171,6 +195,7 @@ motion, and vitals — is covered by Playwright in `e2e/`, running against the
 | **S11.5** Bundle within S9.1 | `bun run check:bundle` (`scripts/check-bundle.mjs`) |
 | **S11.6** Accessibility | `e2e/accessibility.spec.ts` — **accessible names read from the CDP accessibility tree, never the DOM**, plus focus trap/Escape/restore, tab arrow keys, contrast, tap targets, heading order |
 | **S11.7** Responsive and motion | `e2e/responsive.spec.ts` — 360/768/1280/1920, reduced-motion, LCP and CLS |
+| **S11.8** Scroll reveals never strand content invisible | `e2e/responsive.spec.ts` — scrolls the whole page in both motion preferences and fails on any settled, fully-in-view element still below 0.95 opacity |
 | Hydration correctness | `e2e/prerender.spec.ts` — fails on any console error or warning |
 | Structured data and social card | `e2e/prerender.spec.ts` — JSON-LD parsed and cross-checked, OG tags and assets fetched |
 
@@ -202,4 +227,5 @@ a screen reader actually consumes.
 | 2026-08-14/6 | S7.1 | Focus restoration on dialog close is now explicit (`returnFocusTo` + `onCloseAutoFocus`); the dialog also stays mounted while closed | Closing left keyboard users on `<body>` — a WCAG 2.4.3 failure. Radix does not restore on its own in this configuration: the dialog is controlled and portalled with no `DialogTrigger` to return to. Keeping the subtree mounted was tried first and did **not** fix it; the explicit restore did. Caught by the Playwright suite. An earlier ad-hoc check had given a false pass because it asserted `document.activeElement.textContent.includes(...)`, and `<body>`'s textContent contains the entire page. |
 | 2026-08-14/7 | S2.1, S9.6 | Five service offers split onto their own prerendered routes | One URL behind client-side tabs gave nothing to rank per offer (plan finding 5, previously parked). `scripts/prerender.mjs` now emits six documents plus a generated sitemap and a branded 404. Radix `TabsContent` also gained `forceMount`: it mounts only the active panel, so four of the five links through to the new pages were absent from the prerendered HTML and invisible to crawlers. |
 | 2026-08-14/8 | S10.2 | A weak diagnostic result no longer headlines the sprint it advised against | Screen-by-screen review found "Probably not yet" sitting directly above "Reconciliation Opportunity Sprint" and a list of what "a sprint would produce" — telling the visitor they likely do not need this, then presenting it as the recommendation. Weak results now read "No sprint recommended yet", carry a neutral rather than brand-coloured score, and frame deliverables conditionally. |
+| 2026-08-16/10 | S6.6, S6.7, S11.8 | Motion added back deliberately: scroll-linked reveals, a sequential lifecycle entrance, spring hover, a designed focus halo, one conic CTA trace, and cross-document view transitions | Waves 3–5 stripped motion to nothing because every effect on the old site was ambient decoration bought with a JS animation library. The budget left ~5 kB of JS and ~4.6 kB of CSS headroom, which rules a library out permanently — but CSS scroll-driven animations, `@property`, `linear()` easing and view transitions now cover all of it declaratively, on the compositor, for **+0.57 kB CSS and +0.03 kB JS**. Each effect is tied to something true: entrances follow reading order, the stagger is used only on a genuinely ordered lifecycle, and the one flourish rides the primary CTA tier that S3.1 already caps at one per section. Two hiding failure modes are guarded and tested (S6.6, S11.8). |
 | 2026-08-14/9 | S1.1 | `404.html` ships without the app bundle | The bundle booted on the 404, found no route for "/404.html", fell back to the home route and rendered the home page over the 404 (React hydration error #418). It is a static page with one link and needs no JavaScript; the stylesheet is retained. |

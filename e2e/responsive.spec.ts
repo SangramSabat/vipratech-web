@@ -77,6 +77,50 @@ test.describe('motion budget (spec S6.1, S6.3)', () => {
     expect(tooSlow).toEqual([]);
     await context.close();
   });
+
+  /**
+   * The failure mode that matters for scroll-driven reveals (S6.6): the start
+   * state is opacity 0, so any element whose animation never resolves is
+   * content the visitor simply cannot read. That is invisible in a screenshot
+   * of the top of the page and catastrophic if it ships, so it is asserted in
+   * both motion preferences, scrolling the whole page.
+   */
+  test('scroll reveals never strand content invisible', async ({browser}) => {
+    for (const reducedMotion of ['reduce', 'no-preference'] as const) {
+      const context = await browser.newContext({reducedMotion});
+      const page = await context.newPage();
+      await page.goto('/');
+
+      const steps = await page.evaluate(() =>
+        Math.ceil(document.body.scrollHeight / (window.innerHeight / 2)),
+      );
+      const stranded: string[] = [];
+
+      for (let i = 0; i <= steps; i++) {
+        await page.evaluate((n) => window.scrollTo(0, (n * window.innerHeight) / 2), i);
+        await page.waitForTimeout(100);
+        // Judge only elements settled fully inside the viewport; one that is
+        // still entering is legitimately mid-animation.
+        stranded.push(
+          ...(await page.evaluate(() =>
+            [...document.querySelectorAll('.reveal, .reveal-stagger > *')]
+              .filter((el) => {
+                const r = el.getBoundingClientRect();
+                const settled = r.top >= 0 && r.bottom <= window.innerHeight;
+                return settled && Number(getComputedStyle(el).opacity) < 0.95;
+              })
+              .map((el) => el.closest('section')?.id ?? 'unknown'),
+          )),
+        );
+      }
+
+      expect(
+        [...new Set(stranded)],
+        `unreadable sections with reducedMotion=${reducedMotion}`,
+      ).toEqual([]);
+      await context.close();
+    }
+  });
 });
 
 test.describe('core web vitals (spec S9.3, S9.4)', () => {
