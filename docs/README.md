@@ -9,6 +9,7 @@ These documents form a **traceable lifecycle**. Each inherits from the one above
 | 03 | [Copywriting Matrix](./03-copywriting-matrix.md) | What every section says. Source of truth for user-facing copy. |
 | 04 | [Wave Plan](./04-plan.md) | The Impeccable wave plan, findings, and reference-class analysis. |
 | 05 | [UI/UX Spec](./05-ui-ux-spec.md) | 🔒 **LOCKED.** How it is built. Every implementation change cites a section here. |
+| 06 | [Content & Persona-Adaptive Plan](./06-content-and-persona-plan.md) | Proposed. Platform-plus-service positioning, five personas with ship-ready copy, 26-route site map. Supersedes 02 §6. |
 
 ## Working rules
 
@@ -19,11 +20,13 @@ These documents form a **traceable lifecycle**. Each inherits from the one above
 
 ## Outstanding — needs input from VipraTech
 
-The reference class (heizen.work, factory.ai, 8090.ai) places trust assets immediately after the hero. VipraTech currently has none, and they will not be invented. To populate those slots we need:
+The reference class (heizen.work, factory.ai, 8090.ai) places trust assets immediately after the hero. To populate those slots we need:
 
-- Client names and written permission to cite them
+- **Written permission to name MOM / Alimento Agro Foods.** `06` builds a flagship case study around this work. Until permission is confirmed it ships unattributed — "a scaling FMCG brand" — which costs most of its force.
 - Named testimonials with role and company
-- Real outcome metrics from delivered work
+- Any further outcome metrics from delivered work
 - Any formal certification actually held (none claimed today)
+- **A name for the platform.** `06` uses `Foundry` throughout so the copy is writable. Confirm or replace.
+- **A fee band for the diagnostic sprint**, if it is to be published. `SPRINT_FEE_BAND` is `null` and the commercial terms section reads correctly either way.
 
-Until supplied, those sections stay unrendered.
+Until supplied, those sections stay unrendered or unattributed. Nothing here is invented to fill a slot.
