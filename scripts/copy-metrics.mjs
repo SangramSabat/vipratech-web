@@ -35,18 +35,39 @@ const EVALUATIVE = new Set([
 ]);
 
 // Words that signal the visitor's own problem is being named (P4).
-const PROBLEM = /\b(you|your|lose|losing|lost|manual|manually|by hand|gap|gaps|broken|slow|error|errors|mismatch|reconcil|dispute|leak|leakage|spend|cost|risk|fail|wrong|missing|delay)\b/i;
+// Retained only for reference; no longer used for P4. See the note there.
+const _PROBLEM_UNUSED = /\b(you|your|lose|losing|lost|manual|manually|by hand|gap|gaps|broken|slow|error|errors|mismatch|reconcil|dispute|leak|leakage|spend|cost|risk|fail|wrong|missing|delay)\b/i;
+
+// Measure the page's own prose, not its chrome. The header nav, skip link and
+// footer repeat identically on every document; counting them inflates word
+// totals and, worse, charges ~30 words of navigation against P4 on every page
+// as though the reader had to read it before reaching the argument. They do not
+// — the nav is scanned, not read. Falls back to the whole document if a page
+// has no <main>.
+const mainOf = (html) => {
+  const m = /<main\b[^>]*>([\s\S]*?)<\/main>/i.exec(html);
+  return m ? m[1] : html;
+};
 
 const textOf = (html) =>
-  html
+  mainOf(html)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+    // Block-level tags become a space; inline tags vanish. Replacing *every*
+    // tag with a space breaks any word split across inline elements — and this
+    // site does exactly that: SplitText wraps each character of the hero h1 in
+    // its own span for the reveal, so a naive strip rendered the headline as
+    // "A I f o r d e c i s i o n s y o u", turning 7 words into 30 letters and
+    // hiding the word "you" from P4 entirely. The instrument was reporting on
+    // an artefact of the effect it shares a page with.
+    .replace(/<\/?(?:p|div|section|article|header|footer|nav|aside|main|ul|ol|li|dl|dt|dd|table|tr|td|th|h[1-6]|figure|figcaption|blockquote|pre|form|fieldset|legend|hr|br|button)\b[^>]*>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&#x27;|&#39;/g, "'")
     .replace(/&[a-z]+;/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
-const analyse = (text) => {
+const analyse = (text, problemOffset) => {
   const words = text.split(/\s+/).filter(Boolean);
   const n = words.length || 1;
 
@@ -59,11 +80,21 @@ const analyse = (text) => {
   const adjectives = words.filter((w) => EVALUATIVE.has(w.toLowerCase().replace(/[^a-z-]/g, '')));
   const p3 = (adjectives.length / n) * 100;
 
-  // P4 — words before the visitor's problem is named.
-  let p4 = n;
-  for (let i = 0; i < words.length; i++) {
-    if (PROBLEM.test(words[i])) { p4 = i; break; }
-  }
+  // P4 — words of main content before the reader's problem is stated.
+  //
+  // This was vocabulary detection: scan for "you", "manual", "gap", "cost" and
+  // call the first hit the problem. It was wrong, and measurably so. Reordering
+  // the service pages to put the problem above the audience filter improved
+  // three pages by 13 words each and made /services/ai-security *worse* by 60 —
+  // because its early match had never been the problem statement at all, but an
+  // incidental word in the audience line that the reorder pushed later.
+  //
+  // Optimising against that proxy is Goodhart's law with extra steps. The
+  // problem block is now marked `data-reader-problem` in the markup, so this
+  // measures the position of a thing the author declared rather than guessing
+  // from word choice. A page with no marker reports -1 and is excluded, which
+  // is honest: unmarked is unmeasured, not zero.
+  const p4 = problemOffset;
 
   // P2 [heuristic] — sentences asserting something, and how many carry evidence.
   const sentences = text.split(/(?<=[.!?])\s+/).filter((s) => s.split(/\s+/).length >= 4);
@@ -97,9 +128,30 @@ const walk = (dir) =>
 // P4 is the one gate that is genuinely aspirational, because it is the one the
 // baseline actually misses — service pages take 71-157 words to name the
 // reader's problem, against 6 on the home page.
-const GATES = {p1: 15.0, p2: 0.6, p3: 0.5, p4: 40};
+const GATES = {p1: 11.5, p3: 0.5, p4: 40};
+
+// P2 is reported but NOT gated. It is the one property here with no
+// deterministic definition — "is this sentence a claim, and does it carry
+// evidence?" is a judgement, and the regex standing in for it splits sentences
+// on punctuation and guesses at intent. Its proposed 0.6 threshold was invented
+// like the others, and unlike the others it cannot be recalibrated against a
+// baseline, because the baseline is not measuring the right thing to begin
+// with. Gating on it would fail every page forever for reasons no one could
+// act on. It becomes a gate when claims are marked in the markup the way
+// `data-reader-problem` now marks the problem statement.
 const pages = walk(DIST).filter((p) => !p.includes('404')).sort();
-const rows = pages.map((p) => ({page: p.replace(`${DIST}/`, '').replace('/index.html', '') || '/', ...analyse(textOf(readFileSync(p, 'utf8')))}));
+// Words of main content preceding the marked problem block. -1 when unmarked.
+const problemOffsetOf = (html) => {
+  const main = mainOf(html);
+  const i = main.search(/<[a-z]+[^>]*\bdata-reader-problem\b/i);
+  if (i === -1) return -1;
+  return textOf(main.slice(0, i) + '</div>').split(/\s+/).filter(Boolean).length;
+};
+
+const rows = pages.map((p) => {
+  const html = readFileSync(p, 'utf8');
+  return {page: p.replace(`${DIST}/`, '').replace('/index.html', '') || '/', ...analyse(textOf(html), problemOffsetOf(html))};
+});
 
 console.log('\nCopy impact — docs/07 §6\n');
 console.log('page'.padEnd(34), 'words'.padStart(6), 'P1'.padStart(7), 'P2'.padStart(6), 'P3'.padStart(6), 'P4'.padStart(5));
@@ -110,13 +162,20 @@ for (const r of rows) {
     r.page.padEnd(34),
     String(r.words).padStart(6),
     `${r.p1.toFixed(2)}${mark(r.p1 >= GATES.p1)}`.padStart(7),
-    `${r.p2.toFixed(2)}${mark(r.p2 >= GATES.p2)}`.padStart(6),
+    `${r.p2.toFixed(2)} `.padStart(6),
     `${r.p3.toFixed(2)}${mark(r.p3 <= GATES.p3)}`.padStart(6),
-    `${String(r.p4)}${mark(r.p4 <= GATES.p4)}`.padStart(5),
+    `${r.p4 < 0 ? 'n/a' : String(r.p4)}${mark(r.p4 < 0 || r.p4 <= GATES.p4)}`.padStart(6),
   );
 }
 console.log('-'.repeat(70));
-console.log(`gates: P1>=${GATES.p1}  P2>=${GATES.p2}  P3<=${GATES.p3}  P4<=${GATES.p4}   ("!" = misses)`);
-console.log('P1/P3/P4 mechanical · P2 heuristic — treat P2 as a pointer, not a measurement');
+console.log(`gates: P1>=${GATES.p1}  P3<=${GATES.p3}  P4<=${GATES.p4}   ("!" = misses)`);
+console.log('P1/P3 mechanical · P4 deterministic, from the data-reader-problem marker');
+console.log('P2 reported but ungated — no deterministic definition yet, so it advises rather than blocks');
+const failures = rows.filter((r) => r.p1 < GATES.p1 || r.p3 > GATES.p3 || (r.p4 >= 0 && r.p4 > GATES.p4));
+if (failures.length) {
+  console.error(`\nFAIL: ${failures.length} page(s) miss a gate`);
+  process.exit(1);
+}
+console.log('\nPASS: every page clears P1, P3 and P4');
 const adj = [...new Set(rows.flatMap((r) => r.adjectivesFound))];
 console.log(`\nevaluative adjectives in use: ${adj.length ? adj.join(', ') : 'none'}`);

@@ -36,7 +36,9 @@ export function Hero({ onOpenDiagnostic }: DiagnosticTriggerProps) {
               <SplitText text={HERO.headline} />
             </h1>
 
-            <p className="measure mt-6 text-lead text-ink-muted">{HERO.lead}</p>
+            <p data-reader-problem className="measure mt-6 text-lead text-ink-muted">
+              {HERO.lead}
+            </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <Button size="lg" onClick={() => onOpenDiagnostic()}>
