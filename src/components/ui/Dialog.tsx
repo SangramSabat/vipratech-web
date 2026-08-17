@@ -8,6 +8,10 @@ import { cn } from "../../lib/utils";
  *
  * Replaces the hand-rolled modal, which had no focus trap, no focus restore,
  * no Escape handling and no scroll lock — spec S7.1. Radix provides all four.
+ *
+ * Motion lives in index.css under .dialog-scrim / .dialog-panel. It previously
+ * used `animate-in fade-in`, which generated nothing: tailwindcss-animate is not
+ * a dependency here, so the dialog had no animation and no exit at all.
  */
 export const Dialog = DialogPrimitive.Root;
 
@@ -18,10 +22,10 @@ export function DialogContent({
 }: ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in" />
+      <DialogPrimitive.Overlay className="dialog-scrim fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2",
+          "dialog-panel fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2",
           "max-h-[calc(100dvh-2rem)] overflow-y-auto",
           "rounded-2xl border border-hairline bg-ground text-ink shadow-2xl",
           className,

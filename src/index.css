@@ -17,15 +17,29 @@
   --color-ink-muted: var(--color-zinc-300); /* 13.45:1 */
   --color-ink-subtle: var(--color-zinc-400); /* 7.56:1 — floor for muted text */
 
-  /* Brand accent (S5.4) */
-  --color-brand: var(--color-lime-400); /* 12.95:1 on ground */
-  --color-brand-hover: var(--color-lime-300);
-  --color-brand-dim: var(--color-lime-500);
+  /* Brand accent (S5.4).
+     Shifted to the acid lime measured off codesandbox.io (#d6fb41). It is not a
+     softening of the rule: on the zinc-950 ground it measures 16.80:1 against
+     lime-400's 13.19:1, and black-on-brand for the primary pill goes 13.93:1 ->
+     17.73:1. More yellow, more voltage, and strictly more accessible. */
+  --color-brand: #d6fb41; /* 16.80:1 on ground */
+  --color-brand-hover: #e4fd7d; /* lifts on hover, per S5.4's hover-lighter rule */
+  --color-brand-dim: #b2d92f;
 
-  /* Semantic accents — one meaning each (S5.3) */
+  /* Semantic accents — one meaning each (S5.3).
+     raycast.com ships every semantic colour with a ~15% alpha twin so badges and
+     tinted panels come free from one pair instead of a token per surface. This
+     file already used that shape ad hoc (border-verified/30 bg-verified/10 in
+     Products.tsx); naming it makes it a system rather than a habit. */
   --color-verified: var(--color-emerald-400);
   --color-attention: var(--color-amber-300);
   --color-info: var(--color-blue-400);
+
+  /* Display tracking measured off codesandbox.io: -0.05em, held constant in em
+     across viewports (they author in em, so 120px -> -6px and 64px -> -3.2px
+     both resolve to the same ratio). Tailwind's `tracking-tight` is -0.025em,
+     which reads noticeably looser than the reference at display sizes. */
+  --tracking-display: -0.05em;
 
   /* Fluid type scale (S4.4) */
   --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
@@ -66,6 +80,18 @@
       opacity: 0;
     }
   }
+
+  /* --- Measured motion (design-recon) ------------------------------------
+     Curves and durations below were read off live sites with a real cursor,
+     not copied from a census. Provenance is noted per token.
+     ---------------------------------------------------------------------- */
+
+  /* linear.app, measured on live nav links and the primary CTA. The curve most
+     frequent in Linear's stylesheet is a different one; this is the curve that
+     is actually applied to interactive elements. */
+  --ease-ui: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --dur-ui: 160ms; /* Linear's dominant tier */
+  --dur-ui-fast: 100ms; /* nav / colour only */
 }
 
 @layer base {
@@ -177,6 +203,83 @@
     }
   }
 
+  /* --- Per-character headline reveal (design-recon: codesandbox.io) -------
+     Measured recipe from codesandbox.io: opacity 2s ease-in-out staggered 30ms
+     per character, colour 1s ease-in-out on the same stagger offset 400ms — each
+     letter fades in, then warms to full ink a beat later.
+
+     The two-stage structure is kept; the durations are not. At the source values
+     a 36-character headline finishes resolving at ~3.1s, which is right for a
+     developer playground and wrong for a page whose claim is that its output is
+     defensible — the headline is the argument, and it should arrive with
+     conviction. Compressed ~4x so the line is fully legible inside ~700ms while
+     the wave and the warm second stage both survive.
+
+     The opacity stage is deliberately dropped. CodeSandbox fades each character
+     in from zero, which hides the headline for the length of the wave; this file
+     already treats "animation that hides content" as the failure mode worth
+     guarding twice (see .reveal below). Running the wave on colour alone keeps
+     every character painted from the first frame — the headline never falls
+     below 7.76:1 contrast at any point — so it degrades rather than hides, and
+     nothing delays the largest paint.
+
+     Implemented with animation rather than transition because there is no state
+     change to transition from: the delay ramp comes from an inline --i, so the
+     whole effect is CSS and the heading is complete in the prerendered HTML.
+     ---------------------------------------------------------------------- */
+  /* source: codesandbox.io `.text-motion-outline` (design-recon) */
+  .reveal-char {
+    display: inline;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-char {
+      animation: char-warm 600ms ease-out both calc(var(--i) * 14ms);
+    }
+  }
+
+  /* Starting from the muted ink rather than the brand keeps this a warming
+     rather than a colour flash — the accent stays reserved for interactive
+     affordances (S5.4). zinc-400 is the spec's floor for muted text, so the
+     start of the wave is already a legitimate text colour. */
+  @keyframes char-warm {
+    from {
+      color: var(--color-ink-subtle);
+    }
+    to {
+      color: var(--color-ink);
+    }
+  }
+
+  /* --- Dialog motion (design-recon) ---------------------------------------
+     Replaces `animate-in fade-in`, which were dead classes: tailwindcss-animate
+     is not a dependency, so neither utility was ever generated and the dialog
+     animated not at all.
+
+     Two curves because there are two jobs, and both are measured:
+
+     - The scrim is chrome. It takes stripe.com's measured overlay timing,
+       0.3s cubic-bezier(.45,.05,.55,.95) — symmetric, neutral, gets out of the
+       way. Stripe runs a transparent blur there; this scrim keeps its dim
+       because a modal must actually block, unlike their nav.
+     - The panel is an object arriving, so it takes apple.com's measured
+       cubic-bezier(.4,0,.6,1) at 0.32s. Symmetric ease-in-out is what they use
+       on hardware pages, where motion should read as a thing being moved rather
+       than an interface responding.
+     - Exits run at half the entrance duration. Measured on liveblocks.io, whose
+       sheet system pairs every enter with a faster exit; matching the two is the
+       usual recreation error and makes dismissal feel sluggish.
+     -------------------------------------------------------------------------- */
+  @keyframes scrim-in { from { opacity: 0; } }
+  @keyframes scrim-out { to { opacity: 0; } }
+  @keyframes panel-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.97); } }
+  @keyframes panel-out { to { opacity: 0; transform: translate(-50%, -50%) scale(0.985); } }
+
+  .dialog-scrim[data-state="open"] { animation: scrim-in 300ms cubic-bezier(0.45, 0.05, 0.55, 0.95) both; }
+  .dialog-scrim[data-state="closed"] { animation: scrim-out 150ms cubic-bezier(0.45, 0.05, 0.55, 0.95) both; }
+  .dialog-panel[data-state="open"] { animation: panel-in 320ms cubic-bezier(0.4, 0, 0.6, 1) both; }
+  .dialog-panel[data-state="closed"] { animation: panel-out 160ms cubic-bezier(0.4, 0, 0.6, 1) both; }
+
   /* A lit top edge (S12.4). One hairline of brand light where a raised surface
      would catch it — the cheapest way to make a card read as an object rather
      than a rectangle, and reserved for the one featured card per section so it
@@ -275,6 +378,13 @@
     animation-name: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  /* The colour wave cannot strand content invisible, but drop it by name anyway
+     so no character is left mid-warm at the muted tier. */
+  .reveal-char {
+    animation-name: none !important;
+    color: inherit !important;
   }
 
   ::view-transition-group(*),

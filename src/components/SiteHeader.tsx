@@ -39,7 +39,12 @@ export function SiteHeader() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-ink-subtle transition-colors hover:text-ink"
+                  // Nav hover measured off linear.app with a real cursor: the
+                  // subtle text tier lifts to primary *and* a 8% white plate
+                  // appears, at the 100ms tier. The plate is what turns a bare
+                  // text link into a target — it shows the hit area, which is
+                  // otherwise invisible until you click (design-recon S3.6).
+                  className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-ink-subtle transition-colors duration-(--dur-ui-fast) ease-(--ease-ui) hover:bg-white/8 hover:text-ink"
                 >
                   {link.label}
                 </a>

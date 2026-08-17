@@ -33,7 +33,14 @@ export function TabsTrigger({
         "flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-4 py-3 font-mono text-xs font-bold whitespace-nowrap transition-colors",
         "border border-hairline bg-surface/80 text-ink-subtle",
         "hover:bg-surface-raised hover:text-ink",
-        "data-[state=active]:border-brand data-[state=active]:bg-brand data-[state=active]:text-black",
+        // Selected state is brand *border + tint*, not a solid brand fill.
+        // S3.1 reserves "solid lime, black text" for the primary CTA tier, and
+        // the services section renders a primary CTA inside the active panel —
+        // so a filled tab put two identical lime pills in one viewport and the
+        // eye could not tell "this is selected" from "this is the action".
+        // S12.4's featured-option pattern (brand border + tint) is the treatment
+        // the spec already defines for one-of-several, so use that.
+        "data-[state=active]:border-brand data-[state=active]:bg-brand/15 data-[state=active]:text-brand",
         className,
       )}
       {...props}
