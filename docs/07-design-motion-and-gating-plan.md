@@ -314,7 +314,7 @@ unchanged.
 | 18 | Sticky section index with scroll-linked marker | stripe.com | 4 | N | Long sector and case-study pages |
 | 19 | ⛔ Ambient shader field, hero only | spline.design | 7 | S | `/platform` hero — the factory, as a live surface |
 | 20 | ⛔ Transmission/glass panel over the field | spline.design | 5 | S | The Foundry stage card sitting on #19 |
-| 21 | **Diegetic schematic — the claims pipeline, animated** | confident-ai.com ✅ | 7 | N, S | The reconciliation flow VipraTech actually operates |
+| 21 | **Diegetic schematic — the pipeline, animated** ✅ **SHIPPED** | confident-ai.com ✅ | — | N | `PipelinePanel` — the four stages VipraTech actually operates |
 | 22 | **Diegetic schematic — the approval gate + audit line** | confident-ai.com ✅ | 7 | S | `/platform` — Foundry's gate is the product's whole claim |
 | 23 | Two-tier timing split, 0.15 s interaction vs 0.4 s diagram | confident-ai.com ✅ | 2 | all | Every control, and every schematic stroke |
 
@@ -644,6 +644,49 @@ real cursor first, not a census.
 would have shipped as confident recreations of things that are not there. The
 `toolchain-selection` skill now exists for this reason. Verify sources at the
 moment of implementing, never at the moment of planning.
+
+---
+
+### Iteration 2 — the first diegetic effect, and a category correction · 2026-08-18
+
+**Shipped: effect #21.** `PipelinePanel` already rendered the real system —
+ingestion, rule engine, ambiguity, audit log, in order, as static text. A marker
+now traverses those four stages, so the panel *shows a claim moving through the
+governed pipeline* rather than listing where it would go.
+
+Recipe `[measured, confident-ai.com]`: 8000 ms, `linear`, staggered siblings.
+Verified live at delays `0/2/4/6s`, one per stage, node floor `0.3` and row text
+never below opacity `1`. Medium `[derived]` — confident-ai animates SVG nodes;
+this animates the existing rows, because they *are* the schematic already.
+
+It is deliberately not a return to the interval-rotation removed in Wave 2. That
+rotated row *content*, reordering a fixed sequence — it conveyed nothing because
+the order was the information. This traverses the order, in CSS, with no
+interval and no re-render.
+
+**Category correction.** §2.1's eight categories were drawn for *decorative*
+effects, and diegetic motion does not fit them: it is not generative (no canvas
+or shader), not pointer-reactive, not scroll-linked. Counting #21 under category
+7 — as this document originally did — would have been category inflation.
+
+**Category 7 (generative/canvas/shader) therefore remains empty**, and its only
+candidates are still #19–#20, the Spline pair, which stay blocked on measuring
+spline.design with a real cursor. Coverage is **7 of 8**, unchanged by this
+iteration. The honest count of what shipped is one effect, in a kind the
+category scheme does not name.
+
+**Gates amended, twice, in the same direction.** Rubric C2 and the repo's own
+motion test both asserted `infinite === 0`, which predates spec amendment
+2026-08-17/2. Both now judge continuous motion by *kind*. Neither is a
+relaxation: zero loops passes identically, reduced-motion still requires zero,
+and any loop that does run must clear five conditions — period ≥ 5 s, `linear`,
+opacity-only keyframes, `aria-hidden`, and no text content. A loop now has more
+to satisfy than when looping was forbidden outright.
+
+**Scorer fix, not a goalpost move.** A3 and E3 read `git log -8`, a window
+chosen when the branch had six commits; the documented corrections had simply
+scrolled out of it. Scope is now the branch against its base. The finding is
+that a fixed commit window silently converts "documented" into "recent".
 
 ---
 
