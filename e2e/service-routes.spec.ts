@@ -137,8 +137,10 @@ test.describe('service routes', () => {
     const xml = await (await request.get('/sitemap.xml')).text();
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 
+    // Order mirrors ROUTES: home, then the platform arm, then the practices.
     expect(locs).toEqual([
       'https://vipratech.in/',
+      'https://vipratech.in/platform/',
       ...SERVICES.map((s) => `https://vipratech.in/services/${s.slug}/`),
     ]);
   });
@@ -166,5 +168,71 @@ test.describe('service routes', () => {
 
     await page.getByRole('link', {name: /back to the home page/i}).click();
     await expect(page.locator('h1')).toHaveText('AI for decisions you have to defend.');
+  });
+});
+
+test.describe('platform route (Class S — spec S6.1-R)', () => {
+  /**
+   * The showcase tier's first route. Class S *permits* WebGL, a second
+   * continuous layer and a 30 kB route budget; this asserts the page takes
+   * almost none of it. The permission was bought by making Trust-class pages
+   * stricter, so an unused allowance is the point rather than an oversight —
+   * and a later change that quietly cashes it in should fail here.
+   */
+  test('spends almost none of the Class S allowance', async ({page}) => {
+    await page.goto('/platform/');
+    await page.waitForSelector('h1');
+
+    // Class S permits canvas/WebGL. This page uses none: glass needs something
+    // behind it, and there is no 3D scene here to put behind it.
+    expect(await page.locator('canvas').count()).toBe(0);
+
+    const loops = await page.evaluate(() =>
+      [...document.querySelectorAll('*')]
+        .filter((el) => {
+          const cs = getComputedStyle(el);
+          return cs.animationName !== 'none' && cs.animationIterationCount === 'infinite';
+        })
+        .map((el) => {
+          const timing = el.getAnimations()[0]?.effect?.getTiming?.() ?? {};
+          return {
+            dur: timing.duration,
+            ease: timing.easing,
+            delay: getComputedStyle(el).animationDelay,
+          };
+        }));
+
+    // One diegetic schematic: four stages, 12s linear, staggered a stage apart.
+    expect(loops).toHaveLength(4);
+    expect([...new Set(loops.map((l) => l.dur))]).toEqual([12000]);
+    expect([...new Set(loops.map((l) => l.ease))]).toEqual(['linear']);
+    expect(new Set(loops.map((l) => l.delay)).size).toBe(4);
+  });
+
+  test('meets the same accessibility bar as every other route', async ({page}) => {
+    await page.goto('/platform/');
+    const nodes = await interactiveAxNodes(page);
+    expect(nodes.filter((n) => !n.name)).toEqual([]);
+    expect(await contrastFailures(page)).toEqual([]);
+    expect(await undersizedTapTargets(page)).toEqual([]);
+  });
+
+  test('the platform copy is in the prerendered HTML, not injected', async ({request}) => {
+    const html = await (await request.get('/platform/')).text();
+
+    // Tags are stripped before matching because SplitText renders the headline
+    // one <span> per character, so the h1 is NOT a contiguous substring of the
+    // HTML — only of its textContent. A naive `html.includes(headline)` fails
+    // here while the page is perfectly well prerendered.
+    //
+    // Worth knowing: docs/05 S1.1 documents its own check as
+    // `grep -c "AI for decisions you have to defend" dist/index.html >= 1`.
+    // That still returns 3 — but it is matching <title> and the OG/meta tags,
+    // not the h1 it was written to protect. The check passes for a reason that
+    // is no longer the reason, which is worth fixing there separately.
+    const text = html.replace(/<[^>]+>/g, '');
+    expect(text).toContain('The factory we build your software in.');
+    // The honesty section is the point of the page; assert it survives.
+    expect(text).toContain('does not help');
   });
 });

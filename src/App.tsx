@@ -1,5 +1,6 @@
 import { lazy, Suspense, useRef, useState } from "react";
 import { HomePage } from "./components/HomePage";
+import { Platform } from "./pages/Platform";
 import { ServiceDetail } from "./pages/ServiceDetail";
 import { SERVICE_OFFERS } from "./data/companyData";
 import { HOME_ROUTE, type Route } from "./routes";
@@ -52,6 +53,8 @@ export default function App({ route = HOME_ROUTE }: { route?: Route }) {
       <main id="main" className="flex-1">
         {service ? (
           <ServiceDetail service={service} onOpenDiagnostic={handleOpenDiagnostic} />
+        ) : route.path === "/platform/" ? (
+          <Platform onOpenDiagnostic={handleOpenDiagnostic} />
         ) : (
           <HomePage onOpenDiagnostic={handleOpenDiagnostic} />
         )}

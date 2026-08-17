@@ -364,6 +364,15 @@
       animation: flow-pulse 8s linear infinite;
       animation-delay: calc(var(--i) * 2s);
     }
+
+    /* The Class S variant. Same mechanism, slower, because on `/platform` the
+       schematic *is* the argument rather than a panel beside it — a reader
+       there is following the stages, not glancing at an illustration.
+       12s keeps each stage lit for 3s instead of 2s. */
+    .flow-node-slow {
+      animation-duration: 12s;
+      animation-delay: calc(var(--i) * 3s);
+    }
   }
 
   /* The spine the markers travel down. Static — it is the pipeline itself,

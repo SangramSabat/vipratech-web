@@ -28,7 +28,8 @@ export const COMPANY_INFO = {
   founder: "Akhilesh Mittal",
   email: "akhilesh@vipratech.in",
   phone: "+91 70234 15753",
-  address: "Plot No. 1, Vikas Nagar, Nanta Road, Kunhari, Kota, Rajasthan, India",
+  address:
+    "Plot No. 1, Vikas Nagar, Nanta Road, Kunhari, Kota, Rajasthan, India",
   url: "https://vipratech.in",
 };
 
@@ -109,7 +110,8 @@ export const SECTIONS: Record<string, SectionIntro> = {
   how: {
     eyebrow: "How engagements work",
     heading: "Start with a conversation, not a contract.",
-    subhead: "Three stages, each with a defined exit. You can stop after any of them.",
+    subhead:
+      "Three stages, each with a defined exit. You can stop after any of them.",
   },
   why: {
     eyebrow: "Why pilots stall",
@@ -161,7 +163,8 @@ export const SECTIONS: Record<string, SectionIntro> = {
 export const COMPARISON_ROWS: ComparisonRow[] = [
   {
     generic: "One model handles every case",
-    governed: "Rules handle the deterministic cases; AI handles only the ambiguous residue",
+    governed:
+      "Rules handle the deterministic cases; AI handles only the ambiguous residue",
   },
   {
     generic: "Confidence score as the only signal",
@@ -181,7 +184,8 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
 ];
 
-export const COMPARISON_CLOSING = "Ninety percent accurate means someone still checks all of it.";
+export const COMPARISON_CLOSING =
+  "Ninety percent accurate means someone still checks all of it.";
 
 /* -------------------------------------------------------------------------- */
 /* Security & assurance — docs/03-copywriting-matrix.md §4                     */
@@ -233,7 +237,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Human review exception dashboard",
       "Audit-friendly traceability and evidence links",
     ],
-    targetAudience: "Finance, claims, and operations teams handling unaligned cross-system records.",
+    targetAudience:
+      "Finance, claims, and operations teams handling unaligned cross-system records.",
     primaryOfferName: "Reconciliation Opportunity Sprint",
     sprintOutputs: [
       "Current workflow & source map",
@@ -263,7 +268,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Tool-use & authorization boundary checks",
       "Reproducible evidence register & finding review",
     ],
-    targetAudience: "Engineering & risk teams preparing AI agents for production deployment.",
+    targetAudience:
+      "Engineering & risk teams preparing AI agents for production deployment.",
     primaryOfferName: "AI Agent Security Assessment",
     sprintOutputs: [
       "Agent threat model & attack surface map",
@@ -293,7 +299,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Interruption, retry & policy guardrails",
       "Operator handoff & call evidence capture",
     ],
-    targetAudience: "Collections teams, contact centers, and lenders managing high-volume calls.",
+    targetAudience:
+      "Collections teams, contact centers, and lenders managing high-volume calls.",
     primaryOfferName: "Voice AI Feasibility Sprint",
     sprintOutputs: [
       "Call-flow & exception matrix",
@@ -323,7 +330,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Identity suppression & compliance checks",
       "CRM & pipeline attribution telemetry",
     ],
-    targetAudience: "Founders, growth leads, CROs, and agencies scaling B2B outbound.",
+    targetAudience:
+      "Founders, growth leads, CROs, and agencies scaling B2B outbound.",
     primaryOfferName: "Revenue Automation Diagnostic",
     sprintOutputs: [
       "Funnel & revenue workflow audit",
@@ -353,7 +361,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Risk & failure-mode analysis",
       "Focused technical or clickable prototypes",
     ],
-    targetAudience: "Founders, CTOs, and product leaders evaluating complex AI ideas.",
+    targetAudience:
+      "Founders, CTOs, and product leaders evaluating complex AI ideas.",
     primaryOfferName: "AI Product Discovery Sprint",
     sprintOutputs: [
       "Problem brief & evidence corpus",
@@ -454,7 +463,8 @@ export const ENGAGEMENT_STEPS: EngagementStep[] = [
     title: "Production implementation",
     duration: "Custom timeline",
     cost: "Milestone-based",
-    commitment: "Milestone by milestone, scoped from the sprint's own findings.",
+    commitment:
+      "Milestone by milestone, scoped from the sprint's own findings.",
     exit: "Stop after any milestone. Code and infrastructure are yours throughout.",
     description:
       "Full-stack development, AI model orchestration, human review gates, operator dashboards, cloud deployment, monitoring, and audit controls.",
@@ -563,3 +573,83 @@ export const FAQS: FaqEntry[] = [
     a: "Yes. We have built integrations across REST APIs, PostgreSQL, Salesforce and HubSpot, Twilio and Exotel telephony, custom webhook architectures, and flat-file and S3 storage.",
   },
 ];
+
+/**
+ * The platform arm (docs/06 §3, §9).
+ *
+ * VipraTech is positioned as platform-plus-service: Foundry is the system, and
+ * the delivery work is the proof it works. The structural move is 8090's — the
+ * factory is never sold as a tool the company does not itself run.
+ *
+ * `Foundry` is a PLACEHOLDER and is deliberately isolated in one constant.
+ * It has not been cleared: Palantir Foundry and Azure AI Foundry occupy
+ * adjacent enterprise-AI territory (docs/07 F7). Changing it is a one-line
+ * edit here, which is why every reference below reads from `name`.
+ */
+export const PLATFORM = {
+  name: "Foundry",
+  eyebrow: "Foundry",
+  headline: "The factory we build your software in.",
+  lead: "Foundry is an agentic software development system. Requirements become specifications, specifications become tested increments, and every artifact carries the record of how it got there. Agents do the volume. Engineers hold the gates.",
+  stagesIntro: {
+    eyebrow: "The build loop",
+    heading: "How a build moves through it",
+    subhead:
+      "Four stages, in order. An engineer stands at the third one, and nothing reaches production without passing it.",
+  },
+  ownershipIntro: {
+    eyebrow: "Ownership",
+    heading: "What you get either way",
+    subhead:
+      "Whether the engagement continues or stops after the first increment.",
+  },
+  evidenceIntro: {
+    eyebrow: "Evidence",
+    heading: "The systems this team has shipped",
+    subhead:
+      "The reference class sells a factory by showing what came out of it. These carry their own evidence labels, unchanged.",
+  },
+  // Deliberately does NOT claim these were built through Foundry. docs/06 §3
+  // asserts that ("every system in Products & systems was built through
+  // Foundry"), but it is an unconfirmed claim about delivery history, and
+  // 01-brand-guidelines §6 forbids publishing an unverified claim. Naming the
+  // systems and their evidence levels is true today; the stronger provenance
+  // sentence goes in only once the owner confirms it.
+  evidenceNote:
+    "AutoSentinx, MarketingEngine, Aarav Voice System and Latticly are the systems behind the practices on this site. Each is listed with the evidence level it has actually earned — Built, Deployed, Prototyped or Researched — and never a level above it.",
+  limitsIntro: {
+    eyebrow: "Limits",
+    heading: `Where ${"Foundry"} does not help`,
+    subhead: "The cases where this is the wrong tool, named before you buy it.",
+  },
+  stages: [
+    {
+      id: "specify",
+      stage: "Specify",
+      text: "Workflows, exception states and decision rules are captured as an executable specification, not a document.",
+    },
+    {
+      id: "generate",
+      stage: "Generate",
+      text: "Agents produce implementation and tests against that specification, in reviewable increments.",
+    },
+    {
+      id: "gate",
+      stage: "Gate",
+      text: "An engineer approves every increment. Nothing merges on model confidence alone.",
+    },
+    {
+      id: "evidence",
+      stage: "Evidence",
+      text: "Each artifact ships with its specification, its tests, and the record of who approved it.",
+    },
+  ],
+  ownership: {
+    text: "Source code and infrastructure are yours from the first increment. No runtime lock-in, no proprietary format holding your logic.",
+  },
+  // The site tells visitors when they do not need it. That posture is the most
+  // distinctive thing it owns (S10.4), so the platform page carries it too.
+  limits: {
+    text: "If the logic is fully deterministic and stable, a rule engine is cheaper and easier to audit. We will say so on the first call.",
+  },
+} as const;

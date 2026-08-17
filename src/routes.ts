@@ -1,4 +1,4 @@
-import { COMPANY_INFO, SERVICE_OFFERS } from "./data/companyData";
+import { COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
 
 /**
  * The site's routes.
@@ -14,8 +14,10 @@ export interface Route {
   path: string;
   title: string;
   description: string;
-  /** Present on service routes, absent on the home route. */
+  /** Present on service routes, absent on every other route. */
   serviceId?: string;
+  /** Motion budget tier (spec S6.1-R). Absent means Narrative. */
+  motionClass?: "trust" | "narrative" | "showcase";
 }
 
 export const HOME_ROUTE: Route = {
@@ -32,7 +34,15 @@ const SERVICE_ROUTES: Route[] = SERVICE_OFFERS.map((service) => ({
   description: service.description,
 }));
 
-export const ROUTES: Route[] = [HOME_ROUTE, ...SERVICE_ROUTES];
+/** The platform arm. Class S — the showcase tier (spec S6.1-R). */
+const PLATFORM_ROUTE: Route = {
+  path: "/platform/",
+  title: `${PLATFORM.name} — the AI software factory | ${COMPANY_INFO.shortName}`,
+  description: PLATFORM.lead,
+  motionClass: "showcase",
+};
+
+export const ROUTES: Route[] = [HOME_ROUTE, PLATFORM_ROUTE, ...SERVICE_ROUTES];
 
 export function servicePath(serviceId: string): string {
   return `/services/${serviceId}/`;
