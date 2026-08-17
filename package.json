@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "verify": "bun run typecheck && bun run knip && bun run test && bun run build && bun run check:bundle && bun run test:e2e"
+    "verify": "bun run typecheck && bun run knip && bun run test && bun run build && bun run check:bundle && bun run copy:metrics && bun run test:e2e",
+    "copy:metrics": "node scripts/copy-metrics.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
