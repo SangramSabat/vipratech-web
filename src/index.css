@@ -26,7 +26,11 @@
   --color-brand-hover: #e4fd7d; /* lifts on hover, per S5.4's hover-lighter rule */
   --color-brand-dim: #b2d92f;
 
-  /* Semantic accents — one meaning each (S5.3) */
+  /* Semantic accents — one meaning each (S5.3).
+     raycast.com ships every semantic colour with a ~15% alpha twin so badges and
+     tinted panels come free from one pair instead of a token per surface. This
+     file already used that shape ad hoc (border-verified/30 bg-verified/10 in
+     Products.tsx); naming it makes it a system rather than a habit. */
   --color-verified: var(--color-emerald-400);
   --color-attention: var(--color-amber-300);
   --color-info: var(--color-blue-400);
@@ -246,6 +250,35 @@
       color: var(--color-ink);
     }
   }
+
+  /* --- Dialog motion (design-recon) ---------------------------------------
+     Replaces `animate-in fade-in`, which were dead classes: tailwindcss-animate
+     is not a dependency, so neither utility was ever generated and the dialog
+     animated not at all.
+
+     Two curves because there are two jobs, and both are measured:
+
+     - The scrim is chrome. It takes stripe.com's measured overlay timing,
+       0.3s cubic-bezier(.45,.05,.55,.95) — symmetric, neutral, gets out of the
+       way. Stripe runs a transparent blur there; this scrim keeps its dim
+       because a modal must actually block, unlike their nav.
+     - The panel is an object arriving, so it takes apple.com's measured
+       cubic-bezier(.4,0,.6,1) at 0.32s. Symmetric ease-in-out is what they use
+       on hardware pages, where motion should read as a thing being moved rather
+       than an interface responding.
+     - Exits run at half the entrance duration. Measured on liveblocks.io, whose
+       sheet system pairs every enter with a faster exit; matching the two is the
+       usual recreation error and makes dismissal feel sluggish.
+     -------------------------------------------------------------------------- */
+  @keyframes scrim-in { from { opacity: 0; } }
+  @keyframes scrim-out { to { opacity: 0; } }
+  @keyframes panel-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.97); } }
+  @keyframes panel-out { to { opacity: 0; transform: translate(-50%, -50%) scale(0.985); } }
+
+  .dialog-scrim[data-state="open"] { animation: scrim-in 300ms cubic-bezier(0.45, 0.05, 0.55, 0.95) both; }
+  .dialog-scrim[data-state="closed"] { animation: scrim-out 150ms cubic-bezier(0.45, 0.05, 0.55, 0.95) both; }
+  .dialog-panel[data-state="open"] { animation: panel-in 320ms cubic-bezier(0.4, 0, 0.6, 1) both; }
+  .dialog-panel[data-state="closed"] { animation: panel-out 160ms cubic-bezier(0.4, 0, 0.6, 1) both; }
 
   /* A lit top edge (S12.4). One hairline of brand light where a raised surface
      would catch it — the cheapest way to make a card read as an object rather
