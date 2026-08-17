@@ -236,3 +236,43 @@ test.describe('platform route (Class S — spec S6.1-R)', () => {
     expect(text).toContain('does not help');
   });
 });
+
+test.describe('404 (spec S9.6)', () => {
+  /**
+   * The 404 is static HTML with one link. Two regressions were found by the
+   * per-route JS report and are pinned here:
+   *
+   *  - it carried <link rel="modulepreload"> for the React chunk, fetching
+   *    ~61 kB gzip on a page that executes nothing
+   *  - its accent was hardcoded #9ae600 (lime-400) and was left behind when the
+   *    brand moved to #d6fb41, making it the one page still wearing the old
+   *    colour. It now reads the token out of the compiled stylesheet.
+   */
+  test('ships no JavaScript and preloads nothing', async ({request}) => {
+    const html = await (await request.get('/404.html')).text();
+    expect(html).not.toContain('modulepreload');
+    expect(html).not.toMatch(/<script[^>]*type="module"/);
+  });
+
+  test('wears the current brand, not the one it was written with', async ({page}) => {
+    // Loaded as a file here. The 404 *status* is GitHub Pages behaviour and is
+    // covered by 'the 404 stays a 404' above; this test is about its colour.
+    await page.goto('/404.html');
+    const link = page.getByRole('link', {name: /back to the home page/i});
+    const bg = await link.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const brand = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--color-brand').trim());
+
+    const toRgb = async (value: string) =>
+      page.evaluate((v) => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 1;
+        const ctx = c.getContext('2d')!;
+        ctx.fillStyle = v;
+        ctx.fillRect(0, 0, 1, 1);
+        return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+      }, value);
+
+    expect(await toRgb(bg)).toEqual(await toRgb(brand));
+  });
+});
