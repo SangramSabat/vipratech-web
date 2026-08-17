@@ -136,10 +136,27 @@ beyond its volume. The rubric that scored PR #2 (`design-recon/RUBRIC.md`,
 
 ### F9 — the base branch is stale · **minor, mechanical**
 
-PR #3 targets `claude/marketing-website-waves-xq9sep`, the already-merged PR #1
-branch. It therefore does not contain PR #2's design work, and `06` was written
-against a visual system that no longer exists. Retarget to `main`, and land
-after PR #2.
+PR #3 targeted `claude/marketing-website-waves-xq9sep`, the already-merged PR #1
+branch. It therefore did not contain PR #2's design work, and `06` was written
+against a visual system that no longer exists. **Retargeted to `main`.**
+
+### Working convention for this programme
+
+Set by the repo owner, and binding on every wave in §9:
+
+| PR | Branch | Base | Carries |
+|---|---|---|---|
+| **#2** | `design-recon/measured-aesthetic-pass` | `main` | The nine measured effects. Lands first. |
+| **#3** | `claude/content-persona-plan` | `main` | **Planning only.** `06`, `07`, and every subsequent refinement to either. Never source. |
+| **#4** | *(implementation)* | **PR #2's branch** | All source and behaviour changes executing this plan. |
+
+So: a refinement to the plan is a commit on **#3**; anything built from the plan
+is a commit on **#4**, which is based on **#2** and therefore inherits the
+measured aesthetic rather than re-deriving it. Work proceeds locally and is
+committed to #4 at the end of each iteration.
+
+The practical consequence for §9: **Wave 0 belongs to PR #3** — every item in it
+is a decision or a clearance, not a change. Waves A–H are PR #4.
 
 ### What `06` gets right, and this document does not touch
 
