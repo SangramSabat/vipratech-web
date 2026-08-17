@@ -62,7 +62,7 @@ VipraTech is **an AI software factory that also builds the software**. Two arms,
 
 **The load-bearing claim, borrowed structurally from 8090:** the service is the proof of the platform. VipraTech does not sell a tool it does not use — every system in `Products & systems` was built through Foundry.
 
-> **Naming decision required.** `Foundry` is used throughout this document so the copy is writable. Alternatives: `Vipra Foundry`, `The Works`, `Signal Factory`. This is a brand decision to confirm before implementation; a find-and-replace on one constant changes it everywhere.
+> **Naming — provisional placeholder.** `Foundry` is used throughout so the copy is writable. It is **not cleared**: Palantir Foundry and Azure AI Foundry occupy adjacent enterprise-AI territory (`07` F7). `Manthan` was trialled on 2026-08-17 and reverted the same day. It stays one constant, so a later change is a find-and-replace rather than a rewrite.
 
 **Master one-liner** (StoryBrand one-liner, used in the footer, meta description, and outbound):
 

@@ -113,19 +113,22 @@ prerendered documents with CSS motion. The correct move is a **per-route**
 budget where the marketing routes trend toward zero JS, not a raised global
 ceiling. **§8.**
 
-### F7 — `Foundry` is a heavily occupied name · **major, decide before Wave A**
+### F7 — `Foundry` is a heavily occupied name · **major, open**
 
-`06` uses `Foundry` throughout as the platform name and flags naming as an open
-decision. The specific risk is not flagged: **Palantir Foundry** and **Azure AI
-Foundry** are both established products in adjacent enterprise-AI territory,
-and Foundry is also a long-standing VFX software brand. For an AI platform sold
-to enterprise buyers this is a collision on the two axes that matter — buyer
-recall and search visibility.
+`06` uses **`Foundry`** as the platform name and flags naming as an open decision
+without naming the risk: **Palantir Foundry** and **Azure AI Foundry** are both
+established products in adjacent enterprise-AI territory, and Foundry is also a
+long-standing VFX software brand. For an AI platform sold to enterprise buyers
+that is a collision on the two axes that matter — buyer recall and search
+visibility.
 
-Not a legal conclusion, and this document does not make one. It is a flag that
-the name needs a real clearance search before ~2,450 words are written around
-it. `06` correctly isolates it as one constant; that keeps the cost of changing
-it low, so **write the copy, but treat the name as provisional until cleared.**
+`Manthan` was trialled as a replacement on 2026-08-17 and **reverted the same
+day** at the owner's direction; `Foundry` stands as the working placeholder.
+
+The risk is therefore **live, not resolved**. This document makes no legal
+conclusion — it flags that the name needs a real clearance search before ~2,450
+words are written around it. `06` correctly isolates it as one constant, so the
+cost of changing it stays low: **write the copy, treat the name as provisional.**
 
 ### F8 — verification has no design, motion or copy gates · **major**
 
@@ -300,10 +303,10 @@ unchanged.
 
 | # | Effect | Measured from | Cat | Class | Referent on the page |
 |---|---|---|---|---|---|
-| 10 | Inset-ring elevation (light from above, not a drop shadow) | family.co ✱ | 5 | all | Every card; replaces flat borders sitewide |
+| 10 | Inset-ring elevation, `0 0 0 1px inset` in the card colour | family.co ✅ | 5 | all | Every card; replaces flat borders sitewide |
 | 11 | Layered surface grain at low alpha | vercel.com | 5 | N, S | Large empty ground on `/platform`, `/sectors/*` |
 | 12 | Pointer spotlight on card grids | linear.app | 6 | N, S | Sector and product grids — 5+ card choices |
-| 13 | Magnetic primary CTA | family.co ✱ | 6 | N | The one primary per section |
+| 13-R | Two-tier hover darkening — `0.1s ease` buttons, `0.2s ease` nav | family.co ✅ | 2 | all | Every button and link |
 | 14 | Scroll-scrubbed sequence, pinned | apple.com | 4 | S | Foundry's three-stage pipeline on `/platform` |
 | 15 | Shared-element transition across documents | — ⚠️ derived | 8 | all | Sector card → sector page; card becomes hero |
 | 16 | Numeric count-up on the proof strip | stripe.com | 3 | N | The four proof numbers, once, on entry |
@@ -311,12 +314,15 @@ unchanged.
 | 18 | Sticky section index with scroll-linked marker | stripe.com | 4 | N | Long sector and case-study pages |
 | 19 | ⛔ Ambient shader field, hero only | spline.design | 7 | S | `/platform` hero — the factory, as a live surface |
 | 20 | ⛔ Transmission/glass panel over the field | spline.design | 5 | S | The Foundry stage card sitting on #19 |
+| 21 | **Diegetic schematic — the claims pipeline, animated** | confident-ai.com ✅ | 7 | N, S | The reconciliation flow VipraTech actually operates |
+| 22 | **Diegetic schematic — the approval gate + audit line** | confident-ai.com ✅ | 7 | S | `/platform` — Foundry's gate is the product's whole claim |
+| 23 | Two-tier timing split, 0.15 s interaction vs 0.4 s diagram | confident-ai.com ✅ | 2 | all | Every control, and every schematic stroke |
 
-✱ **family.co is Chrome-blocked** — see `APPLIED-TO-vipratech-web.md`. Its
-blueprint is headless-only, and PR #2 rejected all three of its effects for
-exactly this reason. **#10 and #13 require the domain to be granted and the
-blueprint re-verified with a real cursor first.** They are listed as intent, not
-as approved values. Do not implement from the headless numbers.
+✅ **family.co is now measured** — headed GPU-backed Playwright with real hover
+and real Tab presses, 2026-08-17, since the domain stayed blocked to the browser
+extension. #10 is confirmed and cleared. The original #13 ("magnetic CTA") was
+**retracted — it does not exist on the page** — and replaced by #13-R, which is
+what a real cursor actually produced. See §11.
 
 ⚠️ **#15 has no measured source.** Cross-document shared-element transitions
 were not captured in any blueprint. It is `[inferred]` from the `@view-transition`
@@ -325,10 +331,11 @@ or ship it as an explicitly-marked original rather than a recreation.
 
 ### The arithmetic
 
-9 retained + 11 new = **20 effects**, **9 sites**
+9 retained + 14 new = **23 effects**, **10 sites**
 (codesandbox, linear, stripe, apple, liveblocks, raycast, vercel, resend,
-spline — plus family.co conditionally), and **7 of 8 categories**. Only
-category 8 stays partial, pending #15's provenance.
+spline, confident-ai — plus family.co, now measured), and **8 of 8 categories**.
+Category 7 is filled twice over: by the shader field (#19) and, more importantly,
+by the diegetic schematics (#21–#22), which reach it without spectacle.
 
 **Without the §3 amendment**: #19 and #20 are blocked, #14 conflicts with the
 LCP rule, and #11–#13 exceed the one-layer cap wherever they co-occur. The
@@ -482,12 +489,14 @@ the failure this document exists to prevent.
 | **D** | `/platform`, `/work/mom-alimento`, `/engage`; home restructure; effects #14, #17. | B, C |
 | **E** | `/sectors/*` ×5, `/products/`; effect #15. | B, C |
 | **F** | Persona gate (§5) — route-based, no client-side hero swap. | B, D, E |
-| **G** | ⛔ Showcase tier: #19, #20 on `/platform`. Ships only if Wave 0 accepted §3. | D, §3 |
+| **G** | **Showcase tier: #19, #20 on `/platform`.** Amendment accepted 2026-08-17, so this ships. | D |
 | **H** | Copy pass against P1–P4; full verification; rubric re-score. | all |
 
-**Wave G is severable.** Waves 0–F deliver 18 effects, 7 categories, 17 routes
-and the gate without it. G is the difference between an excellent product site
-and a studio piece, and it is the wave to cut first if scope has to give.
+**Wave G ships.** It was drafted as the severable wave — the one to cut if scope
+had to give — but the §3 amendment was accepted on 2026-08-17 specifically to
+get the motion, so it is now core scope. It remains the *last* wave, because
+conditions 1–4 of S6.6-R require everything under it to be complete and correct
+without it first.
 
 ---
 
@@ -519,7 +528,89 @@ the constraint that stops F being satisfied by bulk.
 
 ---
 
-## 11. Open decisions
+## 11. Decisions taken — 2026-08-17
+
+| # | Decision | Effect |
+|---|---|---|
+| 1 | **§3 accepted.** `05-ui-ux-spec.md` amended — S6.1 → S6.1-R, S6.6 → S6.6-R, log entry `2026-08-17/1`. | Showcase tier unblocked. All 20 effects in §4 are in scope. |
+| 2 | **Wave G is no longer severable.** The ambient field and the glass panel ship. | §9 revised. |
+| 3 | **Platform name stays `Foundry`**, as a placeholder. | `Manthan` was trialled and reverted the same day. The collision in F7 is unresolved and still owed a clearance search. |
+| 4 | **Gating confirmed over adaptation** (§5). | The gate is a route. Nothing swaps client-side. |
+
+### Corrections forced by live measurement — `family.co`, 2026-08-17
+
+The domain was still blocked to the browser extension, so it was measured with a
+headed GPU-backed Playwright session driving real hover and real Tab presses
+instead. Two of this document's own claims changed as a result:
+
+- **Effect #10, inset-ring elevation — CONFIRMED, and stronger than claimed.**
+  `color(display-p3 .94902 .941176 .929412) 0 0 0 1px inset` occurs **30 times**,
+  the single most common elevation on the page. Drop shadows appear at most twice
+  each. The site really does light its surfaces from within rather than casting
+  them. Now `[measured]` and cleared to implement.
+- **Effect #13, "magnetic CTA" — RETRACTED. It does not exist.** Every button and
+  link measured under a real cursor changed **background-colour only**:
+  `rgb(23,23,23) → rgb(18,18,18)` on dark, `rgb(246,244,239) → rgb(234,230,221)`
+  on light, at `0.1s ease`. No transform, no translate, no scale on any of them.
+  I inferred "magnetic" from the headless blueprint's parallax section and
+  attached it to the wrong element. **Replaced by effect #13-R below.**
+
+Also now `[measured]` rather than inferred: Display-P3 is the primary authoring
+space (**44** distinct P3 computed values, including `outlineColor`), the focus
+ring is `color(display-p3 .517647 .509804 .505882) solid 2px` at `1px` offset,
+and the radius scale is `10 / 12 / 40 / 72px`.
+
+**Effect #13-R — two-tier hover darkening.** `0.1s ease` on `background-color`
+alone for buttons; `0.2s ease` for nav links. A ~5/255 darkening on dark
+surfaces, ~12/255 on light. It is a smaller effect than the one it replaces, and
+it is the one that is actually there.
+
+### The confident-ai.com finding — a category the budget was missing
+
+Added to the reference set at the owner's direction, measured the same day, and
+it immediately overturned the budget written that morning.
+
+The page runs **92 simultaneous infinite animations** across **133 SVG** nodes at
+**7–8 s `linear`** periods — about **45×** the Class S cap of ≤2. It does not read
+as busy. It reads as expensive. Every one of those animations sits inside a
+schematic of the product's own behaviour: `traceRowPick`, `datasetRouteDraw`,
+`scoreTick`, `promptNode`, `attackProbePillFire`.
+
+So the count-based budget was measuring the wrong thing. It could not distinguish
+a particle field from a diagram of a claims pipeline, and would have banned the
+second in order to prevent the first. `05` gains **S6.1-R.a** (amendment
+`2026-08-17/2`): layer counts govern **ambient** motion; **diegetic** motion is
+budgeted by honesty under four conditions.
+
+This matters beyond the budget. VipraTech's subject matter — a claim entering,
+rules firing, an exception routing to a human, a gate closing, an audit line
+being written — is unusually well suited to being drawn and animated honestly.
+Effects #21–#22 let the page **demonstrate the product rather than describe it**,
+which is also the strongest available answer to generic AI-marketing decoration:
+a schematic of a real system cannot be generic, because the system is specific.
+
+Three mechanisms make the count affordable, all `[measured]`: 7–8 s periods (too
+slow to read as blinking), `linear` easing on every loop (no accent at start or
+end), and hand-numbered staggered siblings (`bubbleAppear1…6`, `streamTurn1/3/5`)
+so a sequence reads as a process with an order. The medium is SVG animated by CSS
+`stroke`/`fill`, not 92 rAF loops — that is why it costs so little.
+
+**Not claimed:** the page's 7 canvases were not characterised, and its one
+authored curve `cubic-bezier(0.22, 1, 0.36, 1)` (×9 in CSS) was **not attributed
+to an element**. That is the frequency-vs-applied trap this toolkit already hit
+on linear.app, so it stays `[measured, unattributed]`.
+
+**Standing caution.** The family.co page also carried **545** transformed elements and
+**68** running animations, none of it in CSS keyframes — the census reported `0`
+keyframes and `0` beziers. This is the same trap this toolkit hit on framer.com:
+**an absence in a CSS census licenses only "not in CSS", never "no motion".**
+family.co's parallax system is real and JS-driven; it has still not been measured
+at the element level, so the lerp-parallax claim in the blueprint stays
+`[inferred]` and must not be implemented from those numbers.
+
+---
+
+## 12. Open decisions
 
 Ordered by what blocks the most work.
 
