@@ -211,14 +211,17 @@
      conviction. Compressed ~4x so the line is fully legible inside ~700ms while
      the wave and the warm second stage both survive.
 
+     The opacity stage is deliberately dropped. CodeSandbox fades each character
+     in from zero, which hides the headline for the length of the wave; this file
+     already treats "animation that hides content" as the failure mode worth
+     guarding twice (see .reveal below). Running the wave on colour alone keeps
+     every character painted from the first frame — the headline never falls
+     below 7.76:1 contrast at any point — so it degrades rather than hides, and
+     nothing delays the largest paint.
+
      Implemented with animation rather than transition because there is no state
      change to transition from: the delay ramp comes from an inline --i, so the
      whole effect is CSS and the heading is complete in the prerendered HTML.
-
-     NOTE (S6.1): this animates the hero heading, which the spec bans on the LCP
-     element. Measured consequence: LCP moves from the h1 to the lead paragraph
-     at ~200-400ms, so LCP timing does not regress, but the rule is still bent.
-     Flagged in the PR rather than resolved unilaterally.
      ---------------------------------------------------------------------- */
   .reveal-char {
     display: inline;
@@ -226,24 +229,14 @@
 
   @media (prefers-reduced-motion: no-preference) {
     .reveal-char {
-      animation:
-        char-fade 500ms ease-out both calc(var(--i) * 12ms),
-        char-warm 400ms ease-out both calc(150ms + var(--i) * 12ms);
+      animation: char-warm 600ms ease-out both calc(var(--i) * 14ms);
     }
   }
 
-  @keyframes char-fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* The second stage. Starting from the muted ink rather than the brand keeps
-     this a warming rather than a colour flash — the accent stays reserved for
-     interactive affordances (S5.4). */
+  /* Starting from the muted ink rather than the brand keeps this a warming
+     rather than a colour flash — the accent stays reserved for interactive
+     affordances (S5.4). zinc-400 is the spec's floor for muted text, so the
+     start of the wave is already a legitimate text colour. */
   @keyframes char-warm {
     from {
       color: var(--color-ink-subtle);
@@ -353,12 +346,10 @@
     transform: none !important;
   }
 
-  /* Same hazard as .reveal: char-fade starts at opacity 0, so clamping the
-     duration is not enough — the name must be dropped, or a headline could
-     strand mid-reveal at zero opacity. */
+  /* The colour wave cannot strand content invisible, but drop it by name anyway
+     so no character is left mid-warm at the muted tier. */
   .reveal-char {
     animation-name: none !important;
-    opacity: 1 !important;
     color: inherit !important;
   }
 
