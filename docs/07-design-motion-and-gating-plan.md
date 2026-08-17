@@ -409,9 +409,9 @@ a check rather than an opinion.
 
 | # | Property | Measure | Gate |
 |---|---|---|---|
-| P1 | **Specificity** | Proper nouns + concrete numerals ÷ 100 words | ≥ 4.0 |
+| P1 | **Specificity** | Proper nouns + concrete numerals ÷ 100 words | ~~≥ 4.0~~ **≥ 15.0** |
 | P2 | **Proof density** | Claims with an attached number, artifact or named system ÷ all claims | ≥ 0.6 |
-| P3 | **Adjective load** | Unquantified evaluative adjectives ÷ 100 words | ≤ 2.0 |
+| P3 | **Adjective load** | Unquantified evaluative adjectives ÷ 100 words | ~~≤ 2.0~~ **≤ 0.5** |
 | P4 | **Labour** | Words before the visitor's own problem is named, per page | ≤ 40 |
 
 P1 and P3 pull against each other by design: the only way to raise specificity
@@ -687,6 +687,60 @@ to satisfy than when looping was forbidden outright.
 chosen when the branch had six commits; the documented corrections had simply
 scrolled out of it. Scope is now the branch against its base. The finding is
 that a fixed commit window silently converts "documented" into "recent".
+
+---
+
+### Iteration 3 — spline verified, and the copy gates were wrong · 2026-08-18
+
+**spline.design measured headed** (still blocked to the extension). `[measured]`:
+48 three.js shaders, three canvases — one at **exactly 100% × 100%** of the
+viewport plus two contained — `backdrop-filter: blur(100px)` persistent at every
+scroll depth, a `blur(24px)` second tier, radii dominated by 16px, and **no drop
+shadows anywhere**. Depth is blur and 3D, never simulated light.
+
+Effects **#19–#20 now have measured values**. They remain unshipped, but the
+blocker has moved: it is no longer "unmeasured", it is **"no Class S route
+exists"**. `/platform` and `/products` are Wave B, and putting a full-viewport
+canvas on the home page would violate S6.1-R, which bans canvas in Class N.
+Category 7 stays empty for a routing reason now, not an evidence one.
+
+**A near-miss, recorded because it nearly became a false finding.** The first
+pass reported a `0×0` canvas and no full-viewport scene — evidence that would
+have contradicted the spec amendment citing spline. The canvas had simply not
+initialised. **A zero-sized canvas is `[not measured]`, not a small canvas.**
+
+---
+
+### The copy baseline exists now, and it overturns §6's own gates
+
+Three iterations in, "50× the copy's impact" had no baseline, so nothing could
+say whether copy improved. `scripts/copy-metrics.mjs` now measures P1–P4 over
+the prerendered HTML and runs inside `verify`.
+
+| | index | services (range) | gate as written | verdict |
+|---|---|---|---|---|
+| **P1** specificity | 16.90 | 17.65 – 18.34 | ≥ 4.0 | **gate was 4× too low** |
+| **P2** proof density *(heuristic)* | 0.56 | 0.48 – 0.55 | ≥ 0.6 | narrowly missed |
+| **P3** adjective load | 0.13 | 0.27 – 0.41 | ≤ 2.0 | **gate was 6× too loose** |
+| **P4** labour | **6** | **71 – 157** | ≤ 40 | home excellent, services fail badly |
+
+**I set P1 and P3 from intuition before measuring anything**, which is the exact
+failure this document was written to catch, committed by the document itself. A
+gate four times below reality is not a target — every page passes on day one and
+the metric never speaks again. Both are now set just inside the measured
+baseline as regression guards: they fail if the copy gets vaguer or fluffier
+than it already is.
+
+**This reframes the content goal.** The existing copy is **not slop**. It is
+specific, unpadded, and on two of four properties already beats what the
+reference class would demand — the only evaluative adjectives anywhere on the
+site are *"rapid"* and *"seamless"*. `06`'s "70% new prose" target would have
+replaced strong copy to hit a word count.
+
+The real defect is structural, and P4 locates it precisely: the home page names
+the reader's problem in **6 words**; every service page takes **71–157**. That
+is a matter of *ordering*, not rewriting — and it is now the content work worth
+doing, in place of a volume target.
 
 ---
 
