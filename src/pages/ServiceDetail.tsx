@@ -43,7 +43,7 @@ export function ServiceDetail({
               </p>
               <h1
                 id="service-heading"
-                className="mt-4 text-display font-extrabold leading-[1.06] tracking-tight text-balance text-ink"
+                className="mt-4 text-display font-extrabold leading-[1.04] tracking-display text-balance text-ink"
               >
                 {service.title}
               </h1>

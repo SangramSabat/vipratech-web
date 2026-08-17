@@ -42,7 +42,10 @@ export function Button<T extends ElementType = "button">({
   return (
     <Component
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center rounded-xl transition-colors",
+        "inline-flex cursor-pointer items-center justify-center rounded-xl",
+        // Measured off linear.app's live CTA: the curve applied to interactive
+        // elements, at its 160ms tier (design-recon blueprints/linear-app S3.6).
+        "transition-colors duration-(--dur-ui) ease-(--ease-ui)",
         "disabled:pointer-events-none disabled:opacity-40",
         VARIANTS[variant],
         variant !== "tertiary" && SIZES[size],

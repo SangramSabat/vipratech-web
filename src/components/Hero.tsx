@@ -3,14 +3,18 @@ import { COMPANY_INFO, CTA, HERO, PROOF_METRICS } from "../data/companyData";
 import type { DiagnosticTriggerProps } from "../types";
 import { Button } from "./ui/Button";
 import { PipelinePanel } from "./PipelinePanel";
+import { SplitText } from "./ui/SplitText";
 
 /**
  * Above-the-fold composition (spec S2.1 §1, S3.3, S9.4).
  *
- * The <h1> is static text so it is present and complete in the prerendered
- * HTML. It was previously typed character-by-character on the client, which
- * both delayed the LCP element by roughly 1.2s and left the headline entirely
- * absent from crawlable markup.
+ * The <h1> is present and complete in the prerendered HTML. It was once typed
+ * character-by-character on the client, which delayed the LCP element by
+ * roughly 1.2s and left the headline absent from crawlable markup.
+ *
+ * SplitText keeps that fix intact: every character is server-rendered and the
+ * reveal is pure CSS `animation-delay`, so there is no client-side typing, no
+ * JavaScript on the critical path, and the accessible name is unchanged.
  */
 export function Hero({ onOpenDiagnostic }: DiagnosticTriggerProps) {
   return (
@@ -27,9 +31,9 @@ export function Hero({ onOpenDiagnostic }: DiagnosticTriggerProps) {
 
             <h1
               id="hero-heading"
-              className="mt-5 text-display font-extrabold leading-[1.04] tracking-tight text-balance text-ink"
+              className="mt-5 text-display font-extrabold leading-[1.02] tracking-display text-balance text-ink"
             >
-              {HERO.headline}
+              <SplitText text={HERO.headline} />
             </h1>
 
             <p className="measure mt-6 text-lead text-ink-muted">{HERO.lead}</p>
