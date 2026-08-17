@@ -5,6 +5,18 @@
 > **Status:** Proposed. Supersedes `02-personas.md` §6 (seams only) and extends `03-copywriting-matrix.md` to the full site.
 >
 > Copy blocks in this document are **final, ship-ready text**. They are written to be read by a customer, not by a reviewer. Everything outside a copy block is build instruction.
+>
+> **⚠️ Amended by [`07-design-motion-and-gating-plan.md`](./07-design-motion-and-gating-plan.md).** `07` reviews this document and overrides it in five places. Where the two disagree, **`07` governs**:
+>
+> | This document | Overridden by `07` | Why |
+> |---|---|---|
+> | §4 — 70% new prose, by word count | §6 — four measured copy properties (P1–P4), gated per page | Word count rewards padding; the goal is impact |
+> | §6 — client-side persona swap on the home hero | §5 — the gate is a route; nothing swaps after paint | A post-hydration hero swap mutates the LCP element PR #2's wave depends on |
+> | §7 — 26 routes | §7 — 17 routes | Four product pages at ~95 words each are too thin to rank or to reward a reader |
+> | §15 — re-base the app-JS budget upward | §8 — per-route budgets; Trust-class routes ship 0 kB | Re-basing an exceeded budget renames the failure |
+> | §15 — Waves A–F, no design wave | §9 — Waves 0–H, design interleaved | Design applied last is decoration |
+>
+> `07` also supplies what this document has none of: motion vocabulary, art direction, and the effect programme. Read them together.
 
 ---
 
