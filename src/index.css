@@ -335,6 +335,49 @@
   }
 
 
+  /* --- Diegetic motion (S6.1-R.a) ----------------------------------------
+     Motion *inside* a schematic of a real system, rather than applied to the
+     page. Budgeted by honesty rather than by layer count.
+
+     Recipe [measured, confident-ai.com]: its 92 simultaneous loops run at
+     7000-8000ms with `linear` easing and hand-numbered staggered siblings
+     (bubbleAppear1..6, streamTurn1/3/5). Three mechanisms make that many
+     animations read as calm rather than busy — a period too slow to register
+     as blinking, linear easing so no frame is accented, and a stagger that
+     makes the sequence read as a process with an order.
+
+     Medium [derived]: confident-ai animates SVG nodes. This animates the four
+     existing pipeline rows, because they are already the schematic — the
+     stages, their order, and their outcomes are rendered as text. Adding SVG
+     to re-draw what the DOM already says would be decoration.
+
+     Honesty conditions (S6.1-R.a): the four stages are the pipeline VipraTech
+     actually operates and are already named in copy; opacity only, so nothing
+     shifts; and the row text never drops below full opacity, so the marker
+     carries the sequence while the content stays readable throughout. */
+  .flow-node {
+    opacity: 0.3;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .flow-node {
+      animation: flow-pulse 8s linear infinite;
+      animation-delay: calc(var(--i) * 2s);
+    }
+  }
+
+  /* The spine the markers travel down. Static — it is the pipeline itself,
+     not motion. */
+  .flow-spine {
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-hairline-strong) 12%,
+      var(--color-hairline-strong) 88%,
+      transparent
+    );
+  }
+
   /* The single flourish on the page, reserved for the one primary CTA per
      section (S3.1). Applied anywhere else it becomes the noise the old site
      shipped, so it is deliberately not a general-purpose utility. */
@@ -372,6 +415,28 @@
   syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
+}
+
+/* One claim moving through the four stages. Each marker holds a quarter of the
+   8s cycle, so the sequence reads at the pace someone actually reads the rows.
+   Peak is brief and the floor is 0.3, never 0 — the marker is a position
+   indicator, not a reveal, and nothing is ever hidden by it (S6.1-R). */
+@keyframes flow-pulse {
+  0% {
+    opacity: 0.3;
+  }
+  4% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  26% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.3;
+  }
 }
 
 @keyframes cta-spin {

@@ -44,24 +44,81 @@ test.describe('responsive (spec S8.1–S8.5)', () => {
   });
 });
 
-test.describe('motion budget (spec S6.1, S6.3)', () => {
-  test('nothing animates forever, in either motion preference', async ({browser}) => {
-    for (const reducedMotion of ['reduce', 'no-preference'] as const) {
-      const context = await browser.newContext({reducedMotion});
-      const page = await context.newPage();
-      await page.goto('/');
+test.describe('motion budget (spec S6.1-R, S6.1-R.a, S6.3)', () => {
+  /**
+   * This asserted `infinite === []` outright until the spec was amended
+   * (2026-08-17/2). That check could not tell a particle field from a diagram
+   * of a claims pipeline, and banned the second in order to prevent the first.
+   *
+   * It is not relaxed here. Under `reduce` the answer is still zero, exactly as
+   * before. Under `no-preference`, anything that loops must clear every
+   * S6.1-R.a condition — period, easing, animated property, and whether it is
+   * decoration at all — so a looping animation now has *more* to satisfy than
+   * when looping was simply forbidden.
+   */
+  const loops = (page: import('@playwright/test').Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('*')]
+        .filter((el) => {
+          const cs = getComputedStyle(el);
+          return cs.animationName !== 'none' && cs.animationIterationCount === 'infinite';
+        })
+        .map((el) => {
+          const anim = el.getAnimations()[0];
+          const timing = anim?.effect?.getTiming?.() ?? {};
+          let props: string[] = [];
+          try {
+            props = [
+              ...new Set(
+                (anim!.effect as KeyframeEffect)
+                  .getKeyframes()
+                  .flatMap((k) =>
+                    Object.keys(k).filter(
+                      (n) => !['offset', 'computedOffset', 'easing', 'composite'].includes(n),
+                    ),
+                  ),
+              ),
+            ];
+          } catch {
+            props = ['?'];
+          }
+          return {
+            name: getComputedStyle(el).animationName,
+            durationMs: typeof timing.duration === 'number' ? timing.duration : -1,
+            easing: timing.easing ?? '',
+            props,
+            ariaHidden: el.getAttribute('aria-hidden') === 'true',
+            hasText: (el.textContent ?? '').trim().length > 0,
+          };
+        }),
+    );
 
-      const infinite = await page.evaluate(() =>
-        [...document.querySelectorAll('*')]
-          .filter((el) => {
-            const cs = getComputedStyle(el);
-            return cs.animationName !== 'none' && cs.animationIterationCount === 'infinite';
-          })
-          .map((el) => getComputedStyle(el).animationName),
-      );
-      expect(infinite, `infinite animation with reducedMotion=${reducedMotion}`).toEqual([]);
-      await context.close();
+  test('reduced motion stops every loop outright', async ({browser}) => {
+    const context = await browser.newContext({reducedMotion: 'reduce'});
+    const page = await context.newPage();
+    await page.goto('/');
+    expect(await loops(page)).toEqual([]);
+    await context.close();
+  });
+
+  test('any loop that does run is diegetic, never ambient (S6.1-R.a)', async ({browser}) => {
+    const context = await browser.newContext({reducedMotion: 'no-preference'});
+    const page = await context.newPage();
+    await page.goto('/');
+
+    for (const loop of await loops(page)) {
+      const why = `${loop.name} (${loop.durationMs}ms ${loop.easing}, ${loop.props.join('+')})`;
+      // Slow enough to read as system activity rather than blinking.
+      expect(loop.durationMs, `${why}: period must be >= 5s`).toBeGreaterThanOrEqual(5000);
+      // Linear, so no frame is accented and the loop recedes.
+      expect(loop.easing, `${why}: must be linear`).toBe('linear');
+      // Opacity only — geometry would make it ambient decoration by definition.
+      expect(loop.props, `${why}: opacity only`).toEqual(['opacity']);
+      // Decoration, not the information carrier.
+      expect(loop.ariaHidden, `${why}: must be aria-hidden`).toBe(true);
+      expect(loop.hasText, `${why}: must carry no text`).toBe(false);
     }
+    await context.close();
   });
 
   test('reduced motion clamps every transition to 150ms', async ({browser}) => {
