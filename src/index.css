@@ -223,6 +223,7 @@
      change to transition from: the delay ramp comes from an inline --i, so the
      whole effect is CSS and the heading is complete in the prerendered HTML.
      ---------------------------------------------------------------------- */
+  /* source: codesandbox.io `.text-motion-outline` (design-recon) */
   .reveal-char {
     display: inline;
   }
