@@ -311,11 +311,11 @@ unchanged.
 | 15 | Shared-element transition across documents | — ⚠️ derived | 8 | all | Sector card → sector page; card becomes hero |
 | ~~16~~ | ~~Numeric count-up on the proof strip~~ | **RETRACTED** | — | — | stripe's numbers are `[inferred]` in the blueprint — no measured count-up exists |
 | 17 | Knockout / masked type over media | resend.com | 5 | S | `/work/mom-alimento` hero |
-| 18 | Sticky section index with scroll-linked marker | stripe.com | 4 | N | Long sector and case-study pages |
+| ~~18~~ | ~~Sticky section index with scroll-linked marker~~ | **RETRACTED** | — | — | No measured source in `blueprints/stripe-com`, and the header nav is already a six-anchor section index — it would duplicate existing navigation |
 | 19 | ⛔ Ambient shader field, hero only | spline.design | 7 | S | `/platform` hero — the factory, as a live surface |
 | 20 | ⛔ Transmission/glass panel over the field | spline.design | 5 | S | The Foundry stage card sitting on #19 |
 | 21 | **Diegetic schematic — the pipeline, animated** ✅ **SHIPPED** | confident-ai.com ✅ | — | N | `PipelinePanel` — the four stages VipraTech actually operates |
-| 22 | **Diegetic schematic — the approval gate + audit line** | confident-ai.com ✅ | 7 | S | `/platform` — Foundry's gate is the product's whole claim |
+| 22 | **Diegetic schematic — the build loop** ✅ **SHIPPED** | confident-ai.com ✅ | — | S | `/platform` — 12s, the page's subject rather than a panel |
 | 23 | Two-tier timing split, 0.15 s interaction vs 0.4 s diagram | confident-ai.com ✅ | 2 | all | Every control, and every schematic stroke |
 
 ✅ **family.co is now measured** — headed GPU-backed Playwright with real hover
@@ -795,6 +795,60 @@ statement now is.
 anything was measured, and every one has since moved. A threshold written from
 intuition is a guess wearing a number's clothes. Measure first, then set the
 gate just inside the baseline, and say which of the two you did.
+
+---
+
+### Iteration 5 — Wave B opened, and a Class S page that declines to spend · 2026-08-18
+
+**`/platform` ships.** Four iterations produced two effects because everything
+ambitious was blocked behind routing that did not exist. The showcase tier now
+has somewhere to live — 7 prerendered documents, up from 6.
+
+Copy is `06` §9 verbatim, *including* "Where Foundry does not help", kept last
+and unornamented. A page that sells a platform and then names where the platform
+is the wrong answer is making a costly signal; dressing it up would cost it the
+signal.
+
+**Effect #22 shipped** at 12 s against the home page's 8 s — on `/platform` the
+schematic is the argument rather than a panel beside it, so each stage holds 3 s
+instead of 2 s. Verified live: `12000ms linear`, delays `0/3/6/9s`.
+
+**What the page declines is the finding.** Class S permits WebGL, a second
+continuous layer and 30 kB of route JS. `/platform` ships **zero canvas and zero
+JavaScript**. Effects #19–#20 are measured, available, and still unused: glass
+needs something behind it, there is no 3D scene, and building one to justify the
+effect is the definition of slop. The Class S permission was bought by making
+Trust-class pages stricter — an unused allowance is the point, not an oversight,
+and an e2e test now fails if a later change quietly cashes it in.
+
+**Category 7 is still empty**, and now for the third distinct reason: not
+unmeasured, not unrouted, but *unwarranted*. That is the honest end state until
+a page exists whose subject is genuinely three-dimensional.
+
+**The copy gate caught the page on the iteration that built it** — P1 10.00
+against 11.5. The fix was structural, not padding: the page had no evidence
+attached, which is the one thing 8090's platform-plus-service argument requires.
+Naming the shipped systems took it to 11.56 and P2 to 0.57, the best on the
+site. It deliberately does **not** claim those systems were built through
+Foundry — `06` §3 asserts that, but it is an unverified claim about delivery
+history and `01-brand-guidelines` §6 forbids publishing one.
+
+**#18 retracted** — no measured source in `blueprints/stripe-com`, *and* the
+header nav is already a six-anchor section index, so it would duplicate
+navigation the site has. Third effect withdrawn for having a source that was
+never measured.
+
+### A defect in `05` S1.1, found sideways
+
+S1.1 documents its own verification as
+`grep -c "AI for decisions you have to defend" dist/index.html` ≥ 1. It still
+returns 3 — but it is matching `<title>` and the OG/meta tags, **not the h1 it
+was written to protect**. `SplitText` renders the headline one `<span>` per
+character, so the h1 is not a contiguous substring of the HTML at all.
+
+The check passes for a reason that is no longer the reason. It should assert
+against the h1's `textContent`, and this is filed rather than fixed here because
+S1.1 is in the locked spec.
 
 ---
 
