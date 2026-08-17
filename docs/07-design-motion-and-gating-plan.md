@@ -852,11 +852,86 @@ S1.1 is in the locked spec.
 
 ---
 
+### Iteration 6 — §8 is measured, and it cannot currently pass · 2026-08-18
+
+§8's per-route budgets were planned five iterations ago and never measured,
+while the single global number crept to **44.02 kB against 45**. Now measured:
+
+| Route | Class | Budget | Actual |
+|---|---|---|---|
+| `/404.html` | — | — | **0.00 kB** |
+| `/` | N | 8 kB | 44.02 kB |
+| `/platform` | S | 30 kB | 44.02 kB |
+| `/services/*` ×5 | **T** | **0 kB** | **44.02 kB** |
+
+**Every document references the same entry chunk.** A visitor to a service page
+downloads the home page's simulator and calculator. Trust-class routes exceed
+their budget by the entire chunk.
+
+**This is architectural, and §8 as written cannot be satisfied by tuning.** It
+needs one of:
+
+  a) **per-route entry points** (Vite multi-entry), so each document references
+     only its own chunk; or
+  b) **no hydration on static routes**, shipping prerendered HTML alone.
+
+The obvious shortcut is already closed: amendment `2026-08-14/3` records that
+`React.lazy` makes `renderToString` emit the Suspense fallback instead of the
+component, which removed real sections from the prerendered HTML and traded the
+site's primary SEO fix for ~8 kB.
+
+**This is a decision, not a task** — it changes the build. Until it is taken,
+`check-bundle.mjs` reports the truth per route and holds today's measured value
+as a ceiling, so the gap cannot widen silently. **§8 should not be quietly
+rewritten to match reality**; that is the F6 failure this document was written
+to catch.
+
+### Two defects the measurement found on its first run
+
+Both on `/404.html` — the page nobody reviews:
+
+- **It preloaded React it never executes.** The script tag was stripped
+  deliberately (amendment note in `prerender.mjs`), but the
+  `<link rel="modulepreload">` hints were not, so a static page with one link
+  fetched the **61 kB** React chunk. Now genuinely zero chunks.
+- **It was still wearing the pre-PR2 brand.** Its accent was hardcoded
+  `#9ae600` (lime-400) and was never updated when the accent moved to
+  `#d6fb41`. It now reads `--color-brand` out of the compiled stylesheet, so it
+  cannot drift again. Pinned by a test that compares **painted pixels**, since
+  the token compiles to `oklch`.
+
+A brand change that misses a page is exactly the failure a token system exists
+to prevent; it survived because that page's colour was never in the token
+system to begin with.
+
+### Layer-3 verified on our own site
+
+CDP `Performance` metrics over a 6 s window with the 12 s loop running:
+
+| Route | ScriptDuration | LayoutCount | transform-vs-`getAnimations` gap |
+|---|---|---|---|
+| `/` | 0.0412 s | 1 | **−35** |
+| `/platform` | **0.0001 s** | **0** | **−42** |
+
+A negative gap means more animations than transformed elements — **no imperative
+per-frame motion anywhere on the site.** The diegetic loops are fully
+compositor-driven and cost essentially nothing.
+
+**Note on tooling:** the `chrome-devtools` MCP was connected this session but its
+tools only register at session start, so it was unavailable. The above is
+Playwright's CDP session, which reaches the same `Performance` domain.
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
 
-1. **Accept or decline the §3 motion amendment.** Blocks effects #14, #19, #20,
+1. **Per-route JS: multi-entry build, or no hydration on static routes?** (§8,
+   iteration 6). Blocks Trust-class routes from ever reaching 0 kB, and the
+   global ceiling has 0.98 kB of headroom left. `06`'s remaining routes cannot
+   land without this being decided.
+2. **Accept or decline the §3 motion amendment.** Blocks effects #14, #19, #20,
    the showcase tier and Wave G. Declining is a legitimate choice — the site
    sells defensibility to regulated buyers, and austerity is an argument. It
    caps the outcome at ~14 effects and 5 of 8 categories. Deciding late is the
