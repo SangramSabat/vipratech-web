@@ -158,3 +158,29 @@ test.describe('core web vitals (spec S9.3, S9.4)', () => {
     expect(cls, 'CLS').toBeLessThanOrEqual(0.05);
   });
 });
+
+test.describe('surface elevation (S6.6, family.co)', () => {
+  /**
+   * family.co elevates with an inset ring in the card's own colour rather than
+   * a cast shadow — measured 30 occurrences of `0 0 0 1px inset` against at
+   * most 2 of any drop shadow. The two modes stay distinct here: pressed at
+   * rest, floating on interaction. This asserts both, because a regression
+   * would most likely collapse them into one.
+   */
+  test('cards carry an inset ring at rest and cast only on hover', async ({page}) => {
+    await page.goto('/');
+    const card = page.locator('.lift').first();
+    await card.waitFor();
+
+    const rest = await card.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(rest).toContain('inset');
+    // exactly one shadow at rest: the ring, nothing cast
+    expect(rest.split(',')).toHaveLength(1);
+
+    await card.hover();
+    await page.waitForTimeout(700);
+    const hover = await card.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(hover).toContain('inset');
+    expect(hover.split(',').length).toBeGreaterThan(1);
+  });
+});

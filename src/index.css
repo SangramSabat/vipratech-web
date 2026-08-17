@@ -92,6 +92,16 @@
   --ease-ui: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --dur-ui: 160ms; /* Linear's dominant tier */
   --dur-ui-fast: 100ms; /* nav / colour only */
+
+
+  /* family.co [measured] — the whole page elevates with an inset ring in the
+     card's own colour rather than a cast shadow: 30 occurrences of
+     `0 0 0 1px inset`, against at most 2 of any drop shadow. Light from
+     within, not from above. Authored here in the sRGB fallback; the P3
+     upgrade is in @supports below, mirroring what family.co itself does.
+     design-recon blueprints/family-co. */
+  --ring-inset: inset 0 0 0 1px var(--color-hairline-strong);
+
 }
 
 @layer base {
@@ -301,8 +311,15 @@
   }
 
   /* Hover lift for cards. The overshoot is what reads as considered rather
-     than corporate; it costs one easing token. */
+     than corporate; it costs one easing token.
+
+     The resting state now carries family.co's inset ring instead of sitting
+     flat: the surface is lit from within, and the drop shadow appears only on
+     hover, so the two elevation modes stay distinct — pressed at rest,
+     floating on interaction. That pairing is family.co's own
+     (design-recon blueprints/family-co §"two elevation modes"). */
   .lift {
+    box-shadow: var(--ring-inset);
     transition:
       transform 500ms var(--ease-spring),
       border-color 200ms ease-out,
@@ -312,8 +329,11 @@
   .lift:focus-within {
     transform: translateY(-4px);
     border-color: color-mix(in oklch, var(--color-brand) 45%, transparent);
-    box-shadow: 0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
+    box-shadow:
+      var(--ring-inset),
+      0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
   }
+
 
   /* The single flourish on the page, reserved for the one primary CTA per
      section (S3.1). Applied anywhere else it becomes the noise the old site
