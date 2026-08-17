@@ -304,12 +304,12 @@ unchanged.
 | # | Effect | Measured from | Cat | Class | Referent on the page |
 |---|---|---|---|---|---|
 | 10 | Inset-ring elevation, `0 0 0 1px inset` in the card colour | family.co ✅ | 5 | all | Every card; replaces flat borders sitewide |
-| 11 | Layered surface grain at low alpha | vercel.com | 5 | N, S | Large empty ground on `/platform`, `/sectors/*` |
-| 12 | Pointer spotlight on card grids | linear.app | 6 | N, S | Sector and product grids — 5+ card choices |
+| 11 | ~~Layered surface grain~~ — **re-scoped to Class S** | vercel.com ⚠️ | 5 | **S only** | vercel's grain is a *canvas* technique, banned outside Class S; a CSS/SVG version would be `[derived]`, not a recreation |
+| ~~12~~ | ~~Pointer spotlight on card grids~~ | **RETRACTED** | — | — | linear.app has no pointer-reactive property — see §11 |
 | 13-R | Two-tier hover darkening — `0.1s ease` buttons, `0.2s ease` nav | family.co ✅ | 2 | all | Every button and link |
 | 14 | Scroll-scrubbed sequence, pinned | apple.com | 4 | S | Foundry's three-stage pipeline on `/platform` |
 | 15 | Shared-element transition across documents | — ⚠️ derived | 8 | all | Sector card → sector page; card becomes hero |
-| 16 | Numeric count-up on the proof strip | stripe.com | 3 | N | The four proof numbers, once, on entry |
+| ~~16~~ | ~~Numeric count-up on the proof strip~~ | **RETRACTED** | — | — | stripe's numbers are `[inferred]` in the blueprint — no measured count-up exists |
 | 17 | Knockout / masked type over media | resend.com | 5 | S | `/work/mom-alimento` hero |
 | 18 | Sticky section index with scroll-linked marker | stripe.com | 4 | N | Long sector and case-study pages |
 | 19 | ⛔ Ambient shader field, hero only | spline.design | 7 | S | `/platform` hero — the factory, as a live surface |
@@ -607,6 +607,43 @@ keyframes and `0` beziers. This is the same trap this toolkit hit on framer.com:
 family.co's parallax system is real and JS-driven; it has still not been measured
 at the element level, so the lerp-parallax claim in the blueprint stays
 `[inferred]` and must not be implemented from those numbers.
+
+---
+
+### Iteration 1 verification — three effects failed on contact · 2026-08-18
+
+Wave C began, and the first act of implementing was to verify the sources. Three
+of this document's own proposed effects did not survive.
+
+- **#12 pointer spotlight — RETRACTED.** A 12-step real-cursor drag across
+  `linear.app` and `linear.app/customers` changed **0 of 435** tracked custom
+  properties. Linear has a *static* radial wash — `radial-gradient(circle,
+  rgb(255 255 255 / .04) 0%, rgb(0 0 0 / 0) 50%)` `[measured]` — and nothing
+  pointer-reactive. The effect was written from a headless blueprint, and
+  **headless blueprints cannot see pointer reactivity at all.**
+- **#16 count-up — RETRACTED.** `blueprints/stripe-com` marks its numbers
+  `[inferred]` — "uniform *values* are not readable from source, only their
+  names." There is no measured count-up to recreate.
+- **#11 grain — re-scoped.** vercel.com's grain is a low-resolution **canvas**
+  upscaled by the GPU's bilinear filter. Canvas is banned outside Class S. A
+  CSS/SVG-turbulence version is a different technique and would be `[derived]`,
+  not a recreation. Class S only, or not at all.
+
+Also withdrawn *after* being implemented: the static wash itself, because
+`.ground-field` already paints a radial gradient and two stacked washes gain
+nothing; and `--dur-diagram`, correct in value but with no diagram yet to apply
+to — a token with no referent is the slop rule this document enforces.
+
+**Revised arithmetic:** 23 → **20 effects**, still **10 sites**, and categories
+drop from 8 of 8 to **7 of 8** — category 6 (pointer-reactive) is now **empty**,
+because its only two candidates were the magnetic CTA (retracted 2026-08-17) and
+this spotlight. Any future pointer-reactive effect needs a source measured with a
+real cursor first, not a census.
+
+**Process note.** Both retracted effects came from headless blueprints, and both
+would have shipped as confident recreations of things that are not there. The
+`toolchain-selection` skill now exists for this reason. Verify sources at the
+moment of implementing, never at the moment of planning.
 
 ---
 
