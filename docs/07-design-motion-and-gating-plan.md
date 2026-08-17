@@ -409,8 +409,8 @@ a check rather than an opinion.
 
 | # | Property | Measure | Gate |
 |---|---|---|---|
-| P1 | **Specificity** | Proper nouns + concrete numerals ÷ 100 words | ~~≥ 4.0~~ **≥ 15.0** |
-| P2 | **Proof density** | Claims with an attached number, artifact or named system ÷ all claims | ≥ 0.6 |
+| P1 | **Specificity** | Proper nouns + concrete numerals ÷ 100 words | ~~≥ 4.0~~ ~~≥ 15.0~~ **≥ 11.5** |
+| P2 | **Proof density** | Claims with an attached number, artifact or named system ÷ all claims | ~~≥ 0.6~~ **advisory, ungated** |
 | P3 | **Adjective load** | Unquantified evaluative adjectives ÷ 100 words | ~~≤ 2.0~~ **≤ 0.5** |
 | P4 | **Labour** | Words before the visitor's own problem is named, per page | ≤ 40 |
 
@@ -741,6 +741,60 @@ The real defect is structural, and P4 locates it precisely: the home page names
 the reader's problem in **6 words**; every service page takes **71–157**. That
 is a matter of *ordering*, not rewriting — and it is now the content work worth
 doing, in place of a volume target.
+
+---
+
+### Iteration 4 — the instrument was broken, and it had already lied · 2026-08-18
+
+**Iteration 3's headline finding is retracted.** "Service pages take 71–157 words
+to name the reader's problem, against 6 on the home page" was measurement
+artifact, end to end. Measured honestly, every page lands at **32–38** against a
+gate of 40, and home at **12**. There was no crisis.
+
+Three bugs, each of which had already produced a false conclusion:
+
+| # | Bug | What it caused |
+|---|---|---|
+| 1 | Counted header, nav and footer | Inflated P1 by ~40%; charged ~30 words of navigation against P4 on every page |
+| 2 | Every tag became a space | `SplitText` wraps each character of the hero h1 in a span, so the headline extracted as `A I f o r d e c i s i o n s y o u` — 7 words became 30 letters and **"you" vanished from P4** |
+| 3 | P4 detected the problem by vocabulary | Matched incidental words, not problem statements |
+
+Bug 2 is the one worth remembering: **the instrument was reporting on an
+artifact of the effect it shares a page with.** A measurement tool that runs
+against your own output is not neutral ground.
+
+Bug 3 produced a live Goodhart failure. Reordering the service pages to put the
+problem above the audience filter improved three pages by 13 words each and made
+`/services/ai-security` **worse by 60** — because its early match had never been
+the problem statement at all, but an incidental word in the audience line that
+the reorder pushed later. **I optimised a page against a proxy that was
+measuring something else.**
+
+P4 is now deterministic: the block is marked `data-reader-problem` in the markup
+and P4 measures the position of a thing the author declared. Unmarked reports
+`n/a` — unmeasured, not zero.
+
+**The reorder is kept**, and is load-bearing: the audience block adds ~14 words
+ahead of the problem, which would put every service page over the gate. It also
+has an argument independent of the metric — qualification placed before the
+reader has recognised themselves asks them to opt into a problem they have not
+been shown.
+
+**P1 recalibrated a third time**, to 11.5. Every recalibration here followed an
+*instrument fix*, never a missed gate — that is the distinction that separates
+calibration from moving the goalposts, and it is worth stating because the
+pattern looks identical from outside.
+
+**P2 is now reported but ungated.** It has no deterministic definition, it cannot
+be recalibrated against a baseline that is not measuring the right thing, and
+gating on it would fail every page forever for reasons no one could act on. It
+becomes a gate when claims are marked in the markup the way the problem
+statement now is.
+
+**Standing lesson for §6.** Every gate in this section was invented before
+anything was measured, and every one has since moved. A threshold written from
+intuition is a guess wearing a number's clothes. Measure first, then set the
+gate just inside the baseline, and say which of the two you did.
 
 ---
 
