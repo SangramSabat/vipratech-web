@@ -154,3 +154,49 @@ test.describe('contrast and target size (spec S5.5, S7.4, S4.2)', () => {
     expect(smallest).toBeGreaterThanOrEqual(12);
   });
 });
+
+test.describe('disabled state legibility', () => {
+  /**
+   * The disabled primary used to be the lime pill at `opacity-40`, which over
+   * the dark ground rendered as a murky olive — a colour that reads as a design
+   * choice rather than an off state, and leaves lime meaning two contradictory
+   * things. It is now a flat neutral. WCAG 1.4.3 exempts disabled controls, so
+   * this asserts the *intent* (neutral, not brand) as well as the ratio.
+   */
+  test('the disabled primary is a neutral, not a faded brand', async ({page}) => {
+    await page.goto('/');
+    await openDiagnostic(page);
+    const btn = page.getByRole('button', {name: /see my result/i});
+    await expect(btn).toBeDisabled();
+
+    const paint = await btn.evaluate((el) => {
+      const style = getComputedStyle(el);
+      const toRgb = (value: string) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 1;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = value;
+        ctx.fillRect(0, 0, 1, 1);
+        return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+      };
+      const luminance = (rgb: number[]) =>
+        rgb
+          .map((channel) => {
+            const s = channel / 255;
+            return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+          })
+          .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+      const fg = toRgb(style.color);
+      const bg = toRgb(style.backgroundColor);
+      const [hi, lo] = [luminance(fg), luminance(bg)].sort((a, b) => b - a);
+      return {fg, bg, opacity: style.opacity, ratio: (hi + 0.05) / (lo + 0.05)};
+    });
+
+    // Achromatic: a neutral has no channel spread worth speaking of, whereas
+    // any faded-lime treatment would leave green far ahead of blue.
+    expect(Math.max(...paint.bg) - Math.min(...paint.bg)).toBeLessThanOrEqual(8);
+    // Not faded — the off state is carried by hue, not by transparency.
+    expect(paint.opacity).toBe('1');
+    expect(paint.ratio).toBeGreaterThanOrEqual(4.5);
+  });
+});

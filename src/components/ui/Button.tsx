@@ -46,7 +46,14 @@ export function Button<T extends ElementType = "button">({
         // Measured off linear.app's live CTA: the curve applied to interactive
         // elements, at its 160ms tier (design-recon blueprints/linear-app S3.6).
         "transition-colors duration-(--dur-ui) ease-(--ease-ui)",
-        "disabled:pointer-events-none disabled:opacity-40",
+        // Disabled is a neutral, not a faded brand. `opacity-40` over the dark
+        // ground turned the lime pill into a murky olive that still read as a
+        // colour choice rather than an off state; grey is unambiguous, and it
+        // keeps lime meaning exactly one thing — "this is pressable".
+        // Measured from painted pixels: 5.68:1 (rgb 159,159,169 on 39,39,42),
+        // above S5.2's floor even though WCAG 1.4.3 exempts disabled controls.
+        "disabled:pointer-events-none disabled:bg-surface-raised disabled:text-ink-subtle",
+        "disabled:border-hairline disabled:shadow-none",
         VARIANTS[variant],
         variant !== "tertiary" && SIZES[size],
         className,
