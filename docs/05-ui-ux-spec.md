@@ -136,7 +136,18 @@ count. It must satisfy all four:
 2. It is SVG animated by CSS (`stroke` / `fill` / `opacity`), not a render loop.
 3. Loop period ≥ 5 s with `linear` easing, so it reads as system activity rather
    than as blinking.
-4. It pauses off-screen and under `prefers-reduced-motion`, like everything else.
+4. It is switched off under `prefers-reduced-motion`, and its cost is
+   **budgeted and measured in both states** rather than required to pause.
+
+   *Amended 2026-08-18/3.* This read "pauses off-screen", inherited from S6.5 —
+   which was written for **canvas and rAF loops**, and they genuinely burn CPU
+   regardless of visibility. A compositor-driven CSS animation does not, and it
+   also **cannot** pause on visibility without becoming scroll-driven, which
+   changes what the effect is. Measured on the shipped schematic: `playState`
+   stays `running` off-screen, at ~1.9 ms of style recalc per 5 s against
+   ~1.4 ms in view, with zero layout in both. The condition as written was
+   unsatisfiable in CSS and was asserted without measurement; it is now a
+   budget an e2e test can check. Canvas and rAF work still pause via S6.5.
 
 Measured basis: confident-ai.com runs **92 simultaneous infinite animations**
 across 133 SVG nodes at 7–8 s `linear` periods, and reads as austere rather than

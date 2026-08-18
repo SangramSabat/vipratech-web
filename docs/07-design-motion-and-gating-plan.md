@@ -1157,6 +1157,45 @@ was never put on the page.**
 
 ---
 
+### Iteration 12 — I asserted a condition I wrote, without measuring it · 2026-08-18
+
+Rendered review continued: modal, footer and service pages at 390 px and
+1440 px. Those are sound — the iteration-4 reorder is visibly working, all six
+nav targets resolve (`/#how` is root-relative, so cross-page anchors were never
+broken), and the mobile modal is readable with large targets.
+
+**The finding is in my own work.** S6.1-R.a condition 4 requires diegetic motion
+to *pause off-screen*. I wrote that condition, shipped an effect against it, and
+asserted compliance in two code comments — without ever checking.
+
+Measured: **`playState` stays `running` off-screen.** It does not pause, and CSS
+**cannot** pause on visibility without becoming scroll-driven, which would change
+what the effect is.
+
+| | style recalc / 5 s | layout |
+|---|---|---|
+| in view | ~1.4 ms | 0 |
+| off-screen | ~1.9 ms | 0 |
+
+Statistically the same, and negligible either way. The wording was inherited from
+**S6.5, which was written for canvas and rAF loops** — those do burn CPU
+regardless of visibility. A compositor opacity animation does not.
+
+So the condition was **unsatisfiable in CSS and unverified in practice**. `05` is
+amended (`2026-08-18/3`): the requirement is now a *measured cost budget in both
+states*, which an e2e test checks, instead of a pause that cannot happen. Canvas
+and rAF work still pause under S6.5, unchanged.
+
+**The pattern worth naming:** the previous four instrument artifacts were the
+tool lying about the page. This is the opposite — **the page was fine and the
+rule was wrong**, and it went unnoticed because I asserted compliance in a
+comment instead of a test. A condition with no check behind it is a wish.
+
+Also renamed `/platform`'s section id `terms` → `what-you-get`: home already
+owns `#terms` for commercial terms, which the nav labels "Pricing".
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
