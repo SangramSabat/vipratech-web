@@ -389,3 +389,36 @@ test.describe('diegetic motion costs what it claims (spec S6.1-R.a)', () => {
     }
   });
 });
+
+test.describe('comparison grids scan across (spec S12.4)', () => {
+  /**
+   * The four evidence cards are a comparison grid, and the horizontal rule
+   * inside each is the line the eye scans along. Measured before the fix, those
+   * rules started at four different heights with a 40px spread: the cards were
+   * flex columns with a flex-1 description, which aligns the card *bottoms*
+   * while letting the rule float to wherever the prose ends.
+   *
+   * Subgrid gives every card the same four row tracks, so the tracks size to
+   * the tallest and all four agree. Asserted at lg, where the grid is 4-up;
+   * below that the cards stack and there is nothing to align.
+   */
+  test('the evidence cards align their internal rules', async ({page}) => {
+    await page.setViewportSize({width: 1440, height: 900});
+    await page.goto('/');
+
+    const offsets = await page.evaluate(() =>
+      [...document.querySelectorAll('#products li')]
+        .filter((card) => card.querySelector('ul'))
+        .slice(0, 4)
+        .map((card) =>
+          Math.round(
+            card.querySelector('ul')!.getBoundingClientRect().top -
+              card.getBoundingClientRect().top,
+          ),
+        ));
+
+    expect(offsets).toHaveLength(4);
+    const spread = Math.max(...offsets) - Math.min(...offsets);
+    expect(spread, `capability lists start at ${offsets.join('/')}`).toBeLessThanOrEqual(1);
+  });
+});
