@@ -43,8 +43,10 @@ export function PersonaLanding({
       <section id="top" aria-labelledby="persona-heading" className="relative overflow-hidden">
         <div className="ground-field pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
           <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
-            For {persona.label.toLowerCase()}
+            For {persona.label}
           </p>
           <h1
             id="persona-heading"
@@ -71,6 +73,40 @@ export function PersonaLanding({
               {CTA.secondary}
               <ArrowRight className="size-4 text-brand" aria-hidden="true" />
             </Button>
+          </div>
+            </div>
+
+            {/* The plan beside the claim, mirroring PipelinePanel on the home
+                hero and the build loop on /platform. Three steps is what a
+                reader wants next after recognising their own problem, and it
+                fills a right half that was empty on all five persona pages. */}
+            <figure className="lg:col-span-5">
+              <figcaption className="border-b border-hairline pb-4 font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
+                How this goes
+              </figcaption>
+              <ol className="relative mt-4 space-y-2">
+                <span
+                  className="flow-spine pointer-events-none absolute bottom-4 left-(--schematic-spine-x) top-4 w-px"
+                  aria-hidden="true"
+                />
+                {persona.plan.map((step, index) => (
+                  <li
+                    key={step}
+                    className="lift relative rounded-xl border border-hairline bg-surface/60 p-4 pl-12"
+                  >
+                    <span
+                      className="flow-node flow-node-slow absolute left-(--schematic-node-x) top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
+                      style={{ "--i": index } as React.CSSProperties}
+                      aria-hidden="true"
+                    />
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="ml-3 text-ink">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </figure>
           </div>
         </div>
       </section>
@@ -105,31 +141,6 @@ export function PersonaLanding({
           </div>
         </div>
 
-        {/* Both stakes are stated. Naming only the upside is advertising, and
-            this site's whole posture is that it will tell you when the answer
-            is no (S10.4). */}
-        <ol className="relative mt-8 space-y-2">
-          <span
-            className="flow-spine pointer-events-none absolute bottom-4 left-(--schematic-spine-x) top-4 w-px"
-            aria-hidden="true"
-          />
-          {persona.plan.map((step, index) => (
-            <li
-              key={step}
-              className="relative rounded-xl border border-hairline bg-surface/60 p-4 pl-12"
-            >
-              <span
-                className="flow-node absolute left-(--schematic-node-x) top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
-                style={{ "--i": index } as React.CSSProperties}
-                aria-hidden="true"
-              />
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className="ml-3 text-ink">{step}</span>
-            </li>
-          ))}
-        </ol>
       </Section>
 
       <Section

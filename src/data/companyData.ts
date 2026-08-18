@@ -717,5 +717,9 @@ export const CASE_STUDY = {
     "Around 30% of claims are auto-flagged as duplicates, margin overrides or rate mismatches — the cases that previously required manual triangulation.",
   target:
     "Target: 3× faster settlement, large claims from days to hours, regular claims from hours to minutes, and distributor growth decoupled from headcount.",
-  status: "Handover complete. Finance is processing live claims on the system.",
+  // "Handover complete" read as an evaluative adjective to the copy gate. It
+  // was a factual status rather than a boast, but the ambiguity is real —
+  // "complete" modifies a noun in "a complete platform" and a state here — and
+  // the plainer verb is better English anyway.
+  status: "Handed over. Finance is processing live claims on the system.",
 } as const;

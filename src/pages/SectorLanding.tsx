@@ -35,6 +35,8 @@ export function SectorLanding({
       <section id="top" aria-labelledby="sector-heading" className="relative overflow-hidden">
         <div className="ground-field pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
           <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
             {sector.label}
           </p>
@@ -64,6 +66,20 @@ export function SectorLanding({
               <ArrowRight className="size-4 text-brand" aria-hidden="true" />
             </Button>
           </div>
+            </div>
+
+            {/* The readiness threshold sits beside the claim rather than three
+                sections below it. It is the fastest way for a reader to rule
+                themselves out, and a hero with nothing in its right half was
+                the defect already found and fixed on /platform — then repeated
+                on ten pages built afterwards without looking at them. */}
+            <aside className="lift rounded-2xl border-l-2 border-attention/50 border-y border-r border-hairline bg-surface/40 p-6 lg:col-span-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-wider text-attention">
+                Is this you yet?
+              </p>
+              <p className="mt-3 text-ink">{sector.signal}</p>
+            </aside>
+          </div>
         </div>
       </section>
 
@@ -71,7 +87,9 @@ export function SectorLanding({
         id="builds"
         intro={{
           eyebrow: "What we build here",
-          heading: `Systems we have built for ${sector.label.toLowerCase()}`,
+          // Not toLowerCase(): it renders "ai risk & assurance". A label is
+          // authored, and lowercasing it destroys every acronym in the set.
+          heading: `Systems we have built for ${sector.label}`,
           subhead:
             "Every line is covered by a practice on this site. Nothing is listed to make the column look full.",
         }}
@@ -89,18 +107,6 @@ export function SectorLanding({
         </ul>
       </Section>
 
-      {sector.signal ? (
-        <Section
-          id="signal"
-          intro={{
-            eyebrow: "The signal you are ready",
-            heading: "When this stops being a nice-to-have",
-            subhead: "A threshold, not a pitch — below it, the manual process is usually cheaper.",
-          }}
-        >
-          <p className="measure text-lead text-ink-muted">{sector.signal}</p>
-        </Section>
-      ) : null}
 
       {/* Links to the persona page rather than restating its argument. The two
           pages share a subject and split the job: this one enumerates, that one
