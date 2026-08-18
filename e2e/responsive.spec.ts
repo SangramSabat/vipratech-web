@@ -276,3 +276,59 @@ test.describe('type scale integrity (spec S4.4)', () => {
     }
   });
 });
+
+test.describe('navigation is reachable at every width (spec S2.1)', () => {
+  /**
+   * Regression test for a defect that shipped from Wave 2 and was invisible to
+   * every gate: the primary nav was `hidden lg:block` with nothing in its
+   * place, so on any viewport under 1024px — phone and tablet both — there was
+   * no way to reach a section, a service page or /platform. Found by rendering
+   * the site at 390px, not by a metric.
+   *
+   * The replacement is a <details> disclosure so it costs no JavaScript;
+   * Trust-class routes are meant to reach 0 kB (docs/07 §8).
+   */
+  for (const width of [390, 768, 1024, 1440]) {
+    test(`every nav link is reachable at ${width}px`, async ({page}) => {
+      await page.setViewportSize({width, height: 900});
+      await page.goto('/');
+
+      const disclosure = page.locator('header details');
+      if (await disclosure.isVisible()) {
+        await disclosure.locator('summary').click();
+      }
+
+      const nav = page.getByRole('navigation', {name: 'Primary'});
+      const links = nav.getByRole('link');
+      const labels = (await links.allTextContents()).map((t) => t.trim()).filter(Boolean);
+
+      // Both layouts render the same six links; only one set is visible.
+      expect(new Set(labels).size).toBe(6);
+      for (const link of await links.all()) {
+        if (await link.isVisible()) {
+          const box = await link.boundingBox();
+          expect(box!.height, 'nav links stay above the 44px target floor').toBeGreaterThanOrEqual(44);
+        }
+      }
+    });
+  }
+
+  test('the header stays one row at 390px', async ({page}) => {
+    // Adding the mobile Menu squeezed the header CTA into four lines. The
+    // wordmark is hidden under sm to buy the space back; this pins the outcome
+    // rather than the mechanism.
+    await page.setViewportSize({width: 390, height: 844});
+    await page.goto('/');
+    const header = page.locator('header');
+    const height = (await header.boundingBox())!.height;
+    expect(height, 'header must not wrap onto a second row').toBeLessThan(90);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+
+  test('the site name survives hiding the wordmark', async ({page}) => {
+    await page.setViewportSize({width: 390, height: 844});
+    await page.goto('/');
+    // Visually hidden, still in the accessibility tree.
+    await expect(page.locator('header').getByText('VipraTech Labs', {exact: true}).first()).toBeAttached();
+  });
+});
