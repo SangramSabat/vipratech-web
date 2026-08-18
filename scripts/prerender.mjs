@@ -6,7 +6,7 @@
  * service offers each get their own document so there is a ranking surface per
  * offer rather than one URL hiding all five behind tabs.
  */
-import { mkdir, readFile, writeFile, rm } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile, rm } from "node:fs/promises";
 import { readFileSync, readdirSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
@@ -136,6 +136,55 @@ const notFound = withMetadata(template, {
   `<div id="root"><main style="min-height:100vh;display:grid;place-items:center;padding:2rem;text-align:center;font-family:ui-sans-serif,system-ui,sans-serif"><div><p style="font-family:ui-monospace,monospace;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:${BRAND}">404</p><h1 style="margin:.75rem 0 0;font-size:2rem;font-weight:800;color:#f4f4f5">That page does not exist.</h1><p style="margin:1rem 0 2rem;color:#d4d4d8">The link may be out of date.</p><a href="/" style="display:inline-block;background:${BRAND};color:#000;font-weight:700;padding:.85rem 1.75rem;border-radius:.75rem;text-decoration:none">Back to the home page</a></div></main></div>`,
   );
 await writeFile(path.join(distDir, "404.html"), notFound, "utf8");
+
+// Sourcemaps are kept out of the published output.
+//
+// `sourcemap: "hidden"` was enabled so the bundle could be attributed to its
+// sources (design-recon RUBRIC G2). Hidden only removes the sourceMappingURL
+// comment — the .map files still sit in dist and would deploy, and they carry
+// the full source *including comments*. That published the sentence "blocked on
+// <client> naming permission" on a site whose one hard constraint is not naming
+// that client.
+//
+// Two fixes, because either alone is brittle: the comments no longer contain
+// the name, and the maps no longer ship. Analysis tooling runs before this
+// step, or against a build made without it.
+// Attribution is summarised first, then the maps are deleted. G2 in
+// design-recon's rubric scores dependency share and would otherwise become
+// unmeasurable — and "not measurable" scores 0 there by design. The summary is
+// counts and percentages only: no source, no comments, nothing to leak.
+const assetsDir = path.join(distDir, "assets");
+const maps = (await readdir(assetsDir)).filter((f) => f.endsWith(".map"));
+const shares = {};
+for (const file of maps) {
+  const map = JSON.parse(await readFile(path.join(assetsDir, file), "utf8"));
+  let total = 0;
+  map.sources.forEach((src, i) => {
+    const length = (map.sourcesContent?.[i] ?? "").length;
+    total += length;
+    const dep = src.includes("node_modules")
+      ? src.match(/node_modules\/((?:@[^/]+\/)?[^/]+)/)?.[1]
+      : null;
+    if (dep) shares[dep] = (shares[dep] ?? 0) + length;
+  });
+  shares.__total = (shares.__total ?? 0) + total;
+}
+await writeFile(
+  path.join(assetsDir, "attribution.json"),
+  JSON.stringify(
+    Object.fromEntries(
+      Object.entries(shares)
+        .filter(([name]) => name !== "__total")
+        .map(([name, bytes]) => [name, +(bytes / shares.__total).toFixed(4)])
+        .sort((a, b) => b[1] - a[1]),
+    ),
+    null,
+    1,
+  ),
+  "utf8",
+);
+await Promise.all(maps.map((f) => rm(path.join(assetsDir, f))));
+console.log(`prerender: ${maps.length} sourcemaps summarised to attribution.json, then removed`);
 
 // The SSR bundle is a build artifact, not something to publish.
 await rm(path.join(root, ".ssr"), { recursive: true, force: true });

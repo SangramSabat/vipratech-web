@@ -1,4 +1,4 @@
-import { COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
+import { CASE_STUDY, COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
 import { PERSONAS } from "./data/personas";
 import { SECTORS } from "./data/sectors";
 
@@ -88,11 +88,20 @@ const PRODUCTS_ROUTE: Route = {
   motionClass: "narrative",
 };
 
+/** The flagship case study, unattributed pending naming permission. Class T. */
+const CASE_STUDY_ROUTE: Route = {
+  path: `/work/${CASE_STUDY.slug}/`,
+  title: `${CASE_STUDY.headline} — ${COMPANY_INFO.shortName}`,
+  description: CASE_STUDY.situation.slice(0, 155),
+  motionClass: "trust",
+};
+
 export const ROUTES: Route[] = [
   HOME_ROUTE,
   PLATFORM_ROUTE,
   ENGAGE_ROUTE,
   PRODUCTS_ROUTE,
+  CASE_STUDY_ROUTE,
   ...PERSONA_ROUTES,
   ...SECTOR_ROUTES,
   ...SERVICE_ROUTES,

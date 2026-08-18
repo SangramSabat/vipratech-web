@@ -666,3 +666,56 @@ export const PLATFORM = {
     text: "If the logic is fully deterministic and stable, a rule engine is cheaper and easier to audit. We will say so on the first call.",
   },
 } as const;
+
+/**
+ * The flagship case study — docs/06 §10, shipped **unattributed**.
+ *
+ * This route was recorded as "blocked on the client naming permission" for
+ * five iterations. That was wrong, and the mistake is worth naming: the
+ * permission gates the client's *name*, not the work.
+ *
+ * `01-brand-guidelines` §6 forbids **fabricated** proof — invented logos,
+ * testimonials, metrics, certifications. Every figure below is real, taken from
+ * the delivery record. And `docs/README` states the fallback outright: until
+ * permission is confirmed it ships as "a scaling FMCG brand". The governance
+ * always allowed this page; I read a gate on the name as a gate on the case.
+ *
+ * So: no client name, no logo, and the URL does not carry the name either —
+ * a slug is publication. Everything else is docs/06 §10 verbatim. When
+ * permission arrives, `client` and the slug are the only edits.
+ */
+export const CASE_STUDY = {
+  slug: "distributor-claims",
+  eyebrow: "Case study · Consumer brands",
+  headline: "Settling distributor claims across 1 lakh outlets.",
+  client: "A scaling FMCG brand — named once written permission is confirmed",
+  scope: "DCP Reconciliation Portal, Phase 1",
+  delivered: "2 months",
+  situation:
+    "Distributors claim margin benefits passed on to retailers. Verifying those claims meant reading handwritten and printed bills, then triangulating them against claim sheets, mapping files and email threads. Benefit caps, SKU variations, rate changes and special approvals all had to be held in someone's head. Large claims took days.",
+  stages: [
+    {
+      id: "vision",
+      stage: "Vision",
+      text: "Handwritten and printed bills are read and structured.",
+    },
+    {
+      id: "normalisation",
+      stage: "Normalisation",
+      text: "SKUs are normalised, benefit caps assigned, claims matched to bills, and data-quality problems flagged.",
+    },
+    {
+      id: "decision",
+      stage: "Decision",
+      text: "Margin-cap, approval and scheme logic runs, producing a settlement decision with its evidence attached.",
+    },
+  ],
+  portal:
+    "The portal carries finance operations from processing through approval and settlement to raising the credit note.",
+  scale: ["100+ distributors", "120+ SKUs", "1 lakh+ retail outlets", "Extensible to adjacent processes"],
+  outcome:
+    "Around 30% of claims are auto-flagged as duplicates, margin overrides or rate mismatches — the cases that previously required manual triangulation.",
+  target:
+    "Target: 3× faster settlement, large claims from days to hours, regular claims from hours to minutes, and distributor growth decoupled from headcount.",
+  status: "Handover complete. Finance is processing live claims on the system.",
+} as const;

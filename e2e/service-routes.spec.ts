@@ -145,6 +145,7 @@ test.describe('service routes', () => {
       'https://vipratech.in/platform/',
       'https://vipratech.in/engage/',
       'https://vipratech.in/products/',
+      'https://vipratech.in/work/distributor-claims/',
       ...['consumer-brands', 'finance-operations', 'risk-assurance', 'customer-operations', 'engineering']
         .map((slug) => `https://vipratech.in/for/${slug}/`),
       ...['consumer-brands', 'financial-operations', 'customer-contact', 'ai-product-teams', 'ai-risk']
@@ -384,5 +385,47 @@ test.describe('cross-document view transitions (spec S6.7)', () => {
         `::view-transition-${pseudo} must be switched off under reduced motion`,
       ).toContain(`::view-transition-${pseudo}(*){animation:none!important}`);
     }
+  });
+});
+
+test.describe('the client is not named (01-brand-guidelines §6)', () => {
+  /**
+   * The flagship case study ships unattributed pending written permission. This
+   * exists because the name leaked once already, from somewhere nobody would
+   * look: `sourcemap: "hidden"` still writes .map files into dist, and those
+   * carry the full source *including comments* — one of which discussed the
+   * permission by name. The site's one hard constraint was being broken by a
+   * build setting added for a bundle-analysis metric.
+   *
+   * So this checks the shipped output rather than the source, and covers the
+   * assets directory too.
+   */
+  test('no client identifier appears anywhere in the published output', async ({request}) => {
+    const paths = [
+      '/',
+      '/work/distributor-claims/',
+      '/for/consumer-brands/',
+      '/sectors/consumer-brands/',
+      '/sitemap.xml',
+    ];
+    const forbidden = /makhana|alimento|\bMOM\b/i;
+
+    for (const path of paths) {
+      const body = await (await request.get(path)).text();
+      expect(forbidden.test(body), `${path} must not name the client`).toBe(false);
+    }
+  });
+
+  test('sourcemaps are not published', async ({request}) => {
+    // They are summarised to attribution.json and deleted at prerender.
+    const html = await (await request.get('/')).text();
+    const chunk = /assets\/(index-[A-Za-z0-9_-]+\.js)/.exec(html)?.[1];
+    expect(chunk, 'entry chunk not found').toBeTruthy();
+    // Asserted on content, not status. `vite preview` serves the SPA fallback
+    // for unknown paths, so a deleted .map still answers 200 with HTML here
+    // while 404-ing on a static host. Checking the body works in both.
+    const body = await (await request.get(`/assets/${chunk}.map`)).text();
+    expect(body.startsWith('{'), 'a sourcemap is being served').toBe(false);
+    expect(body).not.toContain('"sourcesContent"');
   });
 });

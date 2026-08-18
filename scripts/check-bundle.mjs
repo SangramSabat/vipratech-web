@@ -108,7 +108,8 @@ if (failed) {
 // 40 -> 41 for five /sectors/* routes plus their page: 0.26 kB per route.
 // 41 -> 42 for NextStep and the four sector readiness thresholds.
 // 42 -> 43 for /products.
-const CEILING_KB = 43; // today's measured shared entry; not §8's target
+// 43 -> 44 for the case study.
+const CEILING_KB = 44; // today's measured shared entry; not §8's target
 
 const docs = [];
 for await (const file of glob('dist/**/index.html')) docs.push(file);
