@@ -438,7 +438,7 @@ being quarantined in one tool.
 
 ---
 
-## 7. Route consolidation — 26 → 17 (F5)
+## 7. Route consolidation — 26 → 20 (F5)
 
 | `06` | Revised | Rationale |
 |---|---|---|
@@ -447,9 +447,15 @@ being quarantined in one tool.
 | `/for/*` ×5 | **5** — kept | Now the gate targets (§5), so they are load-bearing. |
 | `/platform`, `/work/mom-alimento`, `/engage` | **3** — kept | The three highest-intent pages on the site. |
 | `/`, `/services/*` ×5 | **6** — kept | Existing, ranking, untouched. |
-| | **17** | |
+| | **20** | |
 
-Nine fewer documents, none of the content lost — it relocates into pages thick
+**Corrected 2026-08-18.** This table read **17** and its own rows sum to **20**
+(1 + 5 + 5 + 3 + 6). The error mattered: the completeness criterion read the
+figure straight out of this file, so it reported **12/17 = 71%** when the honest
+number was **12/20 = 60%**. A plan that miscounts its own scope flatters every
+progress report made against it.
+
+Six fewer documents, none of the content lost — it relocates into pages thick
 enough to rank and to reward a reader. Re-expand `/products/*` into their own
 routes when any single product has ≥ 400 words of real substance behind it.
 
