@@ -1,5 +1,6 @@
 import { COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
 import { PERSONAS } from "./data/personas";
+import { SECTORS } from "./data/sectors";
 
 /**
  * The site's routes.
@@ -21,6 +22,8 @@ export interface Route {
   motionClass?: "trust" | "narrative" | "showcase";
   /** Present on `/for/*` routes (docs/07 §5). */
   personaId?: string;
+  /** Present on `/sectors/*` routes (docs/07 §7). */
+  sectorSlug?: string;
 }
 
 export const HOME_ROUTE: Route = {
@@ -67,11 +70,21 @@ const ENGAGE_ROUTE: Route = {
   motionClass: "trust",
 };
 
+/** The SEO surface — one document per sector (docs/07 §7). */
+const SECTOR_ROUTES: Route[] = SECTORS.map((sector) => ({
+  path: `/sectors/${sector.slug}/`,
+  sectorSlug: sector.slug,
+  title: `${sector.label} — ${COMPANY_INFO.shortName}`,
+  description: sector.lead,
+  motionClass: "narrative",
+}));
+
 export const ROUTES: Route[] = [
   HOME_ROUTE,
   PLATFORM_ROUTE,
   ENGAGE_ROUTE,
   ...PERSONA_ROUTES,
+  ...SECTOR_ROUTES,
   ...SERVICE_ROUTES,
 ];
 

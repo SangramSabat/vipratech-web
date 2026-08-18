@@ -291,7 +291,7 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
     title: "Voice AI & Conversational Systems",
     diagnosticLabel: "Multilingual Voice AI & Telephony",
     description:
-      "Designing voice systems that connect conversational AI with telephony, Hindi/Hinglish code-switching, policy guardrails, and seamless human handoff.",
+      "Designing voice systems that connect conversational AI with telephony, Hindi/Hinglish code-switching, policy guardrails, and a defined operator handoff.",
     includedFeatures: [
       "Call-flow & exception state logic",
       "Hindi, Hinglish & code-switching evaluation",

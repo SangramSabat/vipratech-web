@@ -105,7 +105,8 @@ if (failed) {
 // beat it. Raised again to 39 for the SB7 depth pass on those five pages.
 // beat it.
 // 39 -> 40 for /engage: one route, 0.65 kB.
-const CEILING_KB = 40; // today's measured shared entry; not §8's target
+// 40 -> 41 for five /sectors/* routes plus their page: 0.26 kB per route.
+const CEILING_KB = 41; // today's measured shared entry; not §8's target
 
 const docs = [];
 for await (const file of glob('dist/**/index.html')) docs.push(file);

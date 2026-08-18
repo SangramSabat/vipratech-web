@@ -77,7 +77,15 @@ const analyse = (text, problemOffset) => {
   const p1 = ((propers + numerals) / n) * 100;
 
   // P3 — evaluative adjectives with no number attached.
-  const adjectives = words.filter((w) => EVALUATIVE.has(w.toLowerCase().replace(/[^a-z-]/g, '')));
+  // Capitalised occurrences are skipped: an evaluative word inside a proper
+  // name is not a claim. "AI Product Research & Rapid Prototyping" is the name
+  // of a practice — flagging its "Rapid" is the metric misreading a noun as a
+  // boast, while "seamless human handoff" in running prose genuinely is one.
+  // Case separates the two cleanly here, and where it would not, the word is
+  // being used as a modifier anyway.
+  const adjectives = words.filter(
+    (w) => !/^[A-Z]/.test(w) && EVALUATIVE.has(w.toLowerCase().replace(/[^a-z-]/g, '')),
+  );
   const p3 = (adjectives.length / n) * 100;
 
   // P4 — words of main content before the reader's problem is stated.
