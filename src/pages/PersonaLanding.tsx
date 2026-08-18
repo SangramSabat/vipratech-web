@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { COMPANY_INFO, CTA, SERVICE_OFFERS } from "../data/companyData";
 import type { Persona } from "../data/personas";
 import { Button } from "../components/ui/Button";
+import { NextStep } from "../components/NextStep";
 import { Section } from "../components/ui/Section";
 import { SplitText } from "../components/ui/SplitText";
 import { servicePath } from "../routes";
@@ -168,6 +169,10 @@ export function PersonaLanding({
             </li>
           ))}
         </ul>
+
+        <div className="mt-6">
+          <NextStep />
+        </div>
       </Section>
     </>
   );

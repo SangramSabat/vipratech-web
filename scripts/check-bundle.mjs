@@ -106,7 +106,8 @@ if (failed) {
 // beat it.
 // 39 -> 40 for /engage: one route, 0.65 kB.
 // 40 -> 41 for five /sectors/* routes plus their page: 0.26 kB per route.
-const CEILING_KB = 41; // today's measured shared entry; not §8's target
+// 41 -> 42 for NextStep and the four sector readiness thresholds.
+const CEILING_KB = 42; // today's measured shared entry; not §8's target
 
 const docs = [];
 for await (const file of glob('dist/**/index.html')) docs.push(file);

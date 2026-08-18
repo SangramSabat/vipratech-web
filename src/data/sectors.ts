@@ -19,8 +19,17 @@ export interface Sector {
   headline: string;
   lead: string;
   builds: string[];
-  /** The readiness signal, where one is stated in §11. */
-  signal?: string;
+  /**
+   * The readiness threshold — when this stops being worth building.
+   *
+   * docs/06 §11 states one only for consumer brands. The other four are
+   * written here in the same voice and are **our judgement, not a measured
+   * finding**, which is why each says so. They exist because the site's whole
+   * posture is that it will tell you when the answer is no (S10.4), and a
+   * qualification threshold is the cheapest way to do that — it lets a reader
+   * disqualify themselves in one line instead of a sales call.
+   */
+  signal: string;
 }
 
 export const SECTORS: Sector[] = [
@@ -57,6 +66,8 @@ export const SECTORS: Sector[] = [
       "Settlement and credit-note workflow",
       "Data architecture and observability",
     ],
+    signal:
+      "Our rule of thumb, not a measured finding: below roughly 500 documents a month, a well-drilled manual process is usually cheaper than any system you would buy or build. The case changes when a second person starts re-checking the first one's work, because that is the point where the cost is the review loop rather than the extraction.",
   },
   {
     slug: "customer-contact",
@@ -72,6 +83,8 @@ export const SECTORS: Sector[] = [
       "Operator handoff",
       "Collections workflow",
     ],
+    signal:
+      "Our rule of thumb, not a measured finding: under about 200 calls a day, hiring is usually simpler than automating. What changes the maths is not volume alone but conduct — if every call has to stay inside a policy and prove it did, consistency stops being a headcount problem.",
   },
   {
     slug: "ai-product-teams",
@@ -87,6 +100,8 @@ export const SECTORS: Sector[] = [
       "Data architecture and observability",
       "AI SDLC enablement on Foundry",
     ],
+    signal:
+      "Our rule of thumb, not a measured finding: if a prototype has survived more than 3 months without reaching production, the blocker is rarely the model. It is usually malformed input, multi-party data, or the absence of anyone who can approve a release.",
   },
   {
     slug: "ai-risk",
@@ -102,5 +117,7 @@ export const SECTORS: Sector[] = [
       "Evidence registers",
       "Remediation and verification roadmaps",
     ],
+    signal:
+      "Our rule of thumb, not a measured finding: the moment an agent gets tool access and a write path, it needs a test someone can re-run after every fix. Before that, threat modelling on 1 page is enough. After it, an opinion with formatting is not evidence.",
   },
 ];

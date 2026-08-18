@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { COMPANY_INFO, CTA, PLATFORM } from "../data/companyData";
 import { Button } from "../components/ui/Button";
+import { NextStep } from "../components/NextStep";
 import { Section } from "../components/ui/Section";
 import { SplitText } from "../components/ui/SplitText";
 
@@ -127,6 +128,9 @@ export function Platform({
 
       <Section id="evidence" intro={PLATFORM.evidenceIntro}>
         <p className="measure text-lead text-ink-muted">{PLATFORM.evidenceNote}</p>
+        <div className="mt-6">
+          <NextStep />
+        </div>
         <p className="mt-4">
           <a
             href="/#products"

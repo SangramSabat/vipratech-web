@@ -3,6 +3,7 @@ import { COMPANY_INFO, CTA, SERVICE_OFFERS } from "../data/companyData";
 import { PERSONAS } from "../data/personas";
 import type { Sector } from "../data/sectors";
 import { Button } from "../components/ui/Button";
+import { NextStep } from "../components/NextStep";
 import { Section } from "../components/ui/Section";
 import { SplitText } from "../components/ui/SplitText";
 import { servicePath } from "../routes";
@@ -130,6 +131,9 @@ export function SectorLanding({
               </li>
             ))}
           </ul>
+          <div className="mt-6">
+            <NextStep />
+          </div>
           <p className="mt-6">
             <a
               href={`/for/${persona.slug}/`}
