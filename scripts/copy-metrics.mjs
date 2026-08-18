@@ -165,7 +165,18 @@ const GATES = {p3: 0.5, p4: 40};
 // 7.02) so they are regression guards rather than aspirations. This replaces
 // the single /platform exemption, which was the same finding handled one page
 // at a time.
-const ARGUMENT_PAGES = /^(platform|for\/)/;
+// The class is decided by what a page's substance IS, not by which threshold it
+// happens to clear — otherwise this list becomes a place to file failures.
+//
+//   listing  — substance is named things: services, products, systems,
+//              technologies. Proper nouns and numerals are the content.
+//   argument — substance is reasoning: a situation, a commitment, a process, a
+//              limit. Names appear only where a name is genuinely involved.
+//
+// /engage is argument by that test and not by convenience: 383 words about
+// what you commit to and what you keep if you stop, naming no product and no
+// technology anywhere. Its only numerals are durations and percentages.
+const ARGUMENT_PAGES = /^(platform|engage|for\/)/;
 const p1Floor = (page) => (ARGUMENT_PAGES.test(page) ? 6.5 : 11.5);
 
 const pages = walk(DIST).filter((p) => !p.includes('404')).sort();

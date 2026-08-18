@@ -58,9 +58,19 @@ const PERSONA_ROUTES: Route[] = PERSONAS.map((persona) => ({
   motionClass: "narrative",
 }));
 
+/** Engagement models and commercial terms. Class T — no decorative motion. */
+const ENGAGE_ROUTE: Route = {
+  path: "/engage/",
+  title: `How to engage — ${COMPANY_INFO.shortName}`,
+  description:
+    "Three stages, each with a fixed scope and a stated exit. Stop after any one and keep everything produced up to that point.",
+  motionClass: "trust",
+};
+
 export const ROUTES: Route[] = [
   HOME_ROUTE,
   PLATFORM_ROUTE,
+  ENGAGE_ROUTE,
   ...PERSONA_ROUTES,
   ...SERVICE_ROUTES,
 ];

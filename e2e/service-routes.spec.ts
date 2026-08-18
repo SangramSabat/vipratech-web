@@ -143,6 +143,7 @@ test.describe('service routes', () => {
     expect(locs).toEqual([
       'https://vipratech.in/',
       'https://vipratech.in/platform/',
+      'https://vipratech.in/engage/',
       ...['consumer-brands', 'finance-operations', 'risk-assurance', 'customer-operations', 'engineering']
         .map((slug) => `https://vipratech.in/for/${slug}/`),
       ...SERVICES.map((s) => `https://vipratech.in/services/${s.slug}/`),

@@ -104,7 +104,8 @@ if (failed) {
 // kilobyte each is efficient, and it is recorded here so the next raise has to
 // beat it. Raised again to 39 for the SB7 depth pass on those five pages.
 // beat it.
-const CEILING_KB = 39; // today's measured shared entry; not §8's target
+// 39 -> 40 for /engage: one route, 0.65 kB.
+const CEILING_KB = 40; // today's measured shared entry; not §8's target
 
 const docs = [];
 for await (const file of glob('dist/**/index.html')) docs.push(file);
