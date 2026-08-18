@@ -79,10 +79,20 @@ const SECTOR_ROUTES: Route[] = SECTORS.map((sector) => ({
   motionClass: "narrative",
 }));
 
+/** The evidence ladder and the systems on it (docs/07 §7). */
+const PRODUCTS_ROUTE: Route = {
+  path: "/products/",
+  title: `Systems and evidence levels — ${COMPANY_INFO.shortName}`,
+  description:
+    "Three evidence labels, used everywhere and never softened, and which systems currently hold each one.",
+  motionClass: "narrative",
+};
+
 export const ROUTES: Route[] = [
   HOME_ROUTE,
   PLATFORM_ROUTE,
   ENGAGE_ROUTE,
+  PRODUCTS_ROUTE,
   ...PERSONA_ROUTES,
   ...SECTOR_ROUTES,
   ...SERVICE_ROUTES,

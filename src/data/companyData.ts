@@ -392,6 +392,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "AI agent security testing system that executes multi-turn adversarial campaigns and captures auditable evidence.",
+    serviceId: "ai-security",
+    sectorSlug: "ai-risk",
     capabilities: [
       "Multi-turn conversation campaigns",
       "Durable evidence register",
@@ -404,6 +406,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "Multi-tenant revenue workflow engine connecting research, drafting, human approval gates, dispatch, and attribution.",
+    serviceId: "sales-automation",
+    sectorSlug: "consumer-brands",
     capabilities: [
       "Multi-tenant SaaS tenant isolation",
       "Human approval gate workflow",
@@ -416,6 +420,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "Regulated voice and conversational architecture for Hindi/Hinglish telephony with guardrails and operator handoff.",
+    serviceId: "voice-ai",
+    sectorSlug: "customer-contact",
     capabilities: [
       "Telephony & speech integration",
       "Hindi & Hinglish code-switching",
@@ -428,6 +434,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Researched/Designed",
     shortDesc:
       "AI-BDR product architecture and research body exploring governed buyer workflows and automated research synthesis.",
+    serviceId: "product-research",
+    sectorSlug: "ai-product-teams",
     capabilities: [
       "Buyer workflow research",
       "Technical architecture specs",

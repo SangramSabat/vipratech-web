@@ -2,6 +2,7 @@ import { lazy, Suspense, useRef, useState } from "react";
 import { HomePage } from "./components/HomePage";
 import { Engage } from "./pages/Engage";
 import { PersonaLanding } from "./pages/PersonaLanding";
+import { Products } from "./pages/Products";
 import { SectorLanding } from "./pages/SectorLanding";
 import { Platform } from "./pages/Platform";
 import { ServiceDetail } from "./pages/ServiceDetail";
@@ -68,6 +69,8 @@ export default function App({ route = HOME_ROUTE }: { route?: Route }) {
           <SectorLanding sector={sector} onOpenDiagnostic={handleOpenDiagnostic} />
         ) : persona ? (
           <PersonaLanding persona={persona} onOpenDiagnostic={handleOpenDiagnostic} />
+        ) : route.path === "/products/" ? (
+          <Products />
         ) : route.path === "/engage/" ? (
           <Engage onOpenDiagnostic={handleOpenDiagnostic} />
         ) : route.path === "/platform/" ? (

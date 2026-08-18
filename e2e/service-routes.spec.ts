@@ -144,6 +144,7 @@ test.describe('service routes', () => {
       'https://vipratech.in/',
       'https://vipratech.in/platform/',
       'https://vipratech.in/engage/',
+      'https://vipratech.in/products/',
       ...['consumer-brands', 'finance-operations', 'risk-assurance', 'customer-operations', 'engineering']
         .map((slug) => `https://vipratech.in/for/${slug}/`),
       ...['consumer-brands', 'financial-operations', 'customer-contact', 'ai-product-teams', 'ai-risk']
