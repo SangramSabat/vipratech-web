@@ -1276,6 +1276,47 @@ showed it wasn't. Reading a component is not the same as looking at it.
 
 ---
 
+### The design claim, finally measured against the references · 2026-08-18
+
+Copy was benchmarked against 8090/Heizen/Factory from early on. **The design
+side never was** — "the craft is strong" was an internal rubric score, and
+sections A–H never look at another site. `design-recon/probes/design-bench.mjs`
+closes that, measuring vocabulary and discipline on any page.
+
+| | tokens | durations | easings | radii | infinite | canvas | L3 gap | focus | reduced-motion |
+|---|---|---|---|---|---|---|---|---|---|
+| spline.design | 47 | 2 | 3 | 11 | 2 | **3** | +6 | **NO** | **NO** |
+| linear.app | **416** | 6 | 4 | 18 | **103** | 0 | −15 | yes | yes |
+| stripe.com | **715** | **21** | **20** | 12 | 0 | 2 | **+236** | **NO** | **NO** |
+| raycast.com | 89 | 17 | 11 | 22 | 8 | 1 | **+87** | yes | yes |
+| vercel.com | 564 | 10 | 6 | 7 | 0 | 1 | +4 | yes | yes |
+| **ours `/`** | 102 | **6** | **4** | **5** | 4 | 0 | **−35** | **yes** | **yes** |
+
+**Two of the most-cited references fail basic interaction craft.**
+`spline.design` and `stripe.com` ship **no `:focus-visible` rule and no
+`prefers-reduced-motion` block**. The site this project was told to look like
+does not style a keyboard focus state or honour a motion preference. That is
+worth knowing before treating any reference as a standard: **measure what a
+reference does, not what its reputation implies.**
+
+**Where the target is better, measured:** scale discipline (5–6 durations and 4
+easings against stripe's 21 and 20; radii 5 against raycast's 22), motion safety
+(the only negative L3 gap in the group — every moving thing is a declared
+animation, nothing written per-frame from JS), and interaction accessibility.
+
+**Where it is behind:** token depth — 102 against linear's 416, vercel's 564,
+stripe's 715. A real gap, recorded as one.
+
+**Deliberately absent:** canvas. spline runs 3; category 7 stays empty because
+there is no three-dimensional subject here.
+
+**Not measured, not claimed:** visual quality. No instrument in this project
+judges whether a page is good-looking, and a number pretending to would be the
+worst thing in it. The honest scope of every design claim made here is
+*vocabulary and discipline*.
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
