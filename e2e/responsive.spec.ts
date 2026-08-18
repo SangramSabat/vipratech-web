@@ -241,3 +241,38 @@ test.describe('surface elevation (S6.6, family.co)', () => {
     expect(hover.split(',').length).toBeGreaterThan(1);
   });
 });
+
+test.describe('type scale integrity (spec S4.4)', () => {
+  /**
+   * Regression test for a defect that shipped invisibly for weeks.
+   *
+   * `cn()` was `twMerge(clsx(...))`. tailwind-merge treats `text-lead` — our
+   * custom font-size token — as conflicting with `text-ink-muted`, a colour,
+   * because both begin `text-`. It cannot know otherwise; the token is ours.
+   * So it silently deleted `text-lead` from every section subhead, which
+   * rendered at 16px against the authored 20px.
+   *
+   * Asserts the computed size rather than the class list, because the class
+   * list was exactly what lied: the source said `text-lead` and the DOM did not.
+   */
+  test('section subheads render at the lead size, not body size', async ({page}) => {
+    await page.goto('/');
+    const subheads = page.locator('section p.measure.mt-4');
+    const count = await subheads.count();
+    expect(count).toBeGreaterThan(3);
+
+    const lead = await page.evaluate(() => {
+      const probe = document.createElement('p');
+      probe.className = 'text-lead';
+      document.body.append(probe);
+      const size = getComputedStyle(probe).fontSize;
+      probe.remove();
+      return size;
+    });
+
+    for (let i = 0; i < count; i++) {
+      const size = await subheads.nth(i).evaluate((el) => getComputedStyle(el).fontSize);
+      expect(size, `subhead ${i} must be the lead size`).toBe(lead);
+    }
+  });
+});

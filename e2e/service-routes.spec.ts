@@ -326,7 +326,10 @@ test.describe('cross-document view transitions (spec S6.7)', () => {
     // says nothing about the site, which is worse than an honest skip. This is
     // the same class of limit as headless falling back to SwiftShader for
     // WebGL and backdrop-filter (design-recon toolchain-selection).
-    const headless = await page.evaluate(() => /headless/i.test(navigator.userAgent));
+    // Playwright spoofs a normal user-agent in headless, so the UA string
+    // cannot be used to detect it. The resolved project config can: `--headed`
+    // sets `headless: false`, and it is otherwise undefined or true.
+    const headless = test.info().project.use.headless !== false;
     if (headless) {
       test.info().annotations.push({
         type: 'environment',

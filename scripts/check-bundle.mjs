@@ -89,7 +89,11 @@ if (failed) {
    is the property actually worth having until the architecture changes.
    --------------------------------------------------------------------------- */
 
-const CEILING_KB = 45; // today's measured shared entry; not §8's target
+// Ratcheted 45 -> 37 on 2026-08-18 after removing tailwind-merge took the
+// shared entry from 44.02 to 35.66 kB. A ceiling is only useful if it tracks
+// real improvements downward; left at 45 it would have quietly re-authorised
+// the 8.32 kB that was just recovered.
+const CEILING_KB = 37; // today's measured shared entry; not §8's target
 
 const docs = [];
 for await (const file of glob('dist/**/index.html')) docs.push(file);
