@@ -1239,6 +1239,37 @@ Score is now **115/115** on merit, with the scale able to fall.
 
 ---
 
+### Iteration 14 — rendered review of every home section · 2026-08-18
+
+Screenshotted all eleven home sections at 1440 px. Most are sound: the services
+tab strip correctly shows the active tab as **brand border + tint** rather than
+the solid fill that once competed with the primary CTA, and the evidence labels
+are honest — **Latticly is marked Researched/Designed**, not quietly upgraded.
+
+**One real defect, in the evidence grid.** The four cards are a comparison grid,
+and the horizontal rule inside each is the line the eye scans along. Measured,
+those rules started at four different heights — a **40 px spread**.
+
+The cause is worth recording because the obvious fix was already applied. The
+cards were flex columns with a `flex-1` description, which aligns the card
+**bottoms**. But the capability lists differ in height (one card wraps two of its
+three items), so bottom-anchoring pushes the visible rule to four different
+places. **Aligning the bottom edge is not the same as aligning the boundary
+someone actually sees.**
+
+Subgrid gives every card the same four row tracks, so they size to the tallest
+and all four agree. Measured after: `211/211/211/211`, **spread 0 px**. Pinned by
+a test asserting the spread rather than any particular offset, and browsers
+without subgrid fall back to the flex column — today's behaviour, not a broken
+one.
+
+**Method note.** This is the fourth consecutive iteration where rendered review
+found something no gate did, and the second where the defect was *invisible in
+the source* — the code already looked correct, and only the measured geometry
+showed it wasn't. Reading a component is not the same as looking at it.
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
