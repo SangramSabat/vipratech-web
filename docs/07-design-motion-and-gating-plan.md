@@ -1117,6 +1117,46 @@ an evidence list into a highlight reel.
 
 ---
 
+### Iteration 11 — the site had no mobile navigation · 2026-08-18
+
+Continuing the visual review from iteration 10, at 390 px this time. The primary
+nav was `hidden lg:block` **with nothing in its place**. On any viewport under
+1024 px — phone *and* tablet — there was no way to reach a section, a service
+page or `/platform`. The header held a logo and one mailto button.
+
+**This shipped in Wave 2 and survived 64 e2e tests, four gates and an
+accessibility suite**, because no test looked at the header below the `lg`
+breakpoint. It is the same lesson as iteration 10, one level worse: gates do not
+see composition, and they also do not see what is *absent* at a viewport nobody
+tested.
+
+The replacement is a **`<details>` disclosure, not a JS menu** — no state, no
+hydration, no bundle, and natively keyboard-operable, screen-reader announced
+and Escape-dismissible. Trust-class routes are meant to reach 0 kB of JS (§8),
+and a navigation menu is the last thing that should stand in the way of that.
+One `<nav>` serves both layouts, so there is still exactly one Primary landmark.
+
+**Two regressions I caused, both found by looking again rather than reasoning:**
+
+1. Adding *Menu* squeezed the header CTA into **four wrapped lines**. The
+   wordmark now hides under `sm` — the cheapest thing on that row to lose, since
+   the mark still identifies the site and the name stays in `<title>`, the
+   footer, and the accessibility tree via `sr-only`.
+2. That still overflowed by **10 px at 360 px**, caught by the *existing*
+   overflow test. The row gap drops 24 px → 8 px under `sm`, which fits without
+   removing anything.
+
+Six tests now pin nav reachability at **390 / 768 / 1024 / 1440**, the
+single-row header, and the accessible name surviving the hidden wordmark.
+
+**Standing note for the review method.** Two consecutive iterations of looking at
+rendered pages found two defects that eleven iterations of measurement did not.
+Both were compositional — dead space, and a missing element. **Add a rendered
+review at more than one width to every iteration; a metric cannot report what
+was never put on the page.**
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
