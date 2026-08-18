@@ -105,7 +105,12 @@ export interface ProductSystem {
  * into the email summary, but not used in scoring — persona-adaptive content
  * is a separate, deferred decision.
  */
-export type PersonaId = "operations-finance" | "security-risk" | "contact-centre" | "product-cto";
+export type PersonaId =
+  | "consumer-brand"
+  | "operations-finance"
+  | "security-risk"
+  | "contact-centre"
+  | "product-cto";
 
 export interface FitDiagnosticInput {
   workflowType: string;

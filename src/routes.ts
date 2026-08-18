@@ -1,4 +1,5 @@
 import { COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
+import { PERSONAS } from "./data/personas";
 
 /**
  * The site's routes.
@@ -18,6 +19,8 @@ export interface Route {
   serviceId?: string;
   /** Motion budget tier (spec S6.1-R). Absent means Narrative. */
   motionClass?: "trust" | "narrative" | "showcase";
+  /** Present on `/for/*` routes (docs/07 §5). */
+  personaId?: string;
 }
 
 export const HOME_ROUTE: Route = {
@@ -42,7 +45,25 @@ const PLATFORM_ROUTE: Route = {
   motionClass: "showcase",
 };
 
-export const ROUTES: Route[] = [HOME_ROUTE, PLATFORM_ROUTE, ...SERVICE_ROUTES];
+/**
+ * The gate's destinations (docs/07 §5). Each persona is a real prerendered
+ * document rather than a client-side variant of the home page, so a shared link
+ * lands on it and a crawler can index it.
+ */
+const PERSONA_ROUTES: Route[] = PERSONAS.map((persona) => ({
+  path: `/for/${persona.slug}/`,
+  personaId: persona.id,
+  title: `${persona.label} — ${COMPANY_INFO.shortName}`,
+  description: persona.problem,
+  motionClass: "narrative",
+}));
+
+export const ROUTES: Route[] = [
+  HOME_ROUTE,
+  PLATFORM_ROUTE,
+  ...PERSONA_ROUTES,
+  ...SERVICE_ROUTES,
+];
 
 export function servicePath(serviceId: string): string {
   return `/services/${serviceId}/`;

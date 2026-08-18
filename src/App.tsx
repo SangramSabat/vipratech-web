@@ -1,8 +1,10 @@
 import { lazy, Suspense, useRef, useState } from "react";
 import { HomePage } from "./components/HomePage";
+import { PersonaLanding } from "./pages/PersonaLanding";
 import { Platform } from "./pages/Platform";
 import { ServiceDetail } from "./pages/ServiceDetail";
 import { SERVICE_OFFERS } from "./data/companyData";
+import { PERSONAS } from "./data/personas";
 import { HOME_ROUTE, type Route } from "./routes";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
@@ -17,6 +19,9 @@ const FitDiagnosticModal = lazy(() =>
 export default function App({ route = HOME_ROUTE }: { route?: Route }) {
   const service = route.serviceId
     ? SERVICE_OFFERS.find((offer) => offer.id === route.serviceId)
+    : undefined;
+  const persona = route.personaId
+    ? PERSONAS.find((candidate) => candidate.id === route.personaId)
     : undefined;
 
   const [workflow, setWorkflow] = useState("");
@@ -53,6 +58,8 @@ export default function App({ route = HOME_ROUTE }: { route?: Route }) {
       <main id="main" className="flex-1">
         {service ? (
           <ServiceDetail service={service} onOpenDiagnostic={handleOpenDiagnostic} />
+        ) : persona ? (
+          <PersonaLanding persona={persona} onOpenDiagnostic={handleOpenDiagnostic} />
         ) : route.path === "/platform/" ? (
           <Platform onOpenDiagnostic={handleOpenDiagnostic} />
         ) : (
