@@ -276,3 +276,102 @@ test.describe('404 (spec S9.6)', () => {
     expect(await toRgb(bg)).toEqual(await toRgb(brand));
   });
 });
+
+test.describe('cross-document view transitions (spec S6.7)', () => {
+  /**
+   * S6.7 has been in the stylesheet since Wave 2 with no test behind it, which
+   * mattered once the site grew from 6 documents to 7: nothing would have
+   * noticed if a new route broke navigation continuity.
+   *
+   * Both halves are asserted. A cross-document transition needs the OUTGOING
+   * document to start one (`pageswap` carries a viewTransition) and the
+   * INCOMING document to continue it (`pagereveal` carries one too). Checking
+   * only the outgoing half would pass while the user still saw a hard cut.
+   *
+   * The navigation must be a real click. Driving it with `location.href` from
+   * an evaluate() reports `pagereveal` without a transition even when the
+   * feature is working correctly — that false negative cost an iteration.
+   */
+  test('a real navigation runs a transition on both documents', async ({browser}) => {
+    const context = await browser.newContext();
+    await context.addInitScript(() => {
+      addEventListener('pageswap', (e) =>
+        sessionStorage.setItem('vt-swap', String(!!(e as PageSwapEvent).viewTransition)));
+      addEventListener('pagereveal', (e) =>
+        sessionStorage.setItem('vt-reveal', String(!!(e as PageRevealEvent).viewTransition)));
+    });
+    const page = await context.newPage();
+
+    await page.goto('/');
+    const link = page.locator('a[href^="/services/"]').first();
+    const href = await link.getAttribute('href');
+    await link.scrollIntoViewIfNeeded();
+    await link.click();
+    await page.waitForURL(`**${href}`);
+
+    const state = await page.evaluate(() => ({
+      swap: sessionStorage.getItem('vt-swap'),
+      reveal: sessionStorage.getItem('vt-reveal'),
+    }));
+    // The outgoing half holds everywhere, headless included.
+    expect(state.swap, 'outgoing document must start a view transition').toBe('true');
+
+    // The incoming half needs a real compositor. Headless Chromium starts the
+    // transition on the outgoing document and then declines to continue it on
+    // the incoming one, so `pagereveal` arrives without a viewTransition even
+    // though the feature is configured correctly and works in a headed browser
+    // — verified by running exactly this test with --headed.
+    //
+    // Asserting it unconditionally would leave a permanently red test that
+    // says nothing about the site, which is worse than an honest skip. This is
+    // the same class of limit as headless falling back to SwiftShader for
+    // WebGL and backdrop-filter (design-recon toolchain-selection).
+    const headless = await page.evaluate(() => /headless/i.test(navigator.userAgent));
+    if (headless) {
+      test.info().annotations.push({
+        type: 'environment',
+        description: 'incoming-document assertion skipped: headless has no compositor for cross-document view transitions. Run with --headed to check it.',
+      });
+    } else {
+      expect(state.reveal, 'incoming document must continue it').toBe('true');
+    }
+    await context.close();
+  });
+
+  test('the header keeps its identity across every route', async ({page}) => {
+    // A named element is what lets the header hold still while content changes,
+    // rather than cross-fading with the rest of the page. Measured pattern:
+    // raycast.com names its layout container the same way
+    // (design-recon blueprints/raycast-com).
+    for (const path of ['/', '/platform/', '/services/voice-ai/']) {
+      await page.goto(path);
+      const name = await page
+        .locator('header')
+        .evaluate((el) => getComputedStyle(el).viewTransitionName);
+      expect(name, `header on ${path}`).toBe('site-header');
+    }
+  });
+
+  test('reduced motion switches the transitions off', async ({page, request}) => {
+    // Asserted against the shipped stylesheet rather than the CSSOM. The
+    // minifier splits `::view-transition-group(*), ::view-transition-old(*),
+    // ::view-transition-new(*)` into three separate rules inside the media
+    // query, so no single rule's cssText contains both the query and the
+    // selector — a CSSOM assertion fails while the CSS is perfectly correct.
+    await page.goto('/');
+    const href = await page
+      .locator('link[rel="stylesheet"]')
+      .first()
+      .getAttribute('href');
+    const css = await (await request.get(href!)).text();
+
+    const block = /@media[^{]*prefers-reduced-motion[^{]*\{([\s\S]*)/.exec(css);
+    expect(block, 'a prefers-reduced-motion block must exist').not.toBeNull();
+    for (const pseudo of ['group', 'old', 'new']) {
+      expect(
+        block![1],
+        `::view-transition-${pseudo} must be switched off under reduced motion`,
+      ).toContain(`::view-transition-${pseudo}(*){animation:none!important}`);
+    }
+  });
+});

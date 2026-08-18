@@ -455,7 +455,7 @@
 }
 
 /* Cross-document view transitions (S6.7).
-   The site is six separately prerendered documents with no router, so this is
+   The site is seven separately prerendered documents with no router, so this is
    two lines that make navigation feel continuous with zero routing JavaScript.
    Unsupported browsers simply navigate as before. */
 @view-transition {
