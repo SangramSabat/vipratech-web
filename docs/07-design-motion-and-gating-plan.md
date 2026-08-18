@@ -1022,6 +1022,55 @@ are absent from any static census. No timing for them should be quoted.
 
 ---
 
+### Iteration 9 — the bundle was not an architecture problem · 2026-08-18
+
+Two iterations reported "app JS is blocked on an architectural decision" without
+ever saying **what the 44 kB was spent on**. Attributing the entry chunk to its
+sources answered it in one run:
+
+| | share | ≈ gzip |
+|---|---|---|
+| **`tailwind-merge`** | **29.6%** | **8.32 kB** |
+| `src/components` | 19.9% | 8.78 kB |
+| `src/data` | 7.8% | 3.46 kB |
+| Radix (all packages) | ~28% | ~12 kB |
+
+`tailwind-merge` was larger than every component in `src/components` combined,
+and it exists to resolve class conflicts across **19 call sites**.
+
+**What it actually did, measured by building both ways and diffing all seven
+prerendered documents: it changed exactly one class attribute, and that change
+was a defect.**
+
+It treats `text-lead` — our custom font-size token — as conflicting with
+`text-ink-muted`, a colour, because both begin `text-`. It cannot know
+otherwise; the token is ours, not Tailwind's. So it silently deleted `text-lead`
+from **every section subhead on the site**.
+
+| | computed font-size |
+|---|---|
+| with `tailwind-merge` | **16 px** |
+| without | **20 px** (`--text-lead`, as authored) |
+
+The site has been rendering its section subheads a size smaller than designed,
+sitewide, and paying **8.32 kB gzip** for the privilege. `extendTailwindMerge`
+would fix the defect and keep the cost — not worth it, since the same diff found
+**zero** genuine conflicts to resolve.
+
+**app JS 44.02 → 35.66 kB.** The ceiling is ratcheted 45 → 37 so the recovery
+cannot be silently spent. `/platform` is now **5.66 kB over its Class S budget
+rather than 14**, and Narrative/Trust remain out of reach without the §8
+decision — which is still open, but is no longer the only thing standing between
+this plan and its remaining routes.
+
+**The lesson is about the earlier reporting, not the dependency.** "Blocked on an
+architectural decision" was true and useless. A single number with no
+attribution behind it cannot tell you whether you have a design problem or a
+`node_modules` problem — and this was the second. **Report what a budget is spent
+on, not only that it is nearly full.**
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
