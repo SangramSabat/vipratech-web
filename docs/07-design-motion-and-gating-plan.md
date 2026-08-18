@@ -308,7 +308,7 @@ unchanged.
 | ~~12~~ | ~~Pointer spotlight on card grids~~ | **RETRACTED** | — | — | linear.app has no pointer-reactive property — see §11 |
 | 13-R | Two-tier hover darkening — `0.1s ease` buttons, `0.2s ease` nav | family.co ✅ | 2 | all | Every button and link |
 | 14 | Scroll-scrubbed sequence, pinned | apple.com | 4 | S | Foundry's three-stage pipeline on `/platform` |
-| 15 | Shared-element transition across documents | — ⚠️ derived | 8 | all | Sector card → sector page; card becomes hero |
+| 15 | Container view transition + persistent header | raycast.com ✅ | 8 | all | **Already shipped since Wave 2** — measured a source for it, and covered it with tests |
 | ~~16~~ | ~~Numeric count-up on the proof strip~~ | **RETRACTED** | — | — | stripe's numbers are `[inferred]` in the blueprint — no measured count-up exists |
 | 17 | Knockout / masked type over media | resend.com | 5 | S | `/work/mom-alimento` hero |
 | ~~18~~ | ~~Sticky section index with scroll-linked marker~~ | **RETRACTED** | — | — | No measured source in `blueprints/stripe-com`, and the header nav is already a six-anchor section index — it would duplicate existing navigation |
@@ -966,6 +966,59 @@ S6.1-R is precisely the mechanism for holding both — but it should be a stated
 tension rather than an unexamined brief. The Trust-class routes are the 8090
 half; `/platform` is the spline half; and the reason Trust got *stricter* in the
 amendment is exactly this.
+
+---
+
+### Iteration 8 — a source for #15, and a spec section nobody had tested · 2026-08-18
+
+**#15 had a source all along, and was already shipped.** Five reference sites
+were checked for cross-document view transitions. **Only raycast.com authors
+one** `[measured]`:
+
+```css
+.layout-module__…__container { view-transition-name: …__fade; width:100%; height:100% }
+```
+
+A **single named container**, not per-element shared-element morphing — which is
+what `07` originally proposed and marked `[inferred]`. The other four report one
+named element, `root`, which is the **UA default on the document element, not
+authored use**.
+
+vercel.com and raycast.com both matched a naive "does any rule mention
+view-transition" check, but vercel's four hits are `all: unset` resets that
+enumerate every property. **A census that greps for a property name finds resets
+as readily as intent.** Confirm by reading the rule, not counting it.
+
+The site has done the raycast pattern since Wave 2 — `@view-transition` plus a
+named `site-header`. So #15 is reclassified from "inferred, unbuilt" to
+"measured, already shipped", and category 8 is genuinely filled rather than
+partially.
+
+### S6.7 had shipped with no test behind it
+
+That mattered once the site went from six documents to seven: nothing would have
+noticed if `/platform` broke navigation continuity. Three tests added — both
+halves of the transition, header identity on every route, and reduced motion.
+
+**Two false findings caught while writing them, both instrument artifacts:**
+
+1. Driving the navigation with `location.href` from an `evaluate()` reports
+   `pagereveal` **without** a transition even when the feature works. Only a
+   real click reproduces what a user gets. I had already written this up as a
+   broken S6.7 before re-testing.
+2. **Headless Chromium starts the transition on the outgoing document and
+   declines to continue it on the incoming one.** No compositor. Verified by
+   running the identical test `--headed`, where it passes. The assertion is
+   annotated and skipped in headless rather than left permanently red.
+
+That is the **third and fourth** instrument artifact this session to nearly
+become a finding, after the `SplitText` letter-splitting and the vocabulary-based
+P4. The pattern is consistent enough to state as a rule: **when a measurement
+contradicts a thing that visibly works, suspect the instrument first.**
+
+**Also `[not measured]`:** view-transition duration and easing.
+`::view-transition-*` pseudo-elements exist only during a navigation, so they
+are absent from any static census. No timing for them should be quoted.
 
 ---
 
