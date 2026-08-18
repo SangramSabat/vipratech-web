@@ -597,11 +597,14 @@ export const PLATFORM = {
     subhead:
       "Four stages, in order. An engineer stands at the third one, and nothing reaches production without passing it.",
   },
-  ownershipIntro: {
-    eyebrow: "Ownership",
-    heading: "What you get either way",
+  // Ownership and limits are now one section with two columns. Each previously
+  // had its own heading plus a subhead invented to satisfy SectionIntro, above
+  // a single paragraph — two screens of air to say four lines.
+  termsIntro: {
+    eyebrow: "Terms",
+    heading: "What you get, and where this is the wrong tool",
     subhead:
-      "Whether the engagement continues or stops after the first increment.",
+      "Both stated before you buy, because the second is what makes the first believable.",
   },
   evidenceIntro: {
     eyebrow: "Evidence",
@@ -615,13 +618,13 @@ export const PLATFORM = {
   // 01-brand-guidelines §6 forbids publishing an unverified claim. Naming the
   // systems and their evidence levels is true today; the stronger provenance
   // sentence goes in only once the owner confirms it.
+  // Levels are quoted from PRODUCTS rather than restated, so this paragraph
+  // cannot drift above what each system has actually earned
+  // (01-brand-guidelines §6). Latticly is named at Researched/Designed on
+  // purpose: dropping the one that is not yet built would turn an evidence
+  // list into a highlight reel.
   evidenceNote:
-    "AutoSentinx, MarketingEngine, Aarav Voice System and Latticly are the systems behind the practices on this site. Each is listed with the evidence level it has actually earned — Built, Deployed, Prototyped or Researched — and never a level above it.",
-  limitsIntro: {
-    eyebrow: "Limits",
-    heading: `Where ${"Foundry"} does not help`,
-    subhead: "The cases where this is the wrong tool, named before you buy it.",
-  },
+    "AutoSentinx, MarketingEngine and the Aarav Voice System are Built/Deployed. Latticly is Researched/Designed and is labelled that way wherever it appears. Each system is listed with the level it has earned and never one above it — which is the same rule the gates inside Foundry apply to an increment.",
   stages: [
     {
       id: "specify",
@@ -645,11 +648,13 @@ export const PLATFORM = {
     },
   ],
   ownership: {
+    title: "What you get either way",
     text: "Source code and infrastructure are yours from the first increment. No runtime lock-in, no proprietary format holding your logic.",
   },
   // The site tells visitors when they do not need it. That posture is the most
   // distinctive thing it owns (S10.4), so the platform page carries it too.
   limits: {
+    title: "Where Foundry does not help",
     text: "If the logic is fully deterministic and stable, a rule engine is cheaper and easier to audit. We will say so on the first call.",
   },
 } as const;
