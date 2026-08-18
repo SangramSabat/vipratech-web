@@ -332,3 +332,60 @@ test.describe('navigation is reachable at every width (spec S2.1)', () => {
     await expect(page.locator('header').getByText('VipraTech Labs', {exact: true}).first()).toBeAttached();
   });
 });
+
+test.describe('diegetic motion costs what it claims (spec S6.1-R.a)', () => {
+  /**
+   * S6.1-R.a originally required diegetic motion to "pause off-screen". I wrote
+   * that condition, shipped an effect, and asserted compliance in a code comment
+   * without measuring it. Measured, it is false: a CSS animation's playState
+   * stays `running` when scrolled out of view, and CSS has no way to pause on
+   * visibility without becoming scroll-driven, which would change what the
+   * effect is.
+   *
+   * The condition was inherited from S6.5, which was written for canvas/rAF
+   * loops — those genuinely burn CPU regardless of visibility. A compositor
+   * opacity animation does not. So the requirement worth enforcing is not
+   * "pauses" but "costs almost nothing either way", and that is measurable.
+   *
+   * Budget is deliberately loose: this catches an effect that starts doing
+   * main-thread work, not millisecond drift.
+   */
+  test('the schematic costs no more off-screen than in view', async ({page, browserName}) => {
+    test.skip(browserName !== 'chromium', 'CDP Performance domain is Chromium-only');
+
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Performance.enable');
+    await page.goto('/platform/');
+    await page.waitForSelector('.flow-node');
+
+    const metrics = async () =>
+      Object.fromEntries(
+        (await cdp.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]),
+      );
+
+    const sampleWindow = async () => {
+      const before = await metrics();
+      await page.waitForTimeout(3000);
+      const after = await metrics();
+      return {
+        recalcMs: (after.RecalcStyleDuration - before.RecalcStyleDuration) * 1000,
+        layoutMs: (after.LayoutDuration - before.LayoutDuration) * 1000,
+        scriptMs: (after.ScriptDuration - before.ScriptDuration) * 1000,
+      };
+    };
+
+    const inView = await sampleWindow();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(800);
+    const offScreen = await sampleWindow();
+
+    // Layout must be untouched in both: opacity-only motion cannot reflow.
+    expect(inView.layoutMs).toBeLessThan(1);
+    expect(offScreen.layoutMs).toBeLessThan(1);
+    // And no meaningful main-thread work in either state.
+    for (const [label, m] of [['in view', inView], ['off-screen', offScreen]] as const) {
+      expect(m.recalcMs, `${label} style recalc over 3s`).toBeLessThan(60);
+      expect(m.scriptMs, `${label} script over 3s`).toBeLessThan(60);
+    }
+  });
+});

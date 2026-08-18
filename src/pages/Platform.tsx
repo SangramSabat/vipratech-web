@@ -86,6 +86,10 @@ export function Platform({
               Honesty conditions (S6.1-R.a): the four stages are the build
               process described beside them, the markers are aria-hidden and
               carry no text, and opacity is the only property animated.
+
+              It does not pause off-screen and cannot in CSS — see the note on
+              .flow-node in index.css. The cost is measured and budgeted by e2e
+              instead.
             */}
             <figure className="lg:col-span-5">
               <figcaption className="border-b border-hairline pb-4 font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
@@ -138,7 +142,9 @@ export function Platform({
           equal weight rather than a footnote's. A page that sells a platform and
           then names where the platform is the wrong answer is making a costly
           signal; shrinking that half would cost it the signal. */}
-      <Section id="terms" intro={PLATFORM.termsIntro}>
+      {/* Not `terms` — the home page already owns that id for commercial
+          terms, which the nav labels "Pricing". Same word, different subject. */}
+      <Section id="what-you-get" intro={PLATFORM.termsIntro}>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="lift rounded-2xl border border-hairline bg-surface/60 p-6">
             <h3 className="text-h3 font-bold text-ink">{PLATFORM.ownership.title}</h3>

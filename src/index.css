@@ -354,7 +354,16 @@
      Honesty conditions (S6.1-R.a): the four stages are the pipeline VipraTech
      actually operates and are already named in copy; opacity only, so nothing
      shifts; and the row text never drops below full opacity, so the marker
-     carries the sequence while the content stays readable throughout. */
+     carries the sequence while the content stays readable throughout.
+
+     On the off-screen condition, measured rather than assumed: this does NOT
+     pause when scrolled away — a CSS animation's playState stays `running`,
+     and CSS cannot pause on visibility without becoming scroll-driven, which
+     would change what the effect is. What was measured instead is the cost:
+     ~1.9ms of style recalc per 5s off-screen against ~1.4ms in view, and zero
+     layout in both. S6.1-R.a's "pauses off-screen" was inherited from S6.5,
+     which was written for canvas/rAF loops that genuinely burn CPU regardless
+     of visibility. Amended there; pinned by an e2e budget rather than a claim. */
   .flow-node {
     opacity: 0.3;
   }
