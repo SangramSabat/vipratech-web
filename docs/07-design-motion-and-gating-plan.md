@@ -508,6 +508,7 @@ without it first.
 |---|---|
 | 20 distinct measured effects, ≥ 9 sites, ≥ 7 of 8 categories | Extend `design-recon/RUBRIC.md` F1/F2 with a category axis |
 | Every effect names its measured source in-code | Existing rubric A1, unchanged |
+| Navigation reachable at 390px · no dependency >20% of app JS · size tokens render at token value | **New rubric section G** — each derived from a defect that shipped |
 | Per-page-class motion budget holds | Per route: count continuous animations, assert ≤ class limit |
 | Class T routes ship 0 kB JS | `check-bundle.mjs`, per document |
 | P1–P4 pass **per page**, not on average | Copy-analysis script over rendered prose |
@@ -1193,6 +1194,48 @@ comment instead of a test. A condition with no check behind it is a wish.
 
 Also renamed `/platform`'s section id `terms` → `what-you-get`: home already
 owns `#terms` for commercial terms, which the nav labels "Pricing".
+
+---
+
+### Iteration 13 — the scoreboard was broken · 2026-08-18
+
+Twelve iterations, **100/100 every time**. In that window the site shipped:
+
+- **no navigation at all below 1024px** (found iteration 11)
+- a **type scale corrupted sitewide** by a dependency (found iteration 9)
+- a **showcase page that was half empty** (found iteration 10)
+
+Sections A–F scored **100 through every one of them.** A score that never moves
+is not measuring; it is decorating — and I have been reporting it as evidence of
+progress for twelve hours.
+
+`design-recon/RUBRIC.md` gains **section G, 15 pts**, derived entirely from
+defects that actually shipped:
+
+| # | Criterion | Would have failed |
+|---|---|---|
+| **G1** | Navigation reachable at 390 px | Iterations 1–11 — **0 links** on a phone |
+| **G2** | No dependency >20% of app JS | Until iteration 9 — `tailwind-merge` at **29.6%** |
+| **G3** | Size tokens render at their token value | Until iteration 9 — **16 px against an authored 20 px** |
+
+**G2 scores 0 when no sourcemap is emitted.** "Not measurable" is not "pass" —
+that rule is the whole point, and it made the score fall to **110/115** until
+the target began emitting hidden sourcemaps. Largest dependency is now
+`@radix-ui/react-slider` at **10.1%**.
+
+**Why A–F could not see these.** A–F check *what was applied*: provenance,
+fidelity, spec compliance, engineering gates, anti-slop, coverage. Not one of
+them looks at a viewport other than 1440 px, and not one attributes a cost. They
+were built to stop a recreation being *unmeasured* — a different failure from a
+recreation being *incomplete*.
+
+**What G still cannot see: composition.** The half-empty hero was found by
+rendering the page and looking at it, and no mechanical criterion would catch
+its recurrence. Rendered review at two or more widths stays **method rather than
+score**, because a screenshot is not a number — and the last three iterations
+are the argument for keeping it in every pass.
+
+Score is now **115/115** on merit, with the scale able to fall.
 
 ---
 
