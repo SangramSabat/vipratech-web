@@ -923,6 +923,52 @@ Playwright's CDP session, which reaches the same `Performance` domain.
 
 ---
 
+### Iteration 7 — the content reference class, measured at last · 2026-08-18
+
+`06` cites 8090, Factory and Heizen as its content model, and `07` repeats the
+claim that they are "powerful because of restraint and proof density." **Through
+six iterations not one had been measured.** All of it was prose about prose.
+Blueprint: `design-recon/blueprints/content-reference-class`.
+
+| | words in `<main>` | P1 | P3 | `@keyframes` | canvas | shaders |
+|---|---|---|---|---|---|---|
+| **8090.ai** | 453 | 13.02 | 0.22 | **2** | 0 | 0 |
+| **heizen.work** | 798 | **23.06** | 0.88 | 18 | 0 | 0 |
+| **factory.ai** | 32 | `[not measured]` | — | 34 | 0 | 0 |
+| ours `/` | 1653 | 11.49 | **0.06** | — | 0 | 0 |
+| ours `/platform` | 294 | 9.52 | **0.00** | — | 0 | 0 |
+
+**1. The instinct that our copy needed rescuing was wrong.** We already beat the
+entire reference class on restraint — 0.06 against 8090's 0.22, Heizen's 0.88
+and Factory's 3.13. Heizen, held up as a model, uses *transformative,
+streamlined, scalable, advanced, complete, fast*: close to the exact vocabulary
+this document warns against. §6's original "70% new prose" target would have
+replaced the site's strongest property to imitate a site that is weaker at it.
+
+**2. Heizen's specificity lead is not a writing gap.** 23.06 against 11.49 is
+real, and its entire cause is quantified client outcomes — `6-Week Launch`,
+`99% Data Accuracy`, `18.7 hrs Saved/Week`. **No amount of better prose moves
+P1 to 23.** It moves when MOM/Alimento permission arrives, and not before. That
+open item is therefore worth more than any copy work on this plan.
+
+**3. `06` §4 contradicts its own reference class, and now measurably.** 8090
+makes its complete case in **453 words**. Our home page is **1653**. §4 proposes
+growing the site to **~3,500** — roughly **eight times** the model it cites.
+A plan cannot name 8090 as its structural model and simultaneously target eight
+times its length. §4's volume target should be **withdrawn**, not merely
+supplemented by P1–P4.
+
+**4. The brief pairs two incompatible reference classes.** The content class
+runs **zero canvases and zero shaders between them**, and 8090 ships **two
+keyframes** on its whole home page. "Content like 8090, design like spline" asks
+one site to be two kinds of site. That is not fatal — the page-class budget in
+S6.1-R is precisely the mechanism for holding both — but it should be a stated
+tension rather than an unexamined brief. The Trust-class routes are the 8090
+half; `/platform` is the spline half; and the reason Trust got *stricter* in the
+amendment is exactly this.
+
+---
+
 ## 12. Open decisions
 
 Ordered by what blocks the most work.
