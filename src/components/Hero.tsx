@@ -25,7 +25,7 @@ export function Hero({ onOpenDiagnostic }: DiagnosticTriggerProps) {
       <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+            <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
               {HERO.eyebrow}
             </p>
 

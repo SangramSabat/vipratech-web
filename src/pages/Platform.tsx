@@ -44,7 +44,7 @@ export function Platform({
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+              <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
                 {PLATFORM.eyebrow}
               </p>
               <h1
@@ -98,7 +98,7 @@ export function Platform({
               </figcaption>
               <ol className="relative mt-4 space-y-2">
                 <span
-                  className="flow-spine pointer-events-none absolute bottom-4 left-[1.35rem] top-4 w-px"
+                  className="flow-spine pointer-events-none absolute bottom-4 left-(--schematic-spine-x) top-4 w-px"
                   aria-hidden="true"
                 />
                 {PLATFORM.stages.map((stage, index) => (
@@ -107,7 +107,7 @@ export function Platform({
                     className="lift relative rounded-xl border border-hairline bg-surface/60 p-4 pl-12"
                   >
                     <span
-                      className="flow-node flow-node-slow absolute left-[1.1rem] top-6 size-2 -translate-y-1/2 rounded-full bg-brand"
+                      className="flow-node flow-node-slow absolute left-(--schematic-node-x) top-6 size-2 -translate-y-1/2 rounded-full bg-brand"
                       style={{ "--i": index } as React.CSSProperties}
                       aria-hidden="true"
                     />

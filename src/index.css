@@ -41,6 +41,21 @@
      which reads noticeably looser than the reference at display sizes. */
   --tracking-display: -0.05em;
 
+  /* Eyebrow tracking. Was written inline as [0.16em] in eleven places — the
+     most-repeated value on the site and the only one that had genuinely escaped
+     the token system. Found by counting arbitrary values in components rather
+     than by reading them: 97 arbitrary usages, of which exactly three repeat.
+     That count is also the honest answer to this system having 102 computed
+     tokens against linear's 416 and stripe's 715 — the gap is surface size, not
+     indiscipline, and three escapes across twenty pages is what discipline
+     looks like when it is measured instead of asserted. */
+  --tracking-eyebrow: 0.16em;
+
+  /* Diegetic schematic geometry — the spine and the markers that travel it must
+     agree, and did so by two matching magic numbers in four files each. */
+  --schematic-spine-x: 1.35rem;
+  --schematic-node-x: 1.1rem;
+
   /* Fluid type scale (S4.4) */
   --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
   --text-h2: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);

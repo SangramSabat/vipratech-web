@@ -51,7 +51,7 @@ export function SectionHeader({
 }) {
   return (
     <div className={cn("mb-12", align === "center" && "mx-auto text-center")}>
-      <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+      <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
         {intro.eyebrow}
       </p>
       <h2

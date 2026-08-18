@@ -27,7 +27,7 @@ export function CaseStudy({
     <>
       <section id="top" aria-labelledby="case-heading" className="relative overflow-hidden">
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
             {CASE_STUDY.eyebrow}
           </p>
           <h1
@@ -88,7 +88,7 @@ export function CaseStudy({
             — the confident-ai.com recipe, same as /platform. */}
         <ol className="relative space-y-3">
           <span
-            className="flow-spine pointer-events-none absolute bottom-5 left-[1.35rem] top-5 w-px"
+            className="flow-spine pointer-events-none absolute bottom-5 left-(--schematic-spine-x) top-5 w-px"
             aria-hidden="true"
           />
           {CASE_STUDY.stages.map((stage, index) => (
@@ -97,7 +97,7 @@ export function CaseStudy({
               className="lift relative rounded-2xl border border-hairline bg-surface/60 p-5 pl-12"
             >
               <span
-                className="flow-node flow-node-slow absolute left-[1.1rem] top-7 size-2 -translate-y-1/2 rounded-full bg-brand"
+                className="flow-node flow-node-slow absolute left-(--schematic-node-x) top-7 size-2 -translate-y-1/2 rounded-full bg-brand"
                 style={{ "--i": index } as React.CSSProperties}
                 aria-hidden="true"
               />

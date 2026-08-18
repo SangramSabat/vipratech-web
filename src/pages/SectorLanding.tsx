@@ -35,7 +35,7 @@ export function SectorLanding({
       <section id="top" aria-labelledby="sector-heading" className="relative overflow-hidden">
         <div className="ground-field pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
             {sector.label}
           </p>
           <h1

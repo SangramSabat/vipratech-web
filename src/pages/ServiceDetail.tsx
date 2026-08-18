@@ -38,7 +38,7 @@ export function ServiceDetail({
 
           <div className="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+              <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
                 {service.primaryOfferName}
               </p>
               <h1

@@ -46,7 +46,7 @@ export function PipelinePanel() {
             and static. aria-hidden because the order is already carried by the
             list semantics and the numbered rows. */}
         <span
-          className="flow-spine pointer-events-none absolute bottom-3 left-[1.35rem] top-3 w-px"
+          className="flow-spine pointer-events-none absolute bottom-3 left-(--schematic-spine-x) top-3 w-px"
           aria-hidden="true"
         />
         {PIPELINE_STEPS.map((step, index) => (
@@ -56,7 +56,7 @@ export function PipelinePanel() {
           >
             <span className="flex min-w-0 items-baseline gap-3">
               <span
-                className="flow-node absolute left-[1.1rem] top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
+                className="flow-node absolute left-(--schematic-node-x) top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
                 style={{ "--i": index } as React.CSSProperties}
                 aria-hidden="true"
               />

@@ -43,7 +43,7 @@ export function PersonaLanding({
       <section id="top" aria-labelledby="persona-heading" className="relative overflow-hidden">
         <div className="ground-field pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-4 pb-section pt-16 sm:px-6 lg:px-8 lg:pt-24">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
             For {persona.label.toLowerCase()}
           </p>
           <h1
@@ -110,7 +110,7 @@ export function PersonaLanding({
             is no (S10.4). */}
         <ol className="relative mt-8 space-y-2">
           <span
-            className="flow-spine pointer-events-none absolute bottom-4 left-[1.35rem] top-4 w-px"
+            className="flow-spine pointer-events-none absolute bottom-4 left-(--schematic-spine-x) top-4 w-px"
             aria-hidden="true"
           />
           {persona.plan.map((step, index) => (
@@ -119,7 +119,7 @@ export function PersonaLanding({
               className="relative rounded-xl border border-hairline bg-surface/60 p-4 pl-12"
             >
               <span
-                className="flow-node absolute left-[1.1rem] top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
+                className="flow-node absolute left-(--schematic-node-x) top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand"
                 style={{ "--i": index } as React.CSSProperties}
                 aria-hidden="true"
               />
