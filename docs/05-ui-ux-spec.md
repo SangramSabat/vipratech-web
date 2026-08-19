@@ -86,23 +86,112 @@ Every route emits its own `<title>`, `<meta name="description">`, canonical, and
 
 ## 6. Motion
 
-**S6.1** Enforces the motion budget in `01-brand-guidelines.md` §5.
+**S6.1** ~~Enforces the motion budget in `01-brand-guidelines.md` §5.~~
+**Superseded by S6.1-R** — amendment 2026-08-17/1. Retained for history:
 
-| Rule | Limit |
+| ~~Rule~~ | ~~Limit~~ |
 |---|---|
-| Continuously-animating decorative layers visible at once | ≤ 1 |
-| Animation on the LCP element | Never |
-| Ambient full-viewport effects | None |
+| ~~Continuously-animating decorative layers visible at once~~ | ~~≤ 1~~ |
+| ~~Animation on the LCP element~~ | ~~Never~~ |
+| ~~Ambient full-viewport effects~~ | ~~None~~ |
 | Layout-shifting animation | Banned — transform/opacity only |
 | Off-screen / backgrounded animation | Must pause |
+
+**S6.1-R — motion budget by page class.**
+
+One budget was applied to every page, but the site's pages do not have one job. A
+page where someone decides whether to trust an invoice is damaged by spectacle. A
+page where someone decides whether these people can build is damaged by its
+absence. So the budget is now set per page class, and **the strictest class is
+stricter than the rule it replaces** — that is what pays for the loosest one.
+
+| | **Class T — Trust** | **Class N — Narrative** | **Class S — Showcase** |
+|---|---|---|---|
+| Routes | `/engage`, `/work/*`, `/services/*`, diagnostic, any form | `/`, `/for/*`, `/sectors/*` | `/platform`, `/products/*` |
+| Continuous decorative layers | **0** | ≤ 1 | ≤ 2 |
+| Ambient full-viewport effects | Banned | Banned | **Permitted, hero only** |
+| Animation on the LCP element | Banned | Colour/opacity only, never geometry | Colour/opacity only |
+| Pointer-reactive surfaces | Banned | ≤ 1 | ≤ 3 |
+| Canvas / WebGL | Banned | Banned | ≤ 1, lazy, IO-paused |
+| Route JS budget (gzip) | **0 kB** | ≤ 8 kB | ≤ 30 kB |
+
+Inherited by every class without exception: `prefers-reduced-motion` disables
+decorative motion by name (S6.3); off-screen and backgrounded animation pauses
+(S6.5); no React state written from a pointer handler (S6.4); no layout-shifting
+animation; and every effect must have a referent on the page — an effect present
+because it was measured somewhere, rather than because this page needs it, is a
+defect regardless of which class it sits in.
+
+**S6.1-R.a — ambient vs diegetic.** The layer counts above govern **ambient**
+motion only: motion applied *to* the page, carrying no information, whose removal
+costs nothing but flatness. The S6.2 retirements were all of this kind.
+
+**Diegetic** motion — motion *inside* a schematic of a real system, which stops
+the page explaining itself when removed — is budgeted by honesty rather than by
+count. It must satisfy all four:
+
+1. It depicts a system VipraTech actually built or operates. A schematic of a
+   capability that does not exist is a fabricated claim, and `01-brand-guidelines`
+   §6 already forbids those.
+2. It is SVG animated by CSS (`stroke` / `fill` / `opacity`), not a render loop.
+3. Loop period ≥ 5 s with `linear` easing, so it reads as system activity rather
+   than as blinking.
+4. It is switched off under `prefers-reduced-motion`, and its cost is
+   **budgeted and measured in both states** rather than required to pause.
+
+   *Amended 2026-08-18/3.* This read "pauses off-screen", inherited from S6.5 —
+   which was written for **canvas and rAF loops**, and they genuinely burn CPU
+   regardless of visibility. A compositor-driven CSS animation does not, and it
+   also **cannot** pause on visibility without becoming scroll-driven, which
+   changes what the effect is. Measured on the shipped schematic: `playState`
+   stays `running` off-screen, at ~1.9 ms of style recalc per 5 s against
+   ~1.4 ms in view, with zero layout in both. The condition as written was
+   unsatisfiable in CSS and was asserted without measurement; it is now a
+   budget an e2e test can check. Canvas and rAF work still pause via S6.5.
+
+Measured basis: confident-ai.com runs **92 simultaneous infinite animations**
+across 133 SVG nodes at 7–8 s `linear` periods, and reads as austere rather than
+busy, because every one of them depicts its own product working. See
+`design-recon/blueprints/confident-ai-com`. A page can carry ninety animations
+and stay serious, provided each is telling the truth about a real system.
+
+Class T remains the exception: **no motion of either kind**, diegetic included.
+A page where someone is deciding what to pay does not get an animated diagram.
+
+Class T is the trade. `/engage`, `/work/*` and the diagnostic now carry **zero**
+continuous decorative layers and **zero** JavaScript, where the old rule allowed
+one layer and an unbudgeted bundle. The pages where money and trust are decided
+got quieter, and that is what makes the showcase tier affordable.
 
 **S6.2 Retired outright:** `MatrixRainCanvas` full-viewport wash, the 12-particle field, the cursor reticle, the marquee ticker, the rotating crosshair, the sweeping laser, and the typewriter `<h1>`.
 **S6.3** Under `prefers-reduced-motion: reduce`: decorative motion off, functional transitions ≤ 150ms. Enforced globally in `src/index.css` — see amendment 2026-08-14/1 for why no JS hook is involved.
 **S6.4** No React state may be written from a pointer-move handler. Pointer-driven visuals use a CSS custom property written outside the render cycle.
 **S6.5** Any retained canvas pauses via `IntersectionObserver` and `document.hidden`.
 
-**S6.6 Permitted motion.** Motion is CSS-only and compositor-driven: no animation
-library, no `IntersectionObserver`, no React state. Transform and opacity only.
+**S6.6-R Permitted motion.** Motion is CSS-first and compositor-driven. The
+CSS-only rule was doing two jobs at once — keeping the bundle small, and keeping
+motion off the main thread. The first is now done explicitly by S6.1-R's
+per-route budgets, so the second is stated directly instead of enforced through
+a proxy.
+
+JavaScript-driven motion is permitted **in Class S only**, and only when all four
+of these hold:
+
+1. Loaded by dynamic `import()`, never in the shared bundle
+2. Gated on `IntersectionObserver` **and** `document.hidden`
+3. Skipped entirely under `prefers-reduced-motion: reduce` **and** under
+   `navigator.connection.saveData`
+4. Removing it degrades to a static composition that is still complete
+
+Condition 4 is the load-bearing one: it makes every heavy effect an enhancement
+over something that already works, which is also what keeps prerendering honest.
+In Classes T and N, motion remains CSS-only, transform and opacity only.
+
+**S6.2 stands in every class.** `MatrixRainCanvas`, the particle field, the
+cursor reticle, the marquee ticker, the rotating crosshair, the sweeping laser
+and the typewriter `h1` are permanently retired. S6.1-R is not a route back to
+any of them: each lacked both a measured source and a referent on the page, and
+those two requirements are unchanged.
 
 | Effect | Where | Rule |
 |---|---|---|
@@ -245,6 +334,8 @@ applied to surfaces.
 | Date | Section | Change | Reason |
 |---|---|---|---|
 | 2026-08-14 | — | Initial lock | End of Wave 2 |
+| 2026-08-17/1 | S6.1 → S6.1-R, S6.6 → S6.6-R | One global motion budget replaced with three page classes (Trust / Narrative / Showcase). Ambient full-viewport effects and WebGL permitted in Class S only; JS-driven motion permitted in Class S under four conditions. Class T tightened to zero continuous decorative layers and a 0 kB route JS budget. | The site's goal became creative-studio-grade design, and the old S6.1 forbade exactly that: it capped decorative layers at one, banned ambient full-viewport effects and banned any LCP animation. Those three rules are why the design-recon pass applied nine measured effects and rejected ten — **four of the ten rejections cite S6.1 directly**, and the rejected list is close to a list of what makes the reference class look like itself. The conflict was structural, not a matter of effort, so it was amended rather than worked around. S6.1 was not wrong: it killed a real failure (matrix rain, particle field, cursor reticle and typewriter `h1`, all at once, on a page selling defensibility to regulated buyers), and those retirements stand permanently in every class. What changed is that one budget was being asked to serve pages with opposite jobs. The trust pages are now **stricter** than the rule they replace, which is the trade that makes the showcase pages affordable. Full rationale, the 20-effect programme and the verification additions: `07-design-motion-and-gating-plan.md` §3, §4, §10. |
+| 2026-08-17/2 | S6.1-R.a (new) | Layer counts now govern **ambient** motion only. **Diegetic** motion — animation inside a schematic of a system VipraTech actually built — is budgeted by honesty rather than count, under four conditions (real system, SVG+CSS not a render loop, ≥5 s `linear` period, pauses off-screen and under reduced-motion). Class T still permits neither kind. | Measured on confident-ai.com the same day: **92 simultaneous infinite animations** across **133 SVG** nodes at 7–8 s `linear` periods — roughly 45× the Class S cap set that morning — and the page reads as austere rather than busy. The reason is that none of it is decoration: every animation depicts its own product working (`traceRowPick`, `datasetRouteDraw`, `scoreTick`, `promptNode`, `attackProbePillFire`). The count-based budget could not tell the difference between a particle field and a diagram of a claims pipeline, and would have banned the second to prevent the first. The distinction also happens to be the strongest available answer to generic AI-marketing decoration: a schematic of a real system cannot be generic, because the system is specific. Blueprint: `design-recon/blueprints/confident-ai-com`. |
 | 2026-08-14/1 | S6.3 | Dropped the required `usePrefersReducedMotion()` hook; the CSS media query in `index.css` is now the sole gate | Removing the ambient effects (S6.2) left no JS-driven decorative motion for a hook to gate. `motion` (Framer) and `canvas-confetti` became entirely unused and were removed from the dependency tree, taking ~26 kB gzip with them. Shipping an unused hook to satisfy the letter of the rule would have been dead code. |
 | 2026-08-14/2 | S9.1 | Replaced the "entry chunk ≤ 85 kB gzip" budget with an app-code budget plus a total-initial budget | The 85 kB figure was set before the accessible Radix primitives were costed. Measured floor is React ~61 kB + primitives + app code ≈ 100 kB. Splitting React into its own chunk would have made "entry chunk" read 39 kB while changing nothing a user downloads, so the metric was replaced rather than gamed. |
 | 2026-08-14/3 | S9.2 | Diagnostic modal remains lazy; the two interactive tools do not | `renderToString` emits the Suspense fallback rather than the component, so lazy-loading the routing model and effort calculator removed both sections from the prerendered HTML — trading the site's primary SEO fix (S1.1) for ~8 kB. The modal is closed on first paint and absent from initial markup either way, so it stays split. |
