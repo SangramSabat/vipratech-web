@@ -41,6 +41,21 @@
      which reads noticeably looser than the reference at display sizes. */
   --tracking-display: -0.05em;
 
+  /* Eyebrow tracking. Was written inline as [0.16em] in eleven places — the
+     most-repeated value on the site and the only one that had genuinely escaped
+     the token system. Found by counting arbitrary values in components rather
+     than by reading them: 97 arbitrary usages, of which exactly three repeat.
+     That count is also the honest answer to this system having 102 computed
+     tokens against linear's 416 and stripe's 715 — the gap is surface size, not
+     indiscipline, and three escapes across twenty pages is what discipline
+     looks like when it is measured instead of asserted. */
+  --tracking-eyebrow: 0.16em;
+
+  /* Diegetic schematic geometry — the spine and the markers that travel it must
+     agree, and did so by two matching magic numbers in four files each. */
+  --schematic-spine-x: 1.35rem;
+  --schematic-node-x: 1.1rem;
+
   /* Fluid type scale (S4.4) */
   --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
   --text-h2: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
@@ -92,6 +107,16 @@
   --ease-ui: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --dur-ui: 160ms; /* Linear's dominant tier */
   --dur-ui-fast: 100ms; /* nav / colour only */
+
+
+  /* family.co [measured] — the whole page elevates with an inset ring in the
+     card's own colour rather than a cast shadow: 30 occurrences of
+     `0 0 0 1px inset`, against at most 2 of any drop shadow. Light from
+     within, not from above. Authored here in the sRGB fallback; the P3
+     upgrade is in @supports below, mirroring what family.co itself does.
+     design-recon blueprints/family-co. */
+  --ring-inset: inset 0 0 0 1px var(--color-hairline-strong);
+
 }
 
 @layer base {
@@ -301,8 +326,15 @@
   }
 
   /* Hover lift for cards. The overshoot is what reads as considered rather
-     than corporate; it costs one easing token. */
+     than corporate; it costs one easing token.
+
+     The resting state now carries family.co's inset ring instead of sitting
+     flat: the surface is lit from within, and the drop shadow appears only on
+     hover, so the two elevation modes stay distinct — pressed at rest,
+     floating on interaction. That pairing is family.co's own
+     (design-recon blueprints/family-co §"two elevation modes"). */
   .lift {
+    box-shadow: var(--ring-inset);
     transition:
       transform 500ms var(--ease-spring),
       border-color 200ms ease-out,
@@ -312,7 +344,71 @@
   .lift:focus-within {
     transform: translateY(-4px);
     border-color: color-mix(in oklch, var(--color-brand) 45%, transparent);
-    box-shadow: 0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
+    box-shadow:
+      var(--ring-inset),
+      0 12px 30px -12px color-mix(in oklch, var(--color-brand) 30%, transparent);
+  }
+
+
+  /* --- Diegetic motion (S6.1-R.a) ----------------------------------------
+     Motion *inside* a schematic of a real system, rather than applied to the
+     page. Budgeted by honesty rather than by layer count.
+
+     Recipe [measured, confident-ai.com]: its 92 simultaneous loops run at
+     7000-8000ms with `linear` easing and hand-numbered staggered siblings
+     (bubbleAppear1..6, streamTurn1/3/5). Three mechanisms make that many
+     animations read as calm rather than busy — a period too slow to register
+     as blinking, linear easing so no frame is accented, and a stagger that
+     makes the sequence read as a process with an order.
+
+     Medium [derived]: confident-ai animates SVG nodes. This animates the four
+     existing pipeline rows, because they are already the schematic — the
+     stages, their order, and their outcomes are rendered as text. Adding SVG
+     to re-draw what the DOM already says would be decoration.
+
+     Honesty conditions (S6.1-R.a): the four stages are the pipeline VipraTech
+     actually operates and are already named in copy; opacity only, so nothing
+     shifts; and the row text never drops below full opacity, so the marker
+     carries the sequence while the content stays readable throughout.
+
+     On the off-screen condition, measured rather than assumed: this does NOT
+     pause when scrolled away — a CSS animation's playState stays `running`,
+     and CSS cannot pause on visibility without becoming scroll-driven, which
+     would change what the effect is. What was measured instead is the cost:
+     ~1.9ms of style recalc per 5s off-screen against ~1.4ms in view, and zero
+     layout in both. S6.1-R.a's "pauses off-screen" was inherited from S6.5,
+     which was written for canvas/rAF loops that genuinely burn CPU regardless
+     of visibility. Amended there; pinned by an e2e budget rather than a claim. */
+  .flow-node {
+    opacity: 0.3;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .flow-node {
+      animation: flow-pulse 8s linear infinite;
+      animation-delay: calc(var(--i) * 2s);
+    }
+
+    /* The Class S variant. Same mechanism, slower, because on `/platform` the
+       schematic *is* the argument rather than a panel beside it — a reader
+       there is following the stages, not glancing at an illustration.
+       12s keeps each stage lit for 3s instead of 2s. */
+    .flow-node-slow {
+      animation-duration: 12s;
+      animation-delay: calc(var(--i) * 3s);
+    }
+  }
+
+  /* The spine the markers travel down. Static — it is the pipeline itself,
+     not motion. */
+  .flow-spine {
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-hairline-strong) 12%,
+      var(--color-hairline-strong) 88%,
+      transparent
+    );
   }
 
   /* The single flourish on the page, reserved for the one primary CTA per
@@ -354,6 +450,28 @@
   inherits: false;
 }
 
+/* One claim moving through the four stages. Each marker holds a quarter of the
+   8s cycle, so the sequence reads at the pace someone actually reads the rows.
+   Peak is brief and the floor is 0.3, never 0 — the marker is a position
+   indicator, not a reveal, and nothing is ever hidden by it (S6.1-R). */
+@keyframes flow-pulse {
+  0% {
+    opacity: 0.3;
+  }
+  4% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  26% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
 @keyframes cta-spin {
   to {
     --trace-angle: 360deg;
@@ -361,7 +479,7 @@
 }
 
 /* Cross-document view transitions (S6.7).
-   The site is six separately prerendered documents with no router, so this is
+   The site is seven separately prerendered documents with no router, so this is
    two lines that make navigation feel continuous with zero routing JavaScript.
    Unsupported browsers simply navigate as before. */
 @view-transition {

@@ -16,7 +16,7 @@ export function FinalCta({ onOpenDiagnostic }: DiagnosticTriggerProps) {
         aria-hidden="true"
       />
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-        <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+        <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
           {SECTIONS.contact.eyebrow}
         </p>
         <h2

@@ -1,5 +1,6 @@
 import type { DiagnosticTriggerProps } from "../types";
 import { Hero } from "./Hero";
+import { PersonaGate } from "./PersonaGate";
 import { EngagementLifecycle } from "./sections/EngagementLifecycle";
 import { GovernedComparison } from "./sections/GovernedComparison";
 import { Services } from "./sections/Services";
@@ -26,6 +27,10 @@ export function HomePage({ onOpenDiagnostic }: DiagnosticTriggerProps) {
   return (
     <>
       <Hero onOpenDiagnostic={onOpenDiagnostic} />
+
+      {/* Directly under the hero, before any section. The visitor has just read
+          the claim; this is the moment they know whether it is about them. */}
+      <PersonaGate />
       <EngagementLifecycle onOpenDiagnostic={onOpenDiagnostic} />
       <GovernedComparison />
       <Services onOpenDiagnostic={onOpenDiagnostic} />

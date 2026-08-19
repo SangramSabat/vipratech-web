@@ -92,7 +92,7 @@ export function FitDiagnosticModal({
         }}
       >
         <div className="border-b border-hairline bg-surface/50 p-6 pr-16">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
             Fit diagnostic
           </p>
           <DialogTitle className="mt-1.5">

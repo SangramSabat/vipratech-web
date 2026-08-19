@@ -8,7 +8,9 @@ These documents form a **traceable lifecycle**. Each inherits from the one above
 | 02 | [Personas](./02-personas.md) | Who we write for. Triggers, objections, proof required. Persona-adaptive content is deferred; seams only. |
 | 03 | [Copywriting Matrix](./03-copywriting-matrix.md) | What every section says. Source of truth for user-facing copy. |
 | 04 | [Wave Plan](./04-plan.md) | The Impeccable wave plan, findings, and reference-class analysis. |
-| 05 | [UI/UX Spec](./05-ui-ux-spec.md) | 🔒 **LOCKED.** How it is built. Every implementation change cites a section here. |
+| 05 | [UI/UX Spec](./05-ui-ux-spec.md) | 🔒 **LOCKED.** How it is built. Every implementation change cites a section here. Amended 2026-08-17/1: motion budget is now per page class (S6.1-R, S6.6-R). |
+| 06 | [Content & Persona-Adaptive Plan](./06-content-and-persona-plan.md) | Proposed. Platform-plus-service positioning, five personas with ship-ready copy, site map. Supersedes 02 §6. Amended by 07. |
+| 07 | [Design, Motion & Gating Plan](./07-design-motion-and-gating-plan.md) | Proposed. Reviews 06 and supplies its missing half: the 20-effect programme, page-class motion budgets, per-persona art direction, route-based gating, per-route JS budgets. **Governs where it disagrees with 06.** |
 
 ## Working rules
 
@@ -19,11 +21,14 @@ These documents form a **traceable lifecycle**. Each inherits from the one above
 
 ## Outstanding — needs input from VipraTech
 
-The reference class (heizen.work, factory.ai, 8090.ai) places trust assets immediately after the hero. VipraTech currently has none, and they will not be invented. To populate those slots we need:
+The reference class (heizen.work, factory.ai, 8090.ai) places trust assets immediately after the hero. To populate those slots we need:
 
-- Client names and written permission to cite them
+- **Written permission to name MOM / Alimento Agro Foods.** `06` builds a flagship case study around this work. Until permission is confirmed it ships unattributed — "a scaling FMCG brand" — which costs most of its force.
 - Named testimonials with role and company
-- Real outcome metrics from delivered work
+- Any further outcome metrics from delivered work
 - Any formal certification actually held (none claimed today)
+- **A name for the platform.** `06` uses `Foundry` as a placeholder so the copy is writable. It is **not cleared** — Palantir Foundry and Azure AI Foundry occupy adjacent enterprise-AI territory (`07` F7). `Manthan` was trialled on 2026-08-17 and reverted. Held as one constant so a change stays a find-and-replace.
+- **Browser-extension access to `spline.design`**, so the blueprint behind effects #19–#20 can be verified with a real cursor. `family.co` was measured on 2026-08-17 via a headed GPU-backed Playwright session instead, which corrected one effect and retracted another (`07` §11).
+- **A fee band for the diagnostic sprint**, if it is to be published. `SPRINT_FEE_BAND` is `null` and the commercial terms section reads correctly either way.
 
-Until supplied, those sections stay unrendered.
+Until supplied, those sections stay unrendered or unattributed. Nothing here is invented to fill a slot.

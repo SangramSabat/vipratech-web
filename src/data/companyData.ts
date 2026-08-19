@@ -28,7 +28,8 @@ export const COMPANY_INFO = {
   founder: "Akhilesh Mittal",
   email: "akhilesh@vipratech.in",
   phone: "+91 70234 15753",
-  address: "Plot No. 1, Vikas Nagar, Nanta Road, Kunhari, Kota, Rajasthan, India",
+  address:
+    "Plot No. 1, Vikas Nagar, Nanta Road, Kunhari, Kota, Rajasthan, India",
   url: "https://vipratech.in",
 };
 
@@ -109,7 +110,8 @@ export const SECTIONS: Record<string, SectionIntro> = {
   how: {
     eyebrow: "How engagements work",
     heading: "Start with a conversation, not a contract.",
-    subhead: "Three stages, each with a defined exit. You can stop after any of them.",
+    subhead:
+      "Three stages, each with a defined exit. You can stop after any of them.",
   },
   why: {
     eyebrow: "Why pilots stall",
@@ -161,7 +163,8 @@ export const SECTIONS: Record<string, SectionIntro> = {
 export const COMPARISON_ROWS: ComparisonRow[] = [
   {
     generic: "One model handles every case",
-    governed: "Rules handle the deterministic cases; AI handles only the ambiguous residue",
+    governed:
+      "Rules handle the deterministic cases; AI handles only the ambiguous residue",
   },
   {
     generic: "Confidence score as the only signal",
@@ -181,7 +184,8 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
 ];
 
-export const COMPARISON_CLOSING = "Ninety percent accurate means someone still checks all of it.";
+export const COMPARISON_CLOSING =
+  "Ninety percent accurate means someone still checks all of it.";
 
 /* -------------------------------------------------------------------------- */
 /* Security & assurance — docs/03-copywriting-matrix.md §4                     */
@@ -233,7 +237,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Human review exception dashboard",
       "Audit-friendly traceability and evidence links",
     ],
-    targetAudience: "Finance, claims, and operations teams handling unaligned cross-system records.",
+    targetAudience:
+      "Finance, claims, and operations teams handling unaligned cross-system records.",
     primaryOfferName: "Reconciliation Opportunity Sprint",
     sprintOutputs: [
       "Current workflow & source map",
@@ -263,7 +268,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Tool-use & authorization boundary checks",
       "Reproducible evidence register & finding review",
     ],
-    targetAudience: "Engineering & risk teams preparing AI agents for production deployment.",
+    targetAudience:
+      "Engineering & risk teams preparing AI agents for production deployment.",
     primaryOfferName: "AI Agent Security Assessment",
     sprintOutputs: [
       "Agent threat model & attack surface map",
@@ -285,7 +291,7 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
     title: "Voice AI & Conversational Systems",
     diagnosticLabel: "Multilingual Voice AI & Telephony",
     description:
-      "Designing voice systems that connect conversational AI with telephony, Hindi/Hinglish code-switching, policy guardrails, and seamless human handoff.",
+      "Designing voice systems that connect conversational AI with telephony, Hindi/Hinglish code-switching, policy guardrails, and a defined operator handoff.",
     includedFeatures: [
       "Call-flow & exception state logic",
       "Hindi, Hinglish & code-switching evaluation",
@@ -293,7 +299,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Interruption, retry & policy guardrails",
       "Operator handoff & call evidence capture",
     ],
-    targetAudience: "Collections teams, contact centers, and lenders managing high-volume calls.",
+    targetAudience:
+      "Collections teams, contact centers, and lenders managing high-volume calls.",
     primaryOfferName: "Voice AI Feasibility Sprint",
     sprintOutputs: [
       "Call-flow & exception matrix",
@@ -323,7 +330,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Identity suppression & compliance checks",
       "CRM & pipeline attribution telemetry",
     ],
-    targetAudience: "Founders, growth leads, CROs, and agencies scaling B2B outbound.",
+    targetAudience:
+      "Founders, growth leads, CROs, and agencies scaling B2B outbound.",
     primaryOfferName: "Revenue Automation Diagnostic",
     sprintOutputs: [
       "Funnel & revenue workflow audit",
@@ -353,7 +361,8 @@ export const SERVICE_OFFERS: ServiceOffer[] = [
       "Risk & failure-mode analysis",
       "Focused technical or clickable prototypes",
     ],
-    targetAudience: "Founders, CTOs, and product leaders evaluating complex AI ideas.",
+    targetAudience:
+      "Founders, CTOs, and product leaders evaluating complex AI ideas.",
     primaryOfferName: "AI Product Discovery Sprint",
     sprintOutputs: [
       "Problem brief & evidence corpus",
@@ -383,6 +392,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "AI agent security testing system that executes multi-turn adversarial campaigns and captures auditable evidence.",
+    serviceId: "ai-security",
+    sectorSlug: "ai-risk",
     capabilities: [
       "Multi-turn conversation campaigns",
       "Durable evidence register",
@@ -395,6 +406,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "Multi-tenant revenue workflow engine connecting research, drafting, human approval gates, dispatch, and attribution.",
+    serviceId: "sales-automation",
+    sectorSlug: "consumer-brands",
     capabilities: [
       "Multi-tenant SaaS tenant isolation",
       "Human approval gate workflow",
@@ -407,6 +420,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Built/Deployed",
     shortDesc:
       "Regulated voice and conversational architecture for Hindi/Hinglish telephony with guardrails and operator handoff.",
+    serviceId: "voice-ai",
+    sectorSlug: "customer-contact",
     capabilities: [
       "Telephony & speech integration",
       "Hindi & Hinglish code-switching",
@@ -419,6 +434,8 @@ export const PRODUCTS_SYSTEMS: ProductSystem[] = [
     evidenceLevel: "Researched/Designed",
     shortDesc:
       "AI-BDR product architecture and research body exploring governed buyer workflows and automated research synthesis.",
+    serviceId: "product-research",
+    sectorSlug: "ai-product-teams",
     capabilities: [
       "Buyer workflow research",
       "Technical architecture specs",
@@ -454,7 +471,8 @@ export const ENGAGEMENT_STEPS: EngagementStep[] = [
     title: "Production implementation",
     duration: "Custom timeline",
     cost: "Milestone-based",
-    commitment: "Milestone by milestone, scoped from the sprint's own findings.",
+    commitment:
+      "Milestone by milestone, scoped from the sprint's own findings.",
     exit: "Stop after any milestone. Code and infrastructure are yours throughout.",
     description:
       "Full-stack development, AI model orchestration, human review gates, operator dashboards, cloud deployment, monitoring, and audit controls.",
@@ -563,3 +581,145 @@ export const FAQS: FaqEntry[] = [
     a: "Yes. We have built integrations across REST APIs, PostgreSQL, Salesforce and HubSpot, Twilio and Exotel telephony, custom webhook architectures, and flat-file and S3 storage.",
   },
 ];
+
+/**
+ * The platform arm (docs/06 §3, §9).
+ *
+ * VipraTech is positioned as platform-plus-service: Foundry is the system, and
+ * the delivery work is the proof it works. The structural move is 8090's — the
+ * factory is never sold as a tool the company does not itself run.
+ *
+ * `Foundry` is a PLACEHOLDER and is deliberately isolated in one constant.
+ * It has not been cleared: Palantir Foundry and Azure AI Foundry occupy
+ * adjacent enterprise-AI territory (docs/07 F7). Changing it is a one-line
+ * edit here, which is why every reference below reads from `name`.
+ */
+export const PLATFORM = {
+  name: "Foundry",
+  eyebrow: "Foundry",
+  headline: "The factory we build your software in.",
+  lead: "Foundry is an agentic software development system. Requirements become specifications, specifications become tested increments, and every artifact carries the record of how it got there. Agents do the volume. Engineers hold the gates.",
+  stagesIntro: {
+    eyebrow: "The build loop",
+    heading: "How a build moves through it",
+    subhead:
+      "Four stages, in order. An engineer stands at the third one, and nothing reaches production without passing it.",
+  },
+  // Ownership and limits are now one section with two columns. Each previously
+  // had its own heading plus a subhead invented to satisfy SectionIntro, above
+  // a single paragraph — two screens of air to say four lines.
+  termsIntro: {
+    eyebrow: "Terms",
+    heading: "What you get, and where this is the wrong tool",
+    subhead:
+      "Both stated before you buy, because the second is what makes the first believable.",
+  },
+  evidenceIntro: {
+    eyebrow: "Evidence",
+    heading: "The systems this team has shipped",
+    subhead:
+      "The reference class sells a factory by showing what came out of it. These carry their own evidence labels, unchanged.",
+  },
+  // Deliberately does NOT claim these were built through Foundry. docs/06 §3
+  // asserts that ("every system in Products & systems was built through
+  // Foundry"), but it is an unconfirmed claim about delivery history, and
+  // 01-brand-guidelines §6 forbids publishing an unverified claim. Naming the
+  // systems and their evidence levels is true today; the stronger provenance
+  // sentence goes in only once the owner confirms it.
+  // Levels are quoted from PRODUCTS rather than restated, so this paragraph
+  // cannot drift above what each system has actually earned
+  // (01-brand-guidelines §6). Latticly is named at Researched/Designed on
+  // purpose: dropping the one that is not yet built would turn an evidence
+  // list into a highlight reel.
+  evidenceNote:
+    "AutoSentinx, MarketingEngine and the Aarav Voice System are Built/Deployed. Latticly is Researched/Designed and is labelled that way wherever it appears. Each system is listed with the level it has earned and never one above it — which is the same rule the gates inside Foundry apply to an increment.",
+  stages: [
+    {
+      id: "specify",
+      stage: "Specify",
+      text: "Workflows, exception states and decision rules are captured as an executable specification, not a document.",
+    },
+    {
+      id: "generate",
+      stage: "Generate",
+      text: "Agents produce implementation and tests against that specification, in reviewable increments.",
+    },
+    {
+      id: "gate",
+      stage: "Gate",
+      text: "An engineer approves every increment. Nothing merges on model confidence alone.",
+    },
+    {
+      id: "evidence",
+      stage: "Evidence",
+      text: "Each artifact ships with its specification, its tests, and the record of who approved it.",
+    },
+  ],
+  ownership: {
+    title: "What you get either way",
+    text: "Source code and infrastructure are yours from the first increment. No runtime lock-in, no proprietary format holding your logic.",
+  },
+  // The site tells visitors when they do not need it. That posture is the most
+  // distinctive thing it owns (S10.4), so the platform page carries it too.
+  limits: {
+    title: "Where Foundry does not help",
+    text: "If the logic is fully deterministic and stable, a rule engine is cheaper and easier to audit. We will say so on the first call.",
+  },
+} as const;
+
+/**
+ * The flagship case study — docs/06 §10, shipped **unattributed**.
+ *
+ * This route was recorded as "blocked on the client naming permission" for
+ * five iterations. That was wrong, and the mistake is worth naming: the
+ * permission gates the client's *name*, not the work.
+ *
+ * `01-brand-guidelines` §6 forbids **fabricated** proof — invented logos,
+ * testimonials, metrics, certifications. Every figure below is real, taken from
+ * the delivery record. And `docs/README` states the fallback outright: until
+ * permission is confirmed it ships as "a scaling FMCG brand". The governance
+ * always allowed this page; I read a gate on the name as a gate on the case.
+ *
+ * So: no client name, no logo, and the URL does not carry the name either —
+ * a slug is publication. Everything else is docs/06 §10 verbatim. When
+ * permission arrives, `client` and the slug are the only edits.
+ */
+export const CASE_STUDY = {
+  slug: "distributor-claims",
+  eyebrow: "Case study · Consumer brands",
+  headline: "Settling distributor claims across 1 lakh outlets.",
+  client: "A scaling FMCG brand — named once written permission is confirmed",
+  scope: "DCP Reconciliation Portal, Phase 1",
+  delivered: "2 months",
+  situation:
+    "Distributors claim margin benefits passed on to retailers. Verifying those claims meant reading handwritten and printed bills, then triangulating them against claim sheets, mapping files and email threads. Benefit caps, SKU variations, rate changes and special approvals all had to be held in someone's head. Large claims took days.",
+  stages: [
+    {
+      id: "vision",
+      stage: "Vision",
+      text: "Handwritten and printed bills are read and structured.",
+    },
+    {
+      id: "normalisation",
+      stage: "Normalisation",
+      text: "SKUs are normalised, benefit caps assigned, claims matched to bills, and data-quality problems flagged.",
+    },
+    {
+      id: "decision",
+      stage: "Decision",
+      text: "Margin-cap, approval and scheme logic runs, producing a settlement decision with its evidence attached.",
+    },
+  ],
+  portal:
+    "The portal carries finance operations from processing through approval and settlement to raising the credit note.",
+  scale: ["100+ distributors", "120+ SKUs", "1 lakh+ retail outlets", "Extensible to adjacent processes"],
+  outcome:
+    "Around 30% of claims are auto-flagged as duplicates, margin overrides or rate mismatches — the cases that previously required manual triangulation.",
+  target:
+    "Target: 3× faster settlement, large claims from days to hours, regular claims from hours to minutes, and distributor growth decoupled from headcount.",
+  // "Handover complete" read as an evaluative adjective to the copy gate. It
+  // was a factual status rather than a boast, but the ambiguity is real —
+  // "complete" modifies a noun in "a complete platform" and a state here — and
+  // the plainer verb is better English anyway.
+  status: "Handed over. Finance is processing live claims on the system.",
+} as const;

@@ -44,24 +44,81 @@ test.describe('responsive (spec S8.1–S8.5)', () => {
   });
 });
 
-test.describe('motion budget (spec S6.1, S6.3)', () => {
-  test('nothing animates forever, in either motion preference', async ({browser}) => {
-    for (const reducedMotion of ['reduce', 'no-preference'] as const) {
-      const context = await browser.newContext({reducedMotion});
-      const page = await context.newPage();
-      await page.goto('/');
+test.describe('motion budget (spec S6.1-R, S6.1-R.a, S6.3)', () => {
+  /**
+   * This asserted `infinite === []` outright until the spec was amended
+   * (2026-08-17/2). That check could not tell a particle field from a diagram
+   * of a claims pipeline, and banned the second in order to prevent the first.
+   *
+   * It is not relaxed here. Under `reduce` the answer is still zero, exactly as
+   * before. Under `no-preference`, anything that loops must clear every
+   * S6.1-R.a condition — period, easing, animated property, and whether it is
+   * decoration at all — so a looping animation now has *more* to satisfy than
+   * when looping was simply forbidden.
+   */
+  const loops = (page: import('@playwright/test').Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('*')]
+        .filter((el) => {
+          const cs = getComputedStyle(el);
+          return cs.animationName !== 'none' && cs.animationIterationCount === 'infinite';
+        })
+        .map((el) => {
+          const anim = el.getAnimations()[0];
+          const timing = anim?.effect?.getTiming?.() ?? {};
+          let props: string[] = [];
+          try {
+            props = [
+              ...new Set(
+                (anim!.effect as KeyframeEffect)
+                  .getKeyframes()
+                  .flatMap((k) =>
+                    Object.keys(k).filter(
+                      (n) => !['offset', 'computedOffset', 'easing', 'composite'].includes(n),
+                    ),
+                  ),
+              ),
+            ];
+          } catch {
+            props = ['?'];
+          }
+          return {
+            name: getComputedStyle(el).animationName,
+            durationMs: typeof timing.duration === 'number' ? timing.duration : -1,
+            easing: timing.easing ?? '',
+            props,
+            ariaHidden: el.getAttribute('aria-hidden') === 'true',
+            hasText: (el.textContent ?? '').trim().length > 0,
+          };
+        }),
+    );
 
-      const infinite = await page.evaluate(() =>
-        [...document.querySelectorAll('*')]
-          .filter((el) => {
-            const cs = getComputedStyle(el);
-            return cs.animationName !== 'none' && cs.animationIterationCount === 'infinite';
-          })
-          .map((el) => getComputedStyle(el).animationName),
-      );
-      expect(infinite, `infinite animation with reducedMotion=${reducedMotion}`).toEqual([]);
-      await context.close();
+  test('reduced motion stops every loop outright', async ({browser}) => {
+    const context = await browser.newContext({reducedMotion: 'reduce'});
+    const page = await context.newPage();
+    await page.goto('/');
+    expect(await loops(page)).toEqual([]);
+    await context.close();
+  });
+
+  test('any loop that does run is diegetic, never ambient (S6.1-R.a)', async ({browser}) => {
+    const context = await browser.newContext({reducedMotion: 'no-preference'});
+    const page = await context.newPage();
+    await page.goto('/');
+
+    for (const loop of await loops(page)) {
+      const why = `${loop.name} (${loop.durationMs}ms ${loop.easing}, ${loop.props.join('+')})`;
+      // Slow enough to read as system activity rather than blinking.
+      expect(loop.durationMs, `${why}: period must be >= 5s`).toBeGreaterThanOrEqual(5000);
+      // Linear, so no frame is accented and the loop recedes.
+      expect(loop.easing, `${why}: must be linear`).toBe('linear');
+      // Opacity only — geometry would make it ambient decoration by definition.
+      expect(loop.props, `${why}: opacity only`).toEqual(['opacity']);
+      // Decoration, not the information carrier.
+      expect(loop.ariaHidden, `${why}: must be aria-hidden`).toBe(true);
+      expect(loop.hasText, `${why}: must carry no text`).toBe(false);
     }
+    await context.close();
   });
 
   test('reduced motion clamps every transition to 150ms', async ({browser}) => {
@@ -156,5 +213,212 @@ test.describe('core web vitals (spec S9.3, S9.4)', () => {
     expect(lcp!.animated, 'LCP element is animation-gated').toBe(false);
     expect(lcp!.time, 'LCP').toBeLessThan(2000);
     expect(cls, 'CLS').toBeLessThanOrEqual(0.05);
+  });
+});
+
+test.describe('surface elevation (S6.6, family.co)', () => {
+  /**
+   * family.co elevates with an inset ring in the card's own colour rather than
+   * a cast shadow — measured 30 occurrences of `0 0 0 1px inset` against at
+   * most 2 of any drop shadow. The two modes stay distinct here: pressed at
+   * rest, floating on interaction. This asserts both, because a regression
+   * would most likely collapse them into one.
+   */
+  test('cards carry an inset ring at rest and cast only on hover', async ({page}) => {
+    await page.goto('/');
+    const card = page.locator('.lift').first();
+    await card.waitFor();
+
+    const rest = await card.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(rest).toContain('inset');
+    // exactly one shadow at rest: the ring, nothing cast
+    expect(rest.split(',')).toHaveLength(1);
+
+    await card.hover();
+    await page.waitForTimeout(700);
+    const hover = await card.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(hover).toContain('inset');
+    expect(hover.split(',').length).toBeGreaterThan(1);
+  });
+});
+
+test.describe('type scale integrity (spec S4.4)', () => {
+  /**
+   * Regression test for a defect that shipped invisibly for weeks.
+   *
+   * `cn()` was `twMerge(clsx(...))`. tailwind-merge treats `text-lead` — our
+   * custom font-size token — as conflicting with `text-ink-muted`, a colour,
+   * because both begin `text-`. It cannot know otherwise; the token is ours.
+   * So it silently deleted `text-lead` from every section subhead, which
+   * rendered at 16px against the authored 20px.
+   *
+   * Asserts the computed size rather than the class list, because the class
+   * list was exactly what lied: the source said `text-lead` and the DOM did not.
+   */
+  test('section subheads render at the lead size, not body size', async ({page}) => {
+    await page.goto('/');
+    const subheads = page.locator('section p.measure.mt-4');
+    const count = await subheads.count();
+    expect(count).toBeGreaterThan(3);
+
+    const lead = await page.evaluate(() => {
+      const probe = document.createElement('p');
+      probe.className = 'text-lead';
+      document.body.append(probe);
+      const size = getComputedStyle(probe).fontSize;
+      probe.remove();
+      return size;
+    });
+
+    for (let i = 0; i < count; i++) {
+      const size = await subheads.nth(i).evaluate((el) => getComputedStyle(el).fontSize);
+      expect(size, `subhead ${i} must be the lead size`).toBe(lead);
+    }
+  });
+});
+
+test.describe('navigation is reachable at every width (spec S2.1)', () => {
+  /**
+   * Regression test for a defect that shipped from Wave 2 and was invisible to
+   * every gate: the primary nav was `hidden lg:block` with nothing in its
+   * place, so on any viewport under 1024px — phone and tablet both — there was
+   * no way to reach a section, a service page or /platform. Found by rendering
+   * the site at 390px, not by a metric.
+   *
+   * The replacement is a <details> disclosure so it costs no JavaScript;
+   * Trust-class routes are meant to reach 0 kB (docs/07 §8).
+   */
+  for (const width of [390, 768, 1024, 1440]) {
+    test(`every nav link is reachable at ${width}px`, async ({page}) => {
+      await page.setViewportSize({width, height: 900});
+      await page.goto('/');
+
+      const disclosure = page.locator('header details');
+      if (await disclosure.isVisible()) {
+        await disclosure.locator('summary').click();
+      }
+
+      const nav = page.getByRole('navigation', {name: 'Primary'});
+      const links = nav.getByRole('link');
+      const labels = (await links.allTextContents()).map((t) => t.trim()).filter(Boolean);
+
+      // Both layouts render the same six links; only one set is visible.
+      expect(new Set(labels).size).toBe(6);
+      for (const link of await links.all()) {
+        if (await link.isVisible()) {
+          const box = await link.boundingBox();
+          expect(box!.height, 'nav links stay above the 44px target floor').toBeGreaterThanOrEqual(44);
+        }
+      }
+    });
+  }
+
+  test('the header stays one row at 390px', async ({page}) => {
+    // Adding the mobile Menu squeezed the header CTA into four lines. The
+    // wordmark is hidden under sm to buy the space back; this pins the outcome
+    // rather than the mechanism.
+    await page.setViewportSize({width: 390, height: 844});
+    await page.goto('/');
+    const header = page.locator('header');
+    const height = (await header.boundingBox())!.height;
+    expect(height, 'header must not wrap onto a second row').toBeLessThan(90);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+
+  test('the site name survives hiding the wordmark', async ({page}) => {
+    await page.setViewportSize({width: 390, height: 844});
+    await page.goto('/');
+    // Visually hidden, still in the accessibility tree.
+    await expect(page.locator('header').getByText('VipraTech Labs', {exact: true}).first()).toBeAttached();
+  });
+});
+
+test.describe('diegetic motion costs what it claims (spec S6.1-R.a)', () => {
+  /**
+   * S6.1-R.a originally required diegetic motion to "pause off-screen". I wrote
+   * that condition, shipped an effect, and asserted compliance in a code comment
+   * without measuring it. Measured, it is false: a CSS animation's playState
+   * stays `running` when scrolled out of view, and CSS has no way to pause on
+   * visibility without becoming scroll-driven, which would change what the
+   * effect is.
+   *
+   * The condition was inherited from S6.5, which was written for canvas/rAF
+   * loops — those genuinely burn CPU regardless of visibility. A compositor
+   * opacity animation does not. So the requirement worth enforcing is not
+   * "pauses" but "costs almost nothing either way", and that is measurable.
+   *
+   * Budget is deliberately loose: this catches an effect that starts doing
+   * main-thread work, not millisecond drift.
+   */
+  test('the schematic costs no more off-screen than in view', async ({page, browserName}) => {
+    test.skip(browserName !== 'chromium', 'CDP Performance domain is Chromium-only');
+
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Performance.enable');
+    await page.goto('/platform/');
+    await page.waitForSelector('.flow-node');
+
+    const metrics = async () =>
+      Object.fromEntries(
+        (await cdp.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]),
+      );
+
+    const sampleWindow = async () => {
+      const before = await metrics();
+      await page.waitForTimeout(3000);
+      const after = await metrics();
+      return {
+        recalcMs: (after.RecalcStyleDuration - before.RecalcStyleDuration) * 1000,
+        layoutMs: (after.LayoutDuration - before.LayoutDuration) * 1000,
+        scriptMs: (after.ScriptDuration - before.ScriptDuration) * 1000,
+      };
+    };
+
+    const inView = await sampleWindow();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(800);
+    const offScreen = await sampleWindow();
+
+    // Layout must be untouched in both: opacity-only motion cannot reflow.
+    expect(inView.layoutMs).toBeLessThan(1);
+    expect(offScreen.layoutMs).toBeLessThan(1);
+    // And no meaningful main-thread work in either state.
+    for (const [label, m] of [['in view', inView], ['off-screen', offScreen]] as const) {
+      expect(m.recalcMs, `${label} style recalc over 3s`).toBeLessThan(60);
+      expect(m.scriptMs, `${label} script over 3s`).toBeLessThan(60);
+    }
+  });
+});
+
+test.describe('comparison grids scan across (spec S12.4)', () => {
+  /**
+   * The four evidence cards are a comparison grid, and the horizontal rule
+   * inside each is the line the eye scans along. Measured before the fix, those
+   * rules started at four different heights with a 40px spread: the cards were
+   * flex columns with a flex-1 description, which aligns the card *bottoms*
+   * while letting the rule float to wherever the prose ends.
+   *
+   * Subgrid gives every card the same four row tracks, so the tracks size to
+   * the tallest and all four agree. Asserted at lg, where the grid is 4-up;
+   * below that the cards stack and there is nothing to align.
+   */
+  test('the evidence cards align their internal rules', async ({page}) => {
+    await page.setViewportSize({width: 1440, height: 900});
+    await page.goto('/');
+
+    const offsets = await page.evaluate(() =>
+      [...document.querySelectorAll('#products li')]
+        .filter((card) => card.querySelector('ul'))
+        .slice(0, 4)
+        .map((card) =>
+          Math.round(
+            card.querySelector('ul')!.getBoundingClientRect().top -
+              card.getBoundingClientRect().top,
+          ),
+        ));
+
+    expect(offsets).toHaveLength(4);
+    const spread = Math.max(...offsets) - Math.min(...offsets);
+    expect(spread, `capability lists start at ${offsets.join('/')}`).toBeLessThanOrEqual(1);
   });
 });

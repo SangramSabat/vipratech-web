@@ -98,6 +98,14 @@ export interface ProductSystem {
   evidenceLevel: EvidenceLevel;
   shortDesc: string;
   capabilities: string[];
+  /**
+   * The practice this system came out of, and the sector it serves. A stated
+   * judgement rather than a recorded fact — nothing in the delivery history
+   * assigns products to practices, so this is our reading of which capability
+   * each one demonstrates. Used only for navigation, never as a claim.
+   */
+  serviceId: string;
+  sectorSlug: string;
 }
 
 /**
@@ -105,7 +113,12 @@ export interface ProductSystem {
  * into the email summary, but not used in scoring — persona-adaptive content
  * is a separate, deferred decision.
  */
-export type PersonaId = "operations-finance" | "security-risk" | "contact-centre" | "product-cto";
+export type PersonaId =
+  | "consumer-brand"
+  | "operations-finance"
+  | "security-risk"
+  | "contact-centre"
+  | "product-cto";
 
 export interface FitDiagnosticInput {
   workflowType: string;

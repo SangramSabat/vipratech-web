@@ -1,4 +1,6 @@
-import { COMPANY_INFO, SERVICE_OFFERS } from "./data/companyData";
+import { CASE_STUDY, COMPANY_INFO, PLATFORM, SERVICE_OFFERS } from "./data/companyData";
+import { PERSONAS } from "./data/personas";
+import { SECTORS } from "./data/sectors";
 
 /**
  * The site's routes.
@@ -14,8 +16,14 @@ export interface Route {
   path: string;
   title: string;
   description: string;
-  /** Present on service routes, absent on the home route. */
+  /** Present on service routes, absent on every other route. */
   serviceId?: string;
+  /** Motion budget tier (spec S6.1-R). Absent means Narrative. */
+  motionClass?: "trust" | "narrative" | "showcase";
+  /** Present on `/for/*` routes (docs/07 §5). */
+  personaId?: string;
+  /** Present on `/sectors/*` routes (docs/07 §7). */
+  sectorSlug?: string;
 }
 
 export const HOME_ROUTE: Route = {
@@ -32,7 +40,72 @@ const SERVICE_ROUTES: Route[] = SERVICE_OFFERS.map((service) => ({
   description: service.description,
 }));
 
-export const ROUTES: Route[] = [HOME_ROUTE, ...SERVICE_ROUTES];
+/** The platform arm. Class S — the showcase tier (spec S6.1-R). */
+const PLATFORM_ROUTE: Route = {
+  path: "/platform/",
+  title: `${PLATFORM.name} — the AI software factory | ${COMPANY_INFO.shortName}`,
+  description: PLATFORM.lead,
+  motionClass: "showcase",
+};
+
+/**
+ * The gate's destinations (docs/07 §5). Each persona is a real prerendered
+ * document rather than a client-side variant of the home page, so a shared link
+ * lands on it and a crawler can index it.
+ */
+const PERSONA_ROUTES: Route[] = PERSONAS.map((persona) => ({
+  path: `/for/${persona.slug}/`,
+  personaId: persona.id,
+  title: `${persona.label} — ${COMPANY_INFO.shortName}`,
+  description: persona.problem,
+  motionClass: "narrative",
+}));
+
+/** Engagement models and commercial terms. Class T — no decorative motion. */
+const ENGAGE_ROUTE: Route = {
+  path: "/engage/",
+  title: `How to engage — ${COMPANY_INFO.shortName}`,
+  description:
+    "Three stages, each with a fixed scope and a stated exit. Stop after any one and keep everything produced up to that point.",
+  motionClass: "trust",
+};
+
+/** The SEO surface — one document per sector (docs/07 §7). */
+const SECTOR_ROUTES: Route[] = SECTORS.map((sector) => ({
+  path: `/sectors/${sector.slug}/`,
+  sectorSlug: sector.slug,
+  title: `${sector.label} — ${COMPANY_INFO.shortName}`,
+  description: sector.lead,
+  motionClass: "narrative",
+}));
+
+/** The evidence ladder and the systems on it (docs/07 §7). */
+const PRODUCTS_ROUTE: Route = {
+  path: "/products/",
+  title: `Systems and evidence levels — ${COMPANY_INFO.shortName}`,
+  description:
+    "Three evidence labels, used everywhere and never softened, and which systems currently hold each one.",
+  motionClass: "narrative",
+};
+
+/** The flagship case study, unattributed pending naming permission. Class T. */
+const CASE_STUDY_ROUTE: Route = {
+  path: `/work/${CASE_STUDY.slug}/`,
+  title: `${CASE_STUDY.headline} — ${COMPANY_INFO.shortName}`,
+  description: CASE_STUDY.situation.slice(0, 155),
+  motionClass: "trust",
+};
+
+export const ROUTES: Route[] = [
+  HOME_ROUTE,
+  PLATFORM_ROUTE,
+  ENGAGE_ROUTE,
+  PRODUCTS_ROUTE,
+  CASE_STUDY_ROUTE,
+  ...PERSONA_ROUTES,
+  ...SECTOR_ROUTES,
+  ...SERVICE_ROUTES,
+];
 
 export function servicePath(serviceId: string): string {
   return `/services/${serviceId}/`;

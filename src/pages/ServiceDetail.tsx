@@ -38,7 +38,7 @@ export function ServiceDetail({
 
           <div className="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-brand">
+              <p className="font-mono text-xs font-bold uppercase tracking-(--tracking-eyebrow) text-brand">
                 {service.primaryOfferName}
               </p>
               <h1
@@ -67,17 +67,20 @@ export function ServiceDetail({
                 </Button>
               </div>
 
-              <div className="mt-10 rounded-2xl border border-hairline bg-surface/70 p-5">
-                <p className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
-                  Who this is for
-                </p>
-                <p className="mt-2 text-ink-muted">{service.targetAudience}</p>
-              </div>
-
               {/* The concrete failure this practice addresses. Without it every
                   service page opened with the same category-name-plus-features
-                  shape and the five read as one template (S12.3). */}
-              <div className="mt-4 rounded-2xl border-l-2 border-attention/50 border-y border-r border-hairline bg-surface/40 p-5">
+                  shape and the five read as one template (S12.3).
+
+                  It now sits *above* "Who this is for". Measured: every service
+                  page took 41-124 words of main content to reach the reader's
+                  problem, against 8 on the home page (docs/07 §6, P4 — labour
+                  before desire). Qualification is a filter, and a filter placed
+                  before the reader has recognised themselves asks them to opt
+                  in to a problem they have not been shown yet. */}
+              <div
+                data-reader-problem
+                className="mt-10 rounded-2xl border-l-2 border-attention/50 border-y border-r border-hairline bg-surface/40 p-5"
+              >
                 <p className="font-mono text-xs font-bold uppercase tracking-wider text-attention">
                   What this usually looks like
                 </p>
@@ -87,6 +90,13 @@ export function ServiceDetail({
                   <span className="font-semibold text-ink-muted">Why it persists — </span>
                   {service.failureMode.whyItPersists}
                 </p>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-hairline bg-surface/70 p-5">
+                <p className="font-mono text-xs font-bold uppercase tracking-wider text-ink-subtle">
+                  Who this is for
+                </p>
+                <p className="mt-2 text-ink-muted">{service.targetAudience}</p>
               </div>
             </div>
 
